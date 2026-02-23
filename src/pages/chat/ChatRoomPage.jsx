@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useSendMessage, useChatMessages } from '../../query/chatQueries';
 import { chatSocketService } from '../../api/services/chatSocketService';
 import Container from '../../components/common/Container';
@@ -40,6 +40,7 @@ export default function ChatRoomPage() {
   const userType = auth?.userType; // CUSTOMER / OWNER
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchParams] = useSearchParams();
 
@@ -218,8 +219,8 @@ export default function ChatRoomPage() {
 
     navigate(`/shops/${shopInfo.shopId}/reservations/create`, {
       state: {
-        //돌아올 경로 확정(채팅방)
-        returnTo: `/chat/${chatRoomId}`,
+        //돌아올 경로 확정(채팅방) - 현재 쿼리 파라미터 포함
+        returnTo: `/chat/${chatRoomId}${location.search}`,
       },
     });
   };
