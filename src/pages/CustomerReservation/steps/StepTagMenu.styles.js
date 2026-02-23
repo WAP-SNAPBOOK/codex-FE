@@ -12,9 +12,16 @@ export const Divider = styled.hr`
 /* 태그 버튼 영역 */
 export const ButtonGrid = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
   margin-bottom: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
 `;
 
 export const SelectButton = styled.button`
@@ -29,6 +36,7 @@ export const SelectButton = styled.button`
   background-color: ${({ $selected }) => ($selected ? 'rgba(240, 128, 128, 0.1)' : '#fff')};
   color: ${({ $selected }) => ($selected ? theme.colors.primary : '#333')};
   font-size: 15px;
+  white-space: nowrap;
   font-weight: ${({ $selected }) => ($selected ? '600' : '400')};
   cursor: pointer;
   transition:
@@ -41,8 +49,16 @@ export const SelectButton = styled.button`
 export const MenuList = styled.div`
   display: flex;
   flex-direction: column;
+  min-height: 450px;
   height: 450px;
   gap: 10px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
 `;
 
 export const MenuCard = styled.div`
