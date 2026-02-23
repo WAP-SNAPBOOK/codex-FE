@@ -1,8 +1,10 @@
 import { http, HttpResponse } from 'msw';
 
+const BASE = import.meta.env.VITE_API_BASE_URL ?? '';
+
 export const handlers = [
   // 상점별 태그(카테고리) 목록 조회
-  http.get('/api/shops/:shopId/tags', () => {
+  http.get(`${BASE}/api/shops/:shopId/tags`, () => {
     return HttpResponse.json([
       { id: 1, name: '네일' },
       { id: 3, name: '왁싱' },
@@ -10,7 +12,7 @@ export const handlers = [
   }),
 
   // 태그(카테고리)별 메뉴 목록 조회
-  http.get('/api/shops/:shopId/menus', ({ request }) => {
+  http.get(`${BASE}/api/shops/:shopId/menus`, ({ request }) => {
     const url = new URL(request.url);
     const tagIds = url.searchParams.get('tagIds');
 
@@ -21,7 +23,7 @@ export const handlers = [
           shopId: 1,
           name: '젤네일',
           description: '기본 젤네일 시술',
-          isActive: true,
+          isActive: false,
           sortOrder: 1,
         },
         {
