@@ -81,7 +81,7 @@ export const CountControl = styled.div`
   background-color: #f1f3f5;
   border-radius: 14px;
   padding: 6px 8px;
-  align-self: flex-start;
+  align-self: flex-end;
 `;
 
 export const CountNumber = styled.span`
