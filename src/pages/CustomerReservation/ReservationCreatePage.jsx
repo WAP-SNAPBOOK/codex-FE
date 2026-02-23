@@ -4,14 +4,16 @@ import Container from '../../components/common/Container';
 import StepUserInfo from './steps/StepUserInfo';
 import StepDateTime from './steps/StepDateTime';
 import StepPhotoNote from './steps/StepPhotoNote';
+import StepTagMenu from './steps/StepTagMenu';
 import StepOptions from './steps/StepOptions';
 import { NextButton } from '@/components/common/NextButton';
 import backIcon from '@/assets/icons/back-icon.svg';
 import xIcon from '@/assets/icons/X-icon.svg';
 import { useReservationFormHandlers } from './hooks/useReservationFormHandlers';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 export default function ReservationCreatePage() {
+  const { shopId } = useParams();
   const [step, setStep] = useState(1);
   const [canNext, setCanNext] = useState(false);
 
@@ -25,6 +27,10 @@ export default function ReservationCreatePage() {
     photoNote: {
       files: [],
       notes: '',
+    },
+    tagMenu: {
+      tagId: null,
+      menuId: null,
     },
     options: {
       removeYn: '유',
@@ -40,13 +46,18 @@ export default function ReservationCreatePage() {
   const location = useLocation();
 
   //각 예약 단계 폼 입력 헨들러
-  const { handleUserInfoChange, handleDateTimeChange, handlePhotoNoteChange, handleOptionsChange } =
-    useReservationFormHandlers(setFormData, setCanNext);
+  const {
+    handleUserInfoChange,
+    handleDateTimeChange,
+    handlePhotoNoteChange,
+    handleTagMenuChange,
+    handleOptionsChange,
+  } = useReservationFormHandlers(setFormData, setCanNext);
 
   const stepHandlers = {
     1: handleUserInfoChange,
     2: handleDateTimeChange,
-    3: handlePhotoNoteChange,
+    3: handleTagMenuChange,
     4: handleOptionsChange,
   };
 
@@ -117,10 +128,10 @@ export default function ReservationCreatePage() {
           {step === 1 && <StepUserInfo initialData={formData.basic} onChange={stepHandlers[1]} />}
           {step === 2 && <StepDateTime initialData={formData.basic} onChange={stepHandlers[2]} />}
           {step === 3 && (
-            <StepPhotoNote
-              initialData={formData.photoNote}
+            <StepTagMenu
+              shopId={shopId}
+              initialData={formData.tagMenu}
               onChange={stepHandlers[3]}
-              onBack={prev}
             />
           )}
           {step === 4 && <StepOptions initialData={formData.options} onChange={stepHandlers[4]} />}
