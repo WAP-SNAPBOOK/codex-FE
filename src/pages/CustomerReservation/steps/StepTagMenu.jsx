@@ -9,8 +9,8 @@ const MAX = 10;
 
 export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
   const [selectedTagId, setSelectedTagId] = useState(initialData.tagId ?? null);
-  const [selectedMenuId, setSelectedMenuId] = useState(initialData.menuId ?? null);
-  const [menuCount, setMenuCount] = useState(MIN);
+  const [selectedMenuIds, setSelectedMenuIds] = useState(initialData.menuIds ?? []);
+  const [menuCounts, setMenuCounts] = useState(initialData.menuCounts ?? {});
 
   const { data: tags = [], isLoading: tagsLoading } = useShopTags(shopId);
   const { data: menus = [], isLoading: menusLoading } = useMenusByTag(shopId, selectedTagId);
@@ -24,32 +24,41 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
   useEffect(() => {
     onChange({
       tagId: selectedTagId,
-      menuId: selectedMenuId,
-      isValid: selectedTagId !== null && selectedMenuId !== null,
+      menuIds: selectedMenuIds,
+      menuCounts,
+      isValid: selectedTagId !== null && selectedMenuIds.length > 0,
     });
-  }, [selectedTagId, selectedMenuId, onChange]);
+  }, [selectedTagId, selectedMenuIds, menuCounts, onChange]);
 
   const handleTagClick = (tagId) => {
     setSelectedTagId(tagId);
-    setSelectedMenuId(null); // 태그 변경 시 메뉴 초기화
+    setSelectedMenuIds([]);
+    setMenuCounts({});
   };
 
   const handleMenuClick = (menu) => {
     if (!menu.isActive) return;
-    setSelectedMenuId((prev) => {
-      if (prev !== menu.id) setMenuCount(MIN);
-      return prev === menu.id ? null : menu.id;
+    setSelectedMenuIds((prev) =>
+      prev.includes(menu.id) ? prev.filter((id) => id !== menu.id) : [...prev, menu.id]
+    );
+    setMenuCounts((prev) => {
+      if (prev[menu.id]) {
+        const next = { ...prev };
+        delete next[menu.id];
+        return next;
+      }
+      return { ...prev, [menu.id]: MIN };
     });
   };
 
-  const handleMinus = (e) => {
+  const handleMinus = (e, menuId) => {
     e.stopPropagation();
-    setMenuCount((prev) => Math.max(MIN, prev - 1));
+    setMenuCounts((prev) => ({ ...prev, [menuId]: Math.max(MIN, (prev[menuId] ?? MIN) - 1) }));
   };
 
-  const handlePlus = (e) => {
+  const handlePlus = (e, menuId) => {
     e.stopPropagation();
-    setMenuCount((prev) => Math.min(MAX, prev + 1));
+    setMenuCounts((prev) => ({ ...prev, [menuId]: Math.min(MAX, (prev[menuId] ?? MIN) + 1) }));
   };
 
   if (tagsLoading) return <div>로딩 중...</div>;
@@ -82,7 +91,7 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
             <div>메뉴 로딩 중...</div>
           ) : (
             menus.map((menu) => {
-              const isSelected = selectedMenuId === menu.id;
+              const isSelected = selectedMenuIds.includes(menu.id);
               const isDisabled = !menu.isActive;
 
               return (
@@ -92,15 +101,13 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
                     <S.MenuName $disabled={isDisabled}>{menu.name}</S.MenuName>
                     <S.MenuDescription $disabled={isDisabled}>{menu.description}</S.MenuDescription>
                     {isSelected && (
-                      <div className="flex justify-end">
-                        <S.CountControl>
-                          <S.CountButton onClick={handleMinus}>−</S.CountButton>
-                          <S.CountNumber>{menuCount}</S.CountNumber>
-                          <S.CountButton $primary onClick={handlePlus}>
-                            +
-                          </S.CountButton>
-                        </S.CountControl>
-                      </div>
+                      <S.CountControl>
+                        <S.CountButton onClick={(e) => handleMinus(e, menu.id)}>−</S.CountButton>
+                        <S.CountNumber>{menuCounts[menu.id] ?? MIN}</S.CountNumber>
+                        <S.CountButton $primary onClick={(e) => handlePlus(e, menu.id)}>
+                          +
+                        </S.CountButton>
+                      </S.CountControl>
                     )}
                   </S.MenuContent>
                 </S.MenuCard>
