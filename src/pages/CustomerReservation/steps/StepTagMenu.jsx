@@ -16,6 +16,12 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
   const { data: menus = [], isLoading: menusLoading } = useMenusByTag(shopId, selectedTagId);
 
   useEffect(() => {
+    if (!initialData.tagId && tags.length > 0 && selectedTagId === null) {
+      setSelectedTagId(tags[0].id);
+    }
+  }, [tags]);
+
+  useEffect(() => {
     onChange({
       tagId: selectedTagId,
       menuId: selectedMenuId,
