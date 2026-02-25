@@ -62,4 +62,15 @@ export const shopManageService = {
   deactivateMenu: async (shopId, menuId) => {
     await axiosClient.delete(`/api/shops/${shopId}/menus/${menuId}`);
   },
+
+  /**
+   * 메뉴에 태그 연결
+   * @param {number} shopId - 상점 ID (path param)
+   * @param {number} menuId - 메뉴 ID (path param)
+   * @param {number} tagId - 태그 ID
+   * @returns {Promise<void>}
+   */
+  linkMenuTag: async (shopId, menuId, tagId) => {
+    await axiosClient.post(`/api/shops/${shopId}/menus/${menuId}/tags`, { tagId });
+  },
 };

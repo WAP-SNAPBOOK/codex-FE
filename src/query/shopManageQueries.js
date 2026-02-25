@@ -92,3 +92,19 @@ export const useDeactivateShopMenu = () => {
     },
   });
 };
+
+/**
+ * 메뉴에 태그 연결 훅
+ */
+export const useLinkMenuTag = () => {
+  return useMutation({
+    mutationFn: ({ shopId, menuId, tagId }) => shopManageService.linkMenuTag(shopId, menuId, tagId),
+    onSuccess: () => {
+      alert('태그가 연결되었습니다.');
+    },
+    onError: (error) => {
+      console.error('태그 연결 실패:', error);
+      alert('태그 연결 중 오류가 발생했습니다.');
+    },
+  });
+};
