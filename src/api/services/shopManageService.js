@@ -10,4 +10,13 @@ export const shopManageService = {
     const res = await axiosClient.post('/api/tags', { name });
     return res.data;
   },
+
+  /**
+   * 태그(카테고리) 목록 조회
+   * @returns {Promise<Array>} 태그 목록 [{id, name}, ...]
+   */
+  getTags: async () => {
+    const res = await axiosClient.get('/api/tags');
+    return res.data;
+  },
 };

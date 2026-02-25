@@ -1,5 +1,18 @@
-import { useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { shopManageService } from '../api/services/shopManageService';
+
+/**
+ * 태그(카테고리) 생성 훅
+ */
+/**
+ * 태그(카테고리) 목록 조회 훅
+ */
+export const useShopManageTags = () => {
+  return useQuery({
+    queryKey: ['shop-manage-tags'],
+    queryFn: () => shopManageService.getTags(),
+  });
+};
 
 /**
  * 태그(카테고리) 생성 훅
