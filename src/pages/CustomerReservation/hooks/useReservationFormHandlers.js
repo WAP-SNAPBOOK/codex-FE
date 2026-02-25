@@ -37,6 +37,18 @@ export function useReservationFormHandlers(setFormData, setCanNext) {
     [setFormData, setCanNext]
   );
 
+  //태그, 메뉴 선택 헨들러
+  const handleTagMenuChange = useCallback(
+    ({ tagId, menuIds, menuCounts, isValid }) => {
+      setFormData((p) => ({
+        ...p,
+        tagMenu: { tagId, menuIds, menuCounts },
+      }));
+      setCanNext(isValid);
+    },
+    [setFormData, setCanNext]
+  );
+
   //옵션 선택 헨들러
   const handleOptionsChange = useCallback(
     ({ options }) => {
@@ -49,6 +61,7 @@ export function useReservationFormHandlers(setFormData, setCanNext) {
     handleUserInfoChange,
     handleDateTimeChange,
     handlePhotoNoteChange,
+    handleTagMenuChange,
     handleOptionsChange,
   };
 }

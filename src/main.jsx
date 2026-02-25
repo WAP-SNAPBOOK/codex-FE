@@ -4,19 +4,30 @@ import { registerSW } from 'virtual:pwa-register';
 import App from './App.jsx';
 import './index.css';
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+async function bootstrap() {
+  if (import.meta.env.DEV) {
+    const { worker } = await import('./mocks/browser');
+    await worker.start({ onUnhandledRequest: 'bypass' });
+  }
 
-registerSW({
-  onNeedRefresh() {
-    if (confirm('새 버전이 있습니다. 새로고침할까요?')) {
-      window.location.reload();
-    }
-  },
-  onOfflineReady() {
-    console.log('이제 오프라인에서도 사용 가능합니다!');
-  },
-});
+  createRoot(document.getElementById('root')).render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+}
+
+bootstrap();
+
+if (!import.meta.env.DEV) {
+  registerSW({
+    onNeedRefresh() {
+      if (confirm('새 버전이 있습니다. 새로고침할까요?')) {
+        window.location.reload();
+      }
+    },
+    onOfflineReady() {
+      console.log('이제 오프라인에서도 사용 가능합니다!');
+    },
+  });
+}

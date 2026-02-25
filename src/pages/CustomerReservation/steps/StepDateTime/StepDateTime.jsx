@@ -4,7 +4,7 @@ import CalendarMonthControl from '@/components/calendar/CalendarMonthControl';
 import Calendar from '@/components/calendar/Calendar';
 import TimeSlots from '@/components/time/TimeSlots';
 import { formatKoreanDate } from '@/utils/dateTime';
-import * as S from './steps.styles';
+import * as S from '../steps.styles';
 
 export default function StepDateTime({ initialData = {}, onChange }) {
   const [selectedDate, setSelectedDate] = useState(initialData.date ?? null); //선택된 날짜

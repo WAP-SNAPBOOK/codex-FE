@@ -60,4 +60,27 @@ export const reservationService = {
     const res = await axiosClient.get(`/api/reservations/${reservationId}`);
     return res.data;
   },
+
+  /**
+   * 상점별 태그(카테고리) 목록 조회
+   * @param {number} shopId - 상점 ID (path param)
+   * @returns {Promise<Array>} 태그 목록 [{id, name}, ...]
+   */
+  getShopTags: async (shopId) => {
+    const res = await axiosClient.get(`/api/shops/${shopId}/tags`);
+    return res.data;
+  },
+
+  /**
+   * 태그(카테고리)별 메뉴 목록 조회
+   * @param {number} shopId - 상점 ID (path param)
+   * @param {number} tagId - 태그 ID (query param)
+   * @returns {Promise<Array>} 메뉴 목록 [{id, shopId, name, description, isActive, sortOrder}, ...]
+   */
+  getMenusByTag: async (shopId, tagId) => {
+    const res = await axiosClient.get(`/api/shops/${shopId}/menus`, {
+      params: { tagIds: tagId },
+    });
+    return res.data;
+  },
 };
