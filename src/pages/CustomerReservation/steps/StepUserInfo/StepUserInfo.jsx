@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { sanitizeDigits, validateMobile010 } from '@/utils/phoneNumber';
 import userIcon from '@/assets/icons/user-icon_gray.svg';
 import phoneIcon from '@/assets/icons/phone-icon.svg';
-import * as S from './steps.styles';
+import * as S from '../steps.styles';
 
 export default function StepUserInfo({ initialData, onChange }) {
   const [name, setName] = useState(initialData.name ?? '');

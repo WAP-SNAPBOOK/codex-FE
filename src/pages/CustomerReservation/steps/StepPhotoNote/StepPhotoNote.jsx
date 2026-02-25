@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import * as C from './steps.styles';
+import * as C from '../steps.styles';
 import * as S from './stepPhotoNote.style';
 import pictureIcon from '@/assets/icons/picture-icon.svg';
 

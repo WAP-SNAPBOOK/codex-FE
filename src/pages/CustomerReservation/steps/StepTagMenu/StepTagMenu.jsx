@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import * as C from './steps.styles';
+import * as C from '../steps.styles';
 import * as S from './StepTagMenu.styles';
 import RadioButton from '@/components/common/RadioButton';
 import { useShopTags, useMenusByTag } from '@/query/reservationQueries';

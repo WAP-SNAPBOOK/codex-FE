@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import RadioOption from '@/pages/CustomerReservation/steps/RadioOption';
-import * as S from './steps.styles';
+import RadioOption from './RadioOption';
+import * as S from '../steps.styles';
 
 export default function StepOptions({ initialData, onChange }) {
   const [values, setValues] = useState({

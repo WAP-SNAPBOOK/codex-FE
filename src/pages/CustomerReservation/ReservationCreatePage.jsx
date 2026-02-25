@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import * as S from './ReservationCreatePage.styles';
 import Container from '../../components/common/Container';
-import StepUserInfo from './steps/StepUserInfo';
-import StepDateTime from './steps/StepDateTime';
-import StepPhotoNote from './steps/StepPhotoNote';
-import StepTagMenu from './steps/StepTagMenu';
+import StepUserInfo from './steps/StepUserInfo/StepUserInfo';
+import StepDateTime from './steps/StepDateTime/StepDateTime';
+import StepPhotoNote from './steps/StepPhotoNote/StepPhotoNote';
+import StepTagMenu from './steps/StepTagMenu/StepTagMenu';
 import { NextButton } from '@/components/common/NextButton';
 import backIcon from '@/assets/icons/back-icon.svg';
 import xIcon from '@/assets/icons/X-icon.svg';
