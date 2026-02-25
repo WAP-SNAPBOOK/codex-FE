@@ -102,6 +102,20 @@ export const useUnlinkMenuTag = () => {
 /**
  * 메뉴 입력 필드 생성 훅
  */
+/**
+ * 메뉴 입력 필드 조회 훅
+ */
+export const useMenuInputFields = (shopId, menuId) => {
+  return useQuery({
+    queryKey: ['menu-input-fields', shopId, menuId],
+    queryFn: () => menuService.getInputFields(shopId, menuId),
+    enabled: !!shopId && !!menuId,
+  });
+};
+
+/**
+ * 메뉴 입력 필드 생성 훅
+ */
 export const useCreateMenuInputField = () => {
   return useMutation({
     mutationFn: ({ shopId, menuId, ...body }) =>

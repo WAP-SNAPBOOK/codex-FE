@@ -77,4 +77,15 @@ export const menuService = {
     const res = await axiosClient.post(`/api/shops/${shopId}/menus/${menuId}/input-fields`, body);
     return res.data;
   },
+
+  /**
+   * 메뉴 입력 필드 조회
+   * @param {number} shopId - 상점 ID (path param)
+   * @param {number} menuId - 메뉴 ID (path param)
+   * @returns {Promise<Array>} 입력 필드 목록
+   */
+  getInputFields: async (shopId, menuId) => {
+    const res = await axiosClient.get(`/api/shops/${shopId}/menus/${menuId}/input-fields`);
+    return res.data;
+  },
 };
