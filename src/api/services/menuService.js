@@ -65,4 +65,16 @@ export const menuService = {
   unlinkMenuTag: async (shopId, menuId, tagId) => {
     await axiosClient.delete(`/api/shops/${shopId}/menus/${menuId}/tags/${tagId}`);
   },
+
+  /**
+   * 메뉴 입력 필드 생성
+   * @param {number} shopId - 상점 ID (path param)
+   * @param {number} menuId - 메뉴 ID (path param)
+   * @param {Object} body - { label, inputType, required, minValue, maxValue, stepValue, maxLength, placeholder, sortOrder }
+   * @returns {Promise<Object>} 생성된 입력 필드 정보
+   */
+  createInputField: async (shopId, menuId, body) => {
+    const res = await axiosClient.post(`/api/shops/${shopId}/menus/${menuId}/input-fields`, body);
+    return res.data;
+  },
 };
