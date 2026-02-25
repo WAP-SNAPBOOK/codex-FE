@@ -82,3 +82,19 @@ export const useLinkMenuTag = () => {
     },
   });
 };
+
+/**
+ * 태그에서 메뉴 제거 훅
+ */
+export const useUnlinkMenuTag = () => {
+  return useMutation({
+    mutationFn: ({ shopId, menuId, tagId }) => menuService.unlinkMenuTag(shopId, menuId, tagId),
+    onSuccess: () => {
+      alert('메뉴가 태그에서 제거되었습니다.');
+    },
+    onError: (error) => {
+      console.error('태그에서 메뉴 제거 실패:', error);
+      alert('태그에서 메뉴 제거 중 오류가 발생했습니다.');
+    },
+  });
+};

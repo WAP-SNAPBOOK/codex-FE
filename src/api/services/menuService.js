@@ -54,4 +54,15 @@ export const menuService = {
   linkMenuTag: async (shopId, menuId, tagId) => {
     await axiosClient.post(`/api/shops/${shopId}/menus/${menuId}/tags`, { tagId });
   },
+
+  /**
+   * 태그에서 메뉴 제거
+   * @param {number} shopId - 상점 ID (path param)
+   * @param {number} menuId - 메뉴 ID (path param)
+   * @param {number} tagId - 태그 ID (path param)
+   * @returns {Promise<void>}
+   */
+  unlinkMenuTag: async (shopId, menuId, tagId) => {
+    await axiosClient.delete(`/api/shops/${shopId}/menus/${menuId}/tags/${tagId}`);
+  },
 };
