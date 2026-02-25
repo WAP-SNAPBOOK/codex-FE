@@ -5,7 +5,6 @@ import StepUserInfo from './steps/StepUserInfo';
 import StepDateTime from './steps/StepDateTime';
 import StepPhotoNote from './steps/StepPhotoNote';
 import StepTagMenu from './steps/StepTagMenu';
-import StepOptions from './steps/StepOptions';
 import { NextButton } from '@/components/common/NextButton';
 import backIcon from '@/assets/icons/back-icon.svg';
 import xIcon from '@/assets/icons/X-icon.svg';
@@ -24,22 +23,14 @@ export default function ReservationCreatePage() {
       date: '',
       time: '',
     },
-    photoNote: {
-      files: [],
-      notes: '',
-    },
     tagMenu: {
       tagId: null,
       menuIds: [],
       menuCounts: {},
     },
-    options: {
-      removeYn: '유',
-      handFootYn: '손',
-      extYn: '무',
-      extCount: '',
-      wrapYn: '무',
-      wrapCount: '',
+    photoNote: {
+      files: [],
+      notes: '',
     },
   });
 
@@ -47,14 +38,14 @@ export default function ReservationCreatePage() {
   const location = useLocation();
 
   //각 예약 단계 폼 입력 헨들러
-  const { handleUserInfoChange, handleDateTimeChange, handleTagMenuChange, handleOptionsChange } =
+  const { handleUserInfoChange, handleDateTimeChange, handleTagMenuChange, handlePhotoNoteChange } =
     useReservationFormHandlers(setFormData, setCanNext);
 
   const stepHandlers = {
     1: handleUserInfoChange,
     2: handleDateTimeChange,
     3: handleTagMenuChange,
-    4: handleOptionsChange,
+    4: handlePhotoNoteChange,
   };
 
   const handleNextClick = () => {
@@ -130,7 +121,9 @@ export default function ReservationCreatePage() {
               onChange={stepHandlers[3]}
             />
           )}
-          {step === 4 && <StepOptions initialData={formData.options} onChange={stepHandlers[4]} />}
+          {step === 4 && (
+            <StepPhotoNote initialData={formData.photoNote} onChange={stepHandlers[4]} />
+          )}
           <NextButton $width="100%" disabled={step !== 4 && !canNext} onClick={handleNextClick}>
             {step === 4 ? '예약 신청' : '다음 단계로'}
           </NextButton>
