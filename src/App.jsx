@@ -8,7 +8,7 @@ import { AuthProvider } from './context/AuthContext';
 import LoginPage from './pages/login/LoginPage';
 import GlobalStyle from './styles/GlobalStyled';
 import SignupPage from './pages/signup/SignupPage';
-import OwnerSignupPage from './pages/signup/OwnerSignupPage';
+import OwnerSignupPage from './pages/signup/owner/OwnerSignupPage';
 import HomePage from './pages/home/HomePage';
 import { useAuth } from './context/AuthContext';
 import ChatListPage from './pages/chat/ChatListPage';
