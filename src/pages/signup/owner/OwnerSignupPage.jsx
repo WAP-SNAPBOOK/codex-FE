@@ -6,9 +6,16 @@ import { NextButton } from '../../../components/common/NextButton';
 import { useSignupOwner } from '../../../query/signupQueries';
 import { validateMobile010 } from '../../../utils/phoneNumber';
 import StepBasicInfo from './steps/StepBasicInfo/StepBasicInfo';
+import * as S from './OwnerSignupPage.styles';
 
-// 추후 단계 추가 시 TOTAL_STEPS 와 아래 step 렌더링 블록, validateStep, handleNextClick 내 payload 조합 업데이트
-const TOTAL_STEPS = 4;
+// 추후 단계 추가 시 STEPS 배열과 아래 step 렌더링 블록, validateStep, payload 조합을 함께 업데이트
+const STEPS = [
+  { label: '기본\n정보' },
+  { label: '운영시간\n설정' },
+  { label: '휴무일\n설정' },
+  { label: '메뉴\n추가' },
+];
+const TOTAL_STEPS = STEPS.length;
 
 function OwnerSignupPage() {
   const navigate = useNavigate();
@@ -83,17 +90,24 @@ function OwnerSignupPage() {
   return (
     <Container>
       <div className="w-[305px] flex flex-col items-center">
-        {/* 진행 바 */}
-        <div className="w-full flex gap-2 mb-6">
-          {Array.from({ length: TOTAL_STEPS }, (_, i) => (
-            <div
+        {/* 단계 진행 바 */}
+        <S.StepBar>
+          {STEPS.map((s, i) => (
+            <S.StepItemWrapper
               key={i}
-              className={`flex-1 h-2 rounded-full transition-colors duration-300 ${
-                step > i ? 'bg-[#FF8A8A]' : 'bg-[#EEE]'
-              }`}
-            />
+              $first={i === 0}
+              $last={i === STEPS.length - 1}
+              $zIndex={STEPS.length - i}
+            >
+              <S.StepItem
+                $active={step === i + 1}
+                $last={i === STEPS.length - 1}
+              >
+                {s.label}
+              </S.StepItem>
+            </S.StepItemWrapper>
           ))}
-        </div>
+        </S.StepBar>
 
         {step === 1 && <StepBasicInfo initialData={formData.step1} onChange={handleStep1Change} />}
         {/* Step 2 이후: 추후 추가 */}
