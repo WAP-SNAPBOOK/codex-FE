@@ -4,7 +4,7 @@ export default function StepBasicInfo({ initialData, onChange }) {
   return (
     <div className="w-full flex flex-col gap-[15px]">
       <div className="flex flex-col gap-[7px]">
-        <span>이름</span>
+        <span className="font-bold">이름</span>
         <AuthInput
           name="name"
           value={initialData.name}
@@ -14,7 +14,7 @@ export default function StepBasicInfo({ initialData, onChange }) {
         />
       </div>
       <div className="flex flex-col gap-[7px]">
-        <span>전화번호</span>
+        <span className="font-bold">전화번호</span>
         <AuthInput
           name="phoneNumber"
           value={initialData.phoneNumber}
@@ -23,7 +23,7 @@ export default function StepBasicInfo({ initialData, onChange }) {
         />
       </div>
       <div className="flex flex-col gap-[7px]">
-        <span>상호명</span>
+        <span className="font-bold">상호명</span>
         <AuthInput
           name="businessName"
           value={initialData.businessName}
@@ -32,7 +32,7 @@ export default function StepBasicInfo({ initialData, onChange }) {
         />
       </div>
       <div className="flex flex-col gap-[7px]">
-        <span>주소</span>
+        <span className="font-bold">주소</span>
         <AuthInput
           name="address"
           value={initialData.address}
