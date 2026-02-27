@@ -3,6 +3,7 @@ import { signupService } from '../api/services/signupService';
 import { authStorage } from '../utils/auth/authStorage';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
 export const useSignupCustomer = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -29,32 +30,20 @@ export const useSignupCustomer = () => {
   });
 };
 
+// 점주 회원가입: signupOwner → 토큰 저장 → registerShopInfo 순차 호출
 export const useSignupOwner = () => {
   const { login } = useAuth();
-  const navigate = useNavigate();
+
   return useMutation({
-    mutationFn: (payload) => signupService.signupOwner(payload),
-    onSuccess: (data) => {
-      //점주로 회원가입 성공시 기존 데이터 다 날리기
-      authStorage.clear();
-
-      //사용자 정보 전역 상태 + 스토리지 저장
-      login(data);
-
-      //추가 정보(가게 등록) 페이지로 이동
-      navigate('/signup/owner/shop-info', { state: { isSignupRequired: true } });
+    mutationFn: async ({ name, phoneNumber, businessName, address }) => {
+      const ownerData = await signupService.signupOwner({ name, phoneNumber });
+      // registerShopInfo가 인증을 요구하므로 먼저 토큰 저장
+      authStorage.save(ownerData);
+      await signupService.registerShopInfo({ businessName, address });
+      return ownerData;
     },
-  });
-};
-
-// 점주 추가정보 등록 (가게 정보 등록)
-export const useRegisterShopInfo = () => {
-  const navigate = useNavigate();
-
-  return useMutation({
-    mutationFn: (payload) => signupService.registerShopInfo(payload),
-    onSuccess: () => {
-      navigate('/');
+    onSuccess: (ownerData) => {
+      login(ownerData);
     },
   });
 };
