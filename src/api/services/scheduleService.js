@@ -27,4 +27,18 @@ export const scheduleService = {
     );
     return res.data;
   },
+
+  /**
+   * 운영시간 조회
+   * @param {number} shopId - 매장 ID (path param)
+   * @returns {Promise<Object>} 운영시간 데이터
+   *   scheduleType: 'DAILY' | 'WEEKDAY_WEEKEND' | 'BY_DAY'
+   *   + scheduleType에 따라 times / weekdayTimes+weekendTimes / dayTimes 포함
+   */
+  getOperatingTimes: async (shopId) => {
+    const res = await axiosClient.get(
+      `/api/v1/shops/${shopId}/schedule/operating-times`
+    );
+    return res.data;
+  },
 };

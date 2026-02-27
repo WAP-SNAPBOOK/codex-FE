@@ -1,5 +1,16 @@
-import { useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { scheduleService } from '../api/services/scheduleService';
+
+/**
+ * 운영시간 조회 훅
+ */
+export const useOperatingTimes = (shopId) => {
+  return useQuery({
+    queryKey: ['operating-times', shopId],
+    queryFn: () => scheduleService.getOperatingTimes(shopId),
+    enabled: !!shopId,
+  });
+};
 
 /**
  * 운영시간 설정 훅
