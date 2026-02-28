@@ -39,7 +39,7 @@ export default function StepOperatingHours({ initialData, onChange }) {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full mb-[30px]">
       {/* 시간 간격 */}
       <S.SectionTitle>
         예약 받는 시간 간격은
