@@ -97,8 +97,8 @@ function OwnerSignupPage() {
   const isLastStep = step === TOTAL_STEPS;
 
   return (
-    <Container>
-      <div className="w-[305px] flex flex-col items-center">
+    <Container $start>
+      <div className="w-[305px] flex flex-col items-center pt-[40px]">
         {/* 단계 진행 바 */}
         <S.StepBar>
           {STEPS.map((s, i) => (
