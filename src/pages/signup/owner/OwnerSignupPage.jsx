@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SignupTitle } from '../../../components/title/SignupTitle';
 import Container from '../../../components/common/Container';
 import { NextButton } from '../../../components/common/NextButton';
 import { useSignupOwner } from '../../../query/signupQueries';
 import { validateMobile010 } from '../../../utils/phoneNumber';
 import StepBasicInfo from './steps/StepBasicInfo/StepBasicInfo';
+import StepOperatingHours from './steps/StepOperatingHours/StepOperatingHours';
 import * as S from './OwnerSignupPage.styles';
 
 // 추후 단계 추가 시 STEPS 배열과 아래 step 렌더링 블록, validateStep, payload 조합을 함께 업데이트
@@ -25,7 +25,13 @@ function OwnerSignupPage() {
   // 각 단계의 입력값을 부모에서 관리 → 뒤로가기 시 입력값 유지
   const [formData, setFormData] = useState({
     step1: { name: '', phoneNumber: '', businessName: '', address: '' },
-    // step2: { ... }, // 추후 단계 추가 시 확장
+    step2: {
+      slotInterval: '30',
+      scheduleType: 'DAILY',
+      times: [{ start: '09:00', end: '20:00' }],
+      weekdayTimes: [{ start: '09:00', end: '18:00' }],
+      weekendTimes: [{ start: '10:00', end: '16:00' }],
+    },
   });
 
   const signup = useSignupOwner();
@@ -38,7 +44,10 @@ function OwnerSignupPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, step1: { ...prev.step1, [name]: value } }));
   };
-  // const handleStep2Change = (e) => { ... }; // 추후 추가
+
+  const handleStep2Change = (data) => {
+    setFormData((prev) => ({ ...prev, step2: data }));
+  };
 
   // --- Step별 유효성 검사 ---
   const validateStep = (stepNum) => {
@@ -99,10 +108,7 @@ function OwnerSignupPage() {
               $last={i === STEPS.length - 1}
               $zIndex={STEPS.length - i}
             >
-              <S.StepItem
-                $active={step === i + 1}
-                $last={i === STEPS.length - 1}
-              >
+              <S.StepItem $active={step === i + 1} $last={i === STEPS.length - 1}>
                 {s.label}
               </S.StepItem>
             </S.StepItemWrapper>
@@ -110,8 +116,9 @@ function OwnerSignupPage() {
         </S.StepBar>
 
         {step === 1 && <StepBasicInfo initialData={formData.step1} onChange={handleStep1Change} />}
-        {/* Step 2 이후: 추후 추가 */}
-        {/* {step === 2 && <StepXxx initialData={formData.step2} onChange={handleStep2Change} />} */}
+        {step === 2 && (
+          <StepOperatingHours initialData={formData.step2} onChange={handleStep2Change} />
+        )}
 
         <NextButton disabled={signup.isPending} onClick={handleNextClick} className="mt-[30px]">
           {signup.isPending ? '처리중...' : isLastStep ? '가입하기' : '다음 단계로'}
