@@ -3,6 +3,7 @@ import { signupService } from '../api/services/signupService';
 import { authStorage } from '../utils/auth/authStorage';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useUpdateOperatingTimes } from './scheduleQueries';
 
 export const useSignupCustomer = () => {
   const { login } = useAuth();
@@ -30,6 +31,24 @@ export const useSignupCustomer = () => {
   });
 };
 
+// 점주 회원가입 전체 플로우: 기본정보 → 운영시간 설정
+export const useOwnerSignupFlow = () => {
+  const signup = useSignupOwner();
+  const updateOperatingTimes = useUpdateOperatingTimes();
+
+  const submit = async (step1Data, schedulePayload) => {
+    const { shopId } = await signup.mutateAsync(step1Data); // 1) 점주 기본 정보 회원가입
+    await updateOperatingTimes.mutateAsync({ shopId, ...schedulePayload }); // 2) 운영시간 설정
+  };
+
+  return {
+    submit,
+    isPending: signup.isPending || updateOperatingTimes.isPending,
+    isError: signup.isError || updateOperatingTimes.isError,
+    error: signup.error || updateOperatingTimes.error,
+  };
+};
+
 // 점주 회원가입: signupOwner → 토큰 저장 → registerShopInfo 순차 호출
 export const useSignupOwner = () => {
   const { login } = useAuth();
@@ -39,10 +58,10 @@ export const useSignupOwner = () => {
       const ownerData = await signupService.signupOwner({ name, phoneNumber });
       // registerShopInfo가 인증을 요구하므로 먼저 토큰 저장
       authStorage.save(ownerData);
-      await signupService.registerShopInfo({ businessName, address });
-      return ownerData;
+      const shopInfo = await signupService.registerShopInfo({ businessName, address });
+      return { ...ownerData, shopId: shopInfo.shopId };
     },
-    onSuccess: (ownerData) => {
+    onSuccess: ({ shopId: _shopId, ...ownerData }) => {
       login(ownerData);
     },
   });
