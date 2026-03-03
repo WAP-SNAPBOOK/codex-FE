@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Container from '../../../components/common/Container';
 import { NextButton } from '../../../components/common/NextButton';
-import { useSignupOwner } from '../../../query/signupQueries';
+import { useOwnerSignupFlow } from '../../../query/signupQueries';
 import { validateMobile010 } from '../../../utils/phoneNumber';
 import StepBasicInfo from './steps/StepBasicInfo/StepBasicInfo';
 import StepOperatingHours from './steps/StepOperatingHours/StepOperatingHours';
@@ -16,9 +16,19 @@ const STEPS = [
   { label: '메뉴\n추가' },
 ];
 const TOTAL_STEPS = STEPS.length;
+// 추후 단계 구현 시 TOTAL_STEPS로 변경
+const SUBMIT_AT_STEP = 2;
 
 function OwnerSignupPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isSignupRequired = location.state?.isSignupRequired;
+
+  useEffect(() => {
+    //비인가된 접근 시 홈으로
+    if (!isSignupRequired) navigate('/');
+  }, [navigate]);
 
   const [step, setStep] = useState(1);
 
@@ -35,7 +45,7 @@ function OwnerSignupPage() {
     },
   });
 
-  const signup = useSignupOwner();
+  const ownerSignup = useOwnerSignupFlow();
 
   const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   const prev = () => setStep((s) => Math.max(s - 1, 1));
@@ -73,16 +83,17 @@ function OwnerSignupPage() {
   };
 
   // 다음 단계 or 최종 제출
-  const handleNextClick = () => {
+  const handleNextClick = async () => {
     if (!validateStep(step)) return;
 
-    if (step < TOTAL_STEPS) {
+    if (step < SUBMIT_AT_STEP) {
       next();
       return;
     }
 
     // scheduleType에 따라 관련 시간 필드만 포함
-    const { slotInterval, scheduleType, times, weekdayTimes, weekendTimes, dayTimes } = formData.step2;
+    const { slotInterval, scheduleType, times, weekdayTimes, weekendTimes, dayTimes } =
+      formData.step2;
     const schedulePayload =
       scheduleType === 'DAILY'
         ? { slotInterval, scheduleType, times }
@@ -90,21 +101,16 @@ function OwnerSignupPage() {
           ? { slotInterval, scheduleType, weekdayTimes, weekendTimes }
           : { slotInterval, scheduleType, dayTimes };
 
-    // 마지막 단계: 모든 step 데이터를 조합해서 API 호출
-    const payload = {
-      ...formData.step1,
-      ...schedulePayload,
-    };
-
-    signup.mutate(payload, {
-      onSuccess: () => {
-        // TODO: 모든 단계 완료 후 이동할 경로로 변경
-        navigate('/');
-      },
-    });
+    try {
+      await ownerSignup.submit(formData.step1, schedulePayload);
+      navigate('/');
+    } catch {
+      // 에러는 ownerSignup.isError로 표시
+    }
   };
 
-  const isLastStep = step === TOTAL_STEPS;
+  const isLastStep = step === SUBMIT_AT_STEP;
+  const { isPending } = ownerSignup;
 
   return (
     <Container $start>
@@ -130,11 +136,13 @@ function OwnerSignupPage() {
           <StepOperatingHours initialData={formData.step2} onChange={handleStep2Change} />
         )}
 
-        <NextButton disabled={signup.isPending} onClick={handleNextClick} className="mt-auto">
-          {signup.isPending ? '처리중...' : isLastStep ? '가입하기' : '다음 단계로'}
+        <NextButton disabled={isPending} onClick={handleNextClick} className="mt-auto">
+          {isPending ? '처리중...' : isLastStep ? '가입하기' : '다음 단계로'}
         </NextButton>
 
-        {signup.isError && <p style={{ color: 'red' }}>가입 실패: {signup.error?.message}</p>}
+        {ownerSignup.isError && (
+          <p style={{ color: 'red' }}>가입 실패: {ownerSignup.error?.message}</p>
+        )}
       </div>
     </Container>
   );
