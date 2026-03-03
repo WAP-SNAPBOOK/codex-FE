@@ -22,3 +22,13 @@ export const useUpdateOperatingTimes = () => {
       scheduleService.updateOperatingTimes(shopId, payload),
   });
 };
+
+/**
+ * 예약 슬롯 간격 설정 훅
+ */
+export const useUpdateSlotInterval = () => {
+  return useMutation({
+    mutationFn: ({ shopId, intervalMinutes }) =>
+      scheduleService.updateSlotInterval(shopId, intervalMinutes),
+  });
+};

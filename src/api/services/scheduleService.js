@@ -29,6 +29,18 @@ export const scheduleService = {
   },
 
   /**
+   * 예약 슬롯 간격 설정
+   * @param {number} shopId - 매장 ID (path param)
+   * @param {number} intervalMinutes - 슬롯 간격 (분)
+   */
+  updateSlotInterval: async (shopId, intervalMinutes) => {
+    const res = await axiosClient.put(`/api/v1/shops/${shopId}/schedule/interval`, {
+      intervalMinutes,
+    });
+    return res.data;
+  },
+
+  /**
    * 운영시간 조회
    * @param {number} shopId - 매장 ID (path param)
    * @returns {Promise<Object>} 운영시간 데이터
