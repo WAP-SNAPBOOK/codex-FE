@@ -7,6 +7,7 @@ import { validateMobile010 } from '../../../utils/phoneNumber';
 import StepBasicInfo from './steps/StepBasicInfo/StepBasicInfo';
 import StepOperatingHours from './steps/StepOperatingHours/StepOperatingHours';
 import StepHolidays from './steps/StepHolidays/StepHolidays';
+import StepMenuSetup from './steps/StepMenuSetup/StepMenuSetup';
 import * as S from './OwnerSignupPage.styles';
 
 // 추후 단계 추가 시 STEPS 배열과 아래 step 렌더링 블록, validateStep, payload 조합을 함께 업데이트
@@ -17,8 +18,7 @@ const STEPS = [
   { label: '메뉴\n추가' },
 ];
 const TOTAL_STEPS = STEPS.length;
-// 추후 단계 구현 시 TOTAL_STEPS로 변경
-const SUBMIT_AT_STEP = 3;
+const SUBMIT_AT_STEP = TOTAL_STEPS;
 
 function OwnerSignupPage() {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ function OwnerSignupPage() {
     if (!isSignupRequired) navigate('/');
   }, [navigate]);
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(4);
 
   // 각 단계의 입력값을 부모에서 관리 → 뒤로가기 시 입력값 유지
   const [formData, setFormData] = useState({
@@ -47,6 +47,9 @@ function OwnerSignupPage() {
     step3: {
       publicHolidayOff: false,
       holidays: [],
+    },
+    step4: {
+      items: [],
     },
   });
 
@@ -67,6 +70,10 @@ function OwnerSignupPage() {
 
   const handleStep3Change = (data) => {
     setFormData((prev) => ({ ...prev, step3: data }));
+  };
+
+  const handleStep4Change = (data) => {
+    setFormData((prev) => ({ ...prev, step4: data }));
   };
 
   // --- Step별 유효성 검사 ---
@@ -111,7 +118,12 @@ function OwnerSignupPage() {
           : { slotInterval, scheduleType, dayTimes };
 
     try {
-      await ownerSignup.submit(formData.step1, schedulePayload, formData.step3);
+      await ownerSignup.submit(
+        formData.step1,
+        schedulePayload,
+        formData.step3,
+        formData.step4.items
+      );
       navigate('/');
     } catch {
       // 에러는 ownerSignup.isError로 표시
@@ -144,9 +156,8 @@ function OwnerSignupPage() {
         {step === 2 && (
           <StepOperatingHours initialData={formData.step2} onChange={handleStep2Change} />
         )}
-        {step === 3 && (
-          <StepHolidays initialData={formData.step3} onChange={handleStep3Change} />
-        )}
+        {step === 3 && <StepHolidays initialData={formData.step3} onChange={handleStep3Change} />}
+        {step === 4 && <StepMenuSetup initialData={formData.step4} onChange={handleStep4Change} />}
 
         <NextButton disabled={isPending} onClick={handleNextClick} className="mt-auto">
           {isPending ? '처리중...' : isLastStep ? '가입하기' : '다음 단계로'}
