@@ -162,10 +162,6 @@ function OwnerSignupPage() {
         <NextButton disabled={isPending} onClick={handleNextClick} className="mt-auto">
           {isPending ? '처리중...' : isLastStep ? '가입하기' : '다음 단계로'}
         </NextButton>
-
-        {ownerSignup.isError && (
-          <p style={{ color: 'red' }}>가입 실패: {ownerSignup.error?.message}</p>
-        )}
       </div>
     </Container>
   );
