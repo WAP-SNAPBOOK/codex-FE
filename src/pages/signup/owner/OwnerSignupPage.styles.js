@@ -50,7 +50,8 @@ export const StepItem = styled.div`
     position: absolute;
     inset: 1px;
     background: ${({ $active }) => ($active ? 'transparent' : 'white')};
-    border-radius: 0 20px 20px 0;
+    border-radius: ${({ $first, $last }) =>
+      $first ? `${R}px 0 0 ${R}px` : $last ? `0 ${R}px ${R}px 0` : '0'};
     clip-path: ${({ $last }) => chevronPath($last)};
     z-index: -1;
   }

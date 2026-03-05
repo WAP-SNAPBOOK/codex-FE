@@ -145,7 +145,7 @@ function OwnerSignupPage() {
               $last={i === STEPS.length - 1}
               $zIndex={STEPS.length - i}
             >
-              <S.StepItem $active={step === i + 1} $last={i === STEPS.length - 1}>
+              <S.StepItem $active={step === i + 1} $first={i === 0} $last={i === STEPS.length - 1}>
                 {s.label}
               </S.StepItem>
             </S.StepItemWrapper>
