@@ -4,22 +4,18 @@ import { SignupTitle } from '../../components/title/SignupTitle';
 import { AuthInput } from '../../components/auth/AuthInput';
 import Container from '../../components/common/Container';
 import { NextButton } from '../../components/common/NextButton';
-import { useSignupCustomer, useSignupOwner } from '../../query/signupQueries';
+import { useSignupCustomer } from '../../query/signupQueries';
 import { validateMobile010 } from '../../utils/phoneNumber';
 
-function SignupPage({ userType }) {
+// CUSTOMER 전용 회원가입 페이지
+function CustomerSignupPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const isSignupRequired = location.state?.isSignupRequired;
 
   // slug 쿼리값 추출
   const slug = new URLSearchParams(location.search).get('slug');
 
-  // slug 있으면 무조건 CUSTOMER 로 고정 없다면 그대로 진행
-  const effectiveUserType = slug ? 'CUSTOMER' : userType;
-
-  // 타입별 고객, 점주 회원가입 훅 선택
-  const signup = effectiveUserType === 'CUSTOMER' ? useSignupCustomer() : useSignupOwner();
+  const signup = useSignupCustomer();
 
   // 입력폼 상태
   const [formData, setFormData] = useState({
@@ -27,7 +23,9 @@ function SignupPage({ userType }) {
     phoneNumber: '',
   });
 
-  ///비인가된 접근 시 홈으로
+  const isSignupRequired = location.state?.isSignupRequired;
+
+  // 비인가된 접근 시 홈으로
   useEffect(() => {
     if (!isSignupRequired) navigate('/');
   }, [navigate]);
@@ -63,13 +61,6 @@ function SignupPage({ userType }) {
       return;
     }
 
-    // slug 존재 + 점주 회원가입 시도 방지
-    if (slug && userType !== 'CUSTOMER') {
-      alert('링크를 통한 회원가입은 고객만 가능합니다.');
-      navigate('/'); // 홈으로 이동
-      return;
-    }
-
     //회원가입 폼 전달
     signup.mutate(formData);
   };
@@ -77,7 +68,7 @@ function SignupPage({ userType }) {
   return (
     <Container>
       <div className="w-[305px] h-[530px] flex flex-col items-center">
-        <SignupTitle>{userType === 'CUSTOMER' ? '고객 회원가입' : '점주 회원가입'}</SignupTitle>
+        <SignupTitle>고객 회원가입</SignupTitle>
 
         <form onSubmit={onSubmit} className="w-full flex flex-col items-center">
           <label className="w-full block mb-[15px]">
@@ -110,4 +101,4 @@ function SignupPage({ userType }) {
   );
 }
 
-export default SignupPage;
+export default CustomerSignupPage;

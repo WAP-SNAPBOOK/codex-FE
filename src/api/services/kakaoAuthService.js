@@ -28,7 +28,7 @@ export const kakaoAuthService = {
 
   //회원탈퇴
   deleteUser: async () => {
-    const res = await axiosClient.delete('/user');
+    const res = await axiosClient.delete('dev/user');
     return res.data;
   },
 };

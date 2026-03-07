@@ -11,6 +11,7 @@ import BottomNav from '../../components/common/BottomNav';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const deleteUser = useDeleteUser();
 
   //채팅방 목록 이동
   const goToChat = () => {
@@ -32,6 +33,14 @@ export default function HomePage() {
         </S.ButtonGroup>
         <BottomNav />
       </S.CenterArea>
+      {import.meta.env.DEV && (
+        <button
+          onClick={() => deleteUser.mutate()}
+          style={{ position: 'fixed', top: 8, right: 8, fontSize: 11, color: 'gray', zIndex: 9999 }}
+        >
+          [DEV] 회원탈퇴
+        </button>
+      )}
     </Container>
   );
 }

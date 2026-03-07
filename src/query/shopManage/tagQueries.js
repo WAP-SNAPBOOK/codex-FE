@@ -17,9 +17,6 @@ export const useShopManageTags = () => {
 export const useCreateShopTag = () => {
   return useMutation({
     mutationFn: (name) => tagService.createTag(name),
-    onSuccess: () => {
-      alert('태그가 생성되었습니다.');
-    },
     onError: (error) => {
       console.error('태그 생성 실패:', error);
       alert('태그 생성 중 오류가 발생했습니다.');

@@ -7,8 +7,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './context/AuthContext';
 import LoginPage from './pages/login/LoginPage';
 import GlobalStyle from './styles/GlobalStyled';
-import SignupPage from './pages/signup/SignupPage';
-import ShopInfoPage from './pages/signup/ShopInfoPage';
+import CustomerSignupPage from './pages/signup/SignupPage';
+import OwnerSignupPage from './pages/signup/owner/OwnerSignupPage';
 import HomePage from './pages/home/HomePage';
 import { useAuth } from './context/AuthContext';
 import ChatListPage from './pages/chat/ChatListPage';
@@ -54,9 +54,8 @@ function AppRoutes() {
       {/* 인스타 링크 리다이렉트 */}
       <Route path="/s/:slugOrCode" element={<LinkRedirectPage />} />
       <Route path="/signup" element={<SignupGatePage />} />
-      <Route path="/signup/customer" element={<SignupPage userType="CUSTOMER" />} />
-      <Route path="/signup/owner" element={<SignupPage userType="OWNER" />} />
-      <Route path="/signup/owner/shop-info" element={<ShopInfoPage />} />
+      <Route path="/signup/customer" element={<CustomerSignupPage />} />
+      <Route path="/signup/owner" element={<OwnerSignupPage />} />
       <Route path="/chat" element={<ChatListPage />} />
       <Route path="/chat/:chatRoomId" element={<ChatRoomPage />} />
       <Route path="/shops/:shopId/reservations/create" element={<ReservationCreatePage />} />

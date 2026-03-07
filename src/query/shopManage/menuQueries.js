@@ -19,9 +19,6 @@ export const useCreateShopMenu = () => {
   return useMutation({
     mutationFn: ({ shopId, name, description, sortOrder }) =>
       menuService.createMenu(shopId, { name, description, sortOrder }),
-    onSuccess: () => {
-      alert('메뉴가 생성되었습니다.');
-    },
     onError: (error) => {
       const status = error?.response?.status;
       if (status === 409) {
@@ -73,9 +70,6 @@ export const useDeactivateShopMenu = () => {
 export const useLinkMenuTag = () => {
   return useMutation({
     mutationFn: ({ shopId, menuId, tagId }) => menuService.linkMenuTag(shopId, menuId, tagId),
-    onSuccess: () => {
-      alert('태그가 연결되었습니다.');
-    },
     onError: (error) => {
       console.error('태그 연결 실패:', error);
       alert('태그 연결 중 오류가 발생했습니다.');
