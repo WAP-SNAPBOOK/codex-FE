@@ -79,7 +79,7 @@ function OwnerSignupPage() {
     if (step === 2 && !validateStep2(formData.step2)) return;
     if (step === 4 && !validateStep4(formData.step4)) return;
 
-    if (step < SUBMIT_AT_STEP) {
+    if (step < TOTAL_STEPS) {
       next();
       return;
     }
