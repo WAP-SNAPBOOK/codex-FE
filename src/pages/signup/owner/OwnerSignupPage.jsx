@@ -55,7 +55,6 @@ function OwnerSignupPage() {
   const ownerSignup = useOwnerSignupFlow();
 
   const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
-  const prev = () => setStep((s) => Math.max(s - 1, 1));
 
   // --- Step별 onChange ---
   const handleStep1Change = (e) => {
