@@ -16,4 +16,50 @@ export const validateStep1 = ({ name, phoneNumber, businessName, address }) => {
   }
   return true;
 };
-// export const validateStep2 = (step2Data) => true; // 추후 추가
+const ALL_DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+
+// "HH:MM" 문자열 비교로 두 시간 구간이 겹치는지 확인
+const hasOverlap = (slots) => {
+  for (let i = 0; i < slots.length; i++) {
+    for (let j = i + 1; j < slots.length; j++) {
+      if (slots[i].start < slots[j].end && slots[j].start < slots[i].end) return true;
+    }
+  }
+  return false;
+};
+
+export const validateStep2 = ({ scheduleType, times, weekdayTimes, weekendTimes, dayTimes }) => {
+  if (scheduleType === 'DAILY') {
+    if (hasOverlap(times)) {
+      alert('운영 시간이 겹치는 구간이 있습니다.');
+      return false;
+    }
+  }
+
+  if (scheduleType === 'WEEKDAY_WEEKEND') {
+    const errors = [];
+    if (hasOverlap(weekdayTimes)) errors.push('평일 운영 시간이 겹치는 구간이 있습니다.');
+    if (hasOverlap(weekendTimes)) errors.push('주말 운영 시간이 겹치는 구간이 있습니다.');
+    if (errors.length > 0) {
+      alert(errors.join('\n'));
+      return false;
+    }
+  }
+
+  if (scheduleType === 'BY_DAY') {
+    const assignedDays = Object.keys(dayTimes);
+    const missing = ALL_DAYS.filter((d) => !assignedDays.includes(d));
+    if (missing.length > 0) {
+      alert('모든 요일의 운영 시간을 설정해주세요.');
+      return false;
+    }
+    for (const slots of Object.values(dayTimes)) {
+      if (hasOverlap(slots)) {
+        alert('운영 시간이 겹치는 구간이 있습니다.');
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
