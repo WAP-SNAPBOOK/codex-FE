@@ -103,7 +103,7 @@ function OwnerSignupPage() {
       );
       navigate('/');
     } catch {
-      // 에러는 ownerSignup.isError로 표시
+      // submit 내부에서 alert + rollback 처리 완료
     }
   };
 
