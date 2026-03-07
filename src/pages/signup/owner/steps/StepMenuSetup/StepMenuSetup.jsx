@@ -31,16 +31,19 @@ export default function StepMenuSetup({ initialData, onChange }) {
       <S.Input
         placeholder="카테고리"
         value={form.tagName}
+        maxLength={10}
         onChange={(e) => setForm((f) => ({ ...f, tagName: e.target.value }))}
       />
       <S.Input
         placeholder="메뉴명"
         value={form.menuName}
+        maxLength={10}
         onChange={(e) => setForm((f) => ({ ...f, menuName: e.target.value }))}
       />
       <S.Input
         placeholder="설명"
         value={form.description}
+        maxLength={25}
         onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
       />
 
