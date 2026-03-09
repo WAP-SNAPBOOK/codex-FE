@@ -25,7 +25,9 @@ const toGroups = (dayTimes) => {
     const sameDays = Object.entries(dayTimes)
       .filter(([d, t]) => !processed.has(d) && JSON.stringify(t) === key)
       .map(([d]) => d);
-    sameDays.forEach((d) => processed.add(d));
+    sameDays.forEach((d) => {
+      processed.add(d);
+    });
     groups.push({ days: sameDays, times });
   });
   return groups;
