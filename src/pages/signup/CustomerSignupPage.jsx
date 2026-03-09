@@ -12,9 +12,6 @@ function CustomerSignupPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // slug 쿼리값 추출
-  const slug = new URLSearchParams(location.search).get('slug');
-
   const signup = useSignupCustomer();
 
   // 입력폼 상태
