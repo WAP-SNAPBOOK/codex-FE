@@ -123,6 +123,8 @@ function OwnerSignupPage() {
               $zIndex={STEPS.length - i}
               $clickable={i + 1 < step}
               onClick={() => i + 1 < step && setStep(i + 1)}
+              role="button"
+              tabIndex={i + 1 < step ? 0 : -1}
             >
               <S.StepItem $active={step === i + 1} $first={i === 0} $last={i === STEPS.length - 1}>
                 {s.label}
