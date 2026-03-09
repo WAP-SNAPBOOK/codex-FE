@@ -7,10 +7,15 @@ const dropIn = keyframes`
   100% { transform: scale(1); opacity: 1; }
 `;
 
-const Outer = styled.div`
+const Outer = styled.button.attrs(({ $checked }) => ({
+  type: 'button',
+  role: 'radio',
+  'aria-checked': $checked,
+}))`
   flex-shrink: 0;
   width: 22px;
   height: 22px;
+  padding: 0;
   border-radius: 50%;
   border: 2px solid
     ${({ $checked }) => ($checked ? theme.colors.primary : theme.colors.gray.DEFAULT)};
