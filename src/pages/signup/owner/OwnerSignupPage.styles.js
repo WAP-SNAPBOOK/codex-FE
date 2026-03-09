@@ -36,8 +36,8 @@ export const StepItem = styled.div`
   justify-content: center;
   position: relative;
   background: ${({ $active }) => ($active ? '#FF8A8A' : '#EEEEEE')};
-  color: ${({ $active }) => ($active ? '#fff' : '#999')};
-  font-size: 11px;
+  color: ${({ $active }) => ($active ? '#fff' : '#555')};
+  font-size: 12px;
   font-weight: ${({ $active }) => ($active ? '700' : '500')};
   line-height: 1.4;
   white-space: pre-line;
