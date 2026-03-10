@@ -87,7 +87,12 @@ export const scheduleService = {
    * @param {number} shopId - 매장 ID (path param)
    * @param {number} staffId - 스태프 ID (path param)
    * @param {string} yearMonth - 조회 월 (예: '2026-03')
-   * @returns {Promise<Object>} 월별 예약 가능 날짜 데이터
+   * @returns {Promise<{
+   *   yearMonth: string,
+   *   availableDates: number[],
+   *   holidayDates: number[],
+   *   closedDates: number[]
+   * }>}
    */
   getMonthlyAvailability: async (shopId, staffId, yearMonth) => {
     const res = await axiosClient.get(
