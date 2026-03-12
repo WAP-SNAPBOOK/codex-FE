@@ -1,6 +1,3 @@
-// src/components/calendar/Calendar.jsx
-import dayjs from 'dayjs';
-import { useState } from 'react';
 import * as S from './Calendar.style';
 import { getCalendarDays } from './calendar.utils';
 
