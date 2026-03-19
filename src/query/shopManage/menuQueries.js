@@ -110,9 +110,6 @@ export const useMenuInputFields = (shopId, menuId) => {
 export const useCreateMenuInputField = () => {
   return useMutation({
     mutationFn: ({ shopId, menuId, ...body }) => menuService.createInputField(shopId, menuId, body),
-    onSuccess: () => {
-      alert('입력 필드가 생성되었습니다.');
-    },
     onError: (error) => {
       console.error('입력 필드 생성 실패:', error);
       alert('입력 필드 생성 중 오류가 발생했습니다.');
