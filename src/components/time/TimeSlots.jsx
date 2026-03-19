@@ -9,12 +9,20 @@ export default function TimeSlots({ date, value, onSelect, slots }) {
   return (
     <S.TimeGrid>
       {slots
-        .filter((time) => !isPastTime(date, time))
-        .map((time) => (
-          <S.TimeButton key={time} $selected={value === time} onClick={() => onSelect(time)}>
-            {time}
-          </S.TimeButton>
-        ))}
+        .filter(({ time }) => !isPastTime(date, time))
+        .map(({ time, status }) => {
+          const isBooked = status === 'BOOKED';
+          return (
+            <S.TimeButton
+              key={time}
+              $selected={value === time}
+              disabled={isBooked}
+              onClick={() => !isBooked && onSelect(time)}
+            >
+              {time}
+            </S.TimeButton>
+          );
+        })}
     </S.TimeGrid>
   );
 }

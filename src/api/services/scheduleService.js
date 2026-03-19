@@ -109,7 +109,8 @@ export const scheduleService = {
    * @param {string} date - 조회 날짜 (예: '2026-03-05', 'YYYY-MM-DD')
    * @returns {Promise<{
    *   date: string,
-   *   slots: string[],
+   *   intervalMinutes: number,
+   *   slots: { time: string, status: 'AVAILABLE' | 'BOOKED' }[],
    *   holiday: boolean
    * }>}
    */
