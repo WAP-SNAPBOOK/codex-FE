@@ -26,7 +26,7 @@ export default function ReservationCreatePage() {
     tagMenu: {
       tagId: null,
       menuIds: [],
-      menuCounts: {},
+      inputFieldValues: {},
     },
     photoNote: {
       files: [],
