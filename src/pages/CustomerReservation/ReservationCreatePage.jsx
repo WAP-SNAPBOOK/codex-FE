@@ -9,15 +9,14 @@ import { NextButton } from '@/components/common/NextButton';
 import backIcon from '@/assets/icons/back-icon.svg';
 import xIcon from '@/assets/icons/X-icon.svg';
 import { useReservationFormHandlers } from './hooks/useReservationFormHandlers';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useCreateReservation } from '@/query/reservationQueries';
 import { useUploadMultipleFiles } from '@/query/fileQueries';
 
-// TODO: staffId를 동적으로 받아야 함
-const STAFF_ID = 29;
-
 export default function ReservationCreatePage() {
   const { shopId } = useParams();
+  const [searchParams] = useSearchParams();
+  const staffId = Number(searchParams.get('staffId'));
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -107,7 +106,7 @@ export default function ReservationCreatePage() {
 
     const payload = {
       shopId: Number(shopId),
-      staffId: STAFF_ID,
+      staffId: staffId,
       date: basic.date,
       time: basic.time,
       requirements: photoNote.notes || null,
@@ -145,7 +144,7 @@ export default function ReservationCreatePage() {
           {step === 2 && (
             <StepDateTime
               shopId={shopId}
-              staffId={STAFF_ID}
+              staffId={staffId}
               initialData={formData.basic}
               onChange={stepHandlers[2]}
             />

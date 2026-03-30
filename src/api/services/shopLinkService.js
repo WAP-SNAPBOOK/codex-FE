@@ -29,22 +29,22 @@ export const shopLinkService = {
   },
 
   /**
-   * 매장 정보 조회 (공개 링크로 접근 시)
+   * 매장 예약 진입 정보 조회 (공개 링크로 접근 시)
    * @param {string} slugOrCode - 매장 식별 코드
-   * @returns {Promise<{shopId:number, shopName:string}>}
+   * @returns {Promise<{shopId:number, shopName:string, defaultStaffId:number, staffs:Array}>}
    */
   getShopInfoByCode: async (slugOrCode) => {
-    const res = await axiosClient.get(`/shop/${slugOrCode}`);
+    const res = await axiosClient.get(`/api/public/shops/${slugOrCode}/booking-entry`);
     return res.data;
   },
 
   /**
-   * 매장 정보 조회 (shopId 직접 조회)
-   *@param {Number} shopId 매장 아이디
-   * @returns {Promise<{shopId:number, shopName:string}>}
+   * 매장 예약 진입 정보 조회 (shopId 직접 조회)
+   * @param {number} shopId 매장 아이디
+   * @returns {Promise<{shopId:number, shopName:string, defaultStaffId:number, staffs:Array}>}
    */
   getShopInfo: async (shopId) => {
-    const res = await axiosClient.get(`/shop/info/${shopId}`);
+    const res = await axiosClient.get(`/api/v1/shops/${shopId}/booking-entry`);
     return res.data;
   },
 };

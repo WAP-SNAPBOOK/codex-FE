@@ -217,7 +217,10 @@ export default function ChatRoomPage() {
   const handleClickReservation = () => {
     if (!shopInfo?.shopId) return; //shopId 없을 시 예약 진행 X
 
-    navigate(`/shops/${shopInfo.shopId}/reservations/create`, {
+    const staffId = shopInfo.defaultStaffId;
+    const query = staffId ? `?staffId=${staffId}` : '';
+
+    navigate(`/shops/${shopInfo.shopId}/reservations/create${query}`, {
       state: {
         //돌아올 경로 확정(채팅방) - 현재 쿼리 파라미터 포함
         returnTo: `/chat/${chatRoomId}${location.search}`,
