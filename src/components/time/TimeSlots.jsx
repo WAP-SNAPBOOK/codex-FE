@@ -11,7 +11,7 @@ export default function TimeSlots({ date, value, onSelect, slots }) {
       {slots
         .filter(({ time }) => !isPastTime(date, time))
         .map(({ time, status }) => {
-          const isBooked = status === 'BOOKED';
+          const isBooked = status === 'UNAVAILABLE';
           return (
             <S.TimeButton
               key={time}
