@@ -25,7 +25,7 @@ export default function MenuItemCard({ item, idx, isExpanded, onToggle, onRemove
       inputType: fieldForm.inputType,
       required: fieldForm.required,
       placeholder: fieldForm.placeholder || null,
-      sortOrder: item.inputFields.length,
+      sortOrder: item.inputFields.length === 0 ? 0 : Math.max(...item.inputFields.map((f) => f.sortOrder)) + 1,
       ...(fieldForm.inputType === 'NUMBER'
         ? {
             minValue: fieldForm.minValue !== '' ? Number(fieldForm.minValue) : null,
