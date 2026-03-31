@@ -2,15 +2,13 @@ import { useState, useEffect } from 'react';
 import * as C from '../steps.styles';
 import * as S from './StepTagMenu.styles';
 import RadioButton from '@/components/common/RadioButton';
-import CountStepper from './CountStepper';
 import { useShopTags, useMenusByTag } from '@/query/reservationQueries';
-
-const MIN = 1;
+import MenuInputFields from './MenuInputFields';
 
 export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
   const [selectedTagId, setSelectedTagId] = useState(initialData.tagId ?? null);
   const [selectedMenuIds, setSelectedMenuIds] = useState(initialData.menuIds ?? []);
-  const [menuCounts, setMenuCounts] = useState(initialData.menuCounts ?? {});
+  const [inputFieldValues, setInputFieldValues] = useState(initialData.inputFieldValues ?? {});
 
   const { data: tags = [], isLoading: tagsLoading } = useShopTags(shopId);
   const { data: menus = [], isLoading: menusLoading } = useMenusByTag(shopId, selectedTagId);
@@ -25,15 +23,15 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
     onChange({
       tagId: selectedTagId,
       menuIds: selectedMenuIds,
-      menuCounts,
+      inputFieldValues,
       isValid: selectedTagId !== null && selectedMenuIds.length > 0,
     });
-  }, [selectedTagId, selectedMenuIds, menuCounts, onChange]);
+  }, [selectedTagId, selectedMenuIds, inputFieldValues, onChange]);
 
   const handleTagClick = (tagId) => {
     setSelectedTagId(tagId);
     setSelectedMenuIds([]);
-    setMenuCounts({});
+    setInputFieldValues({});
   };
 
   const handleMenuClick = (menu) => {
@@ -41,16 +39,7 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
     setSelectedMenuIds((prev) =>
       prev.includes(menu.id) ? prev.filter((id) => id !== menu.id) : [...prev, menu.id]
     );
-    setMenuCounts((prev) => {
-      if (prev[menu.id]) {
-        const next = { ...prev };
-        delete next[menu.id];
-        return next;
-      }
-      return { ...prev, [menu.id]: MIN };
-    });
   };
-
 
   if (tagsLoading) return <div>로딩 중...</div>;
 
@@ -92,9 +81,16 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
                     <S.MenuName $disabled={isDisabled}>{menu.name}</S.MenuName>
                     <S.MenuDescription $disabled={isDisabled}>{menu.description}</S.MenuDescription>
                     {isSelected && (
-                      <CountStepper
-                        count={menuCounts[menu.id] ?? MIN}
-                        onChange={(val) => setMenuCounts((prev) => ({ ...prev, [menu.id]: val }))}
+                      <MenuInputFields
+                        shopId={shopId}
+                        menuId={menu.id}
+                        values={inputFieldValues[menu.id] ?? {}}
+                        onChange={(fieldId, val) =>
+                          setInputFieldValues((prev) => ({
+                            ...prev,
+                            [menu.id]: { ...prev[menu.id], [fieldId]: val },
+                          }))
+                        }
                       />
                     )}
                   </S.MenuContent>

@@ -88,7 +88,7 @@ export default function StepPhotoNote({ initialData = {}, onChange }) {
         요구사항 <S.Optional>(선택)</S.Optional>
       </C.SectionTitle>
 
-      <S.TextArea
+      <C.TextArea
         placeholder="요구사항을 입력해 주세요"
         value={notes}
         onChange={(e) => setNotes(e.target.value.slice(0, 250))}

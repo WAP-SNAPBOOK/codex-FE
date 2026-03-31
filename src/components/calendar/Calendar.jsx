@@ -1,11 +1,9 @@
-// src/components/calendar/Calendar.jsx
-import dayjs from 'dayjs';
-import { useState } from 'react';
 import * as S from './Calendar.style';
 import { getCalendarDays } from './calendar.utils';
 
-export default function Calendar({ value, currentMonth, onSelect }) {
+export default function Calendar({ value, currentMonth, onSelect, availabilityData }) {
   const days = getCalendarDays(currentMonth);
+  const availableDates = availabilityData?.availableDates ?? null;
 
   return (
     <S.Container>
@@ -22,13 +20,15 @@ export default function Calendar({ value, currentMonth, onSelect }) {
       <S.DayGrid>
         {days.map((day) => {
           const isSelected = value === day.date;
-
+          //이전 달의 패딩 셀, 과거 날짜, api 데이터로 unavailable 한 날짜 비활성화
+          const isUnavailable =
+            !day.date || (availableDates !== null && !availableDates.includes(day.label));
           return (
             <S.DayCell
               key={day.key}
-              disabled={day.disabled}
+              disabled={day.disabled || isUnavailable}
               $selected={isSelected}
-              onClick={() => !day.disabled && onSelect(day.date)}
+              onClick={() => onSelect(day.date)}
             >
               {day.label}
             </S.DayCell>

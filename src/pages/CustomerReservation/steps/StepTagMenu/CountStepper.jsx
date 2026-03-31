@@ -1,17 +1,14 @@
 import * as S from './CountStepper.styles';
 
-const MIN = 1;
-const MAX = 10;
-
-export default function CountStepper({ count = MIN, onChange }) {
+export default function CountStepper({ count = 1, onChange, min = 1, max = 10, step = 1 }) {
   const handleMinus = (e) => {
     e.stopPropagation();
-    onChange(Math.max(MIN, count - 1));
+    onChange(Math.max(min, count - step));
   };
 
   const handlePlus = (e) => {
     e.stopPropagation();
-    onChange(Math.min(MAX, count + 1));
+    onChange(Math.min(max, count + step));
   };
 
   return (

@@ -72,6 +72,15 @@ export const SectionHeader = styled.div`
   margin-bottom: 16px;
 `;
 
+export const TextArea = styled.textarea`
+  width: 100%;
+  min-height: 96px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 12px;
+  resize: none;
+`;
+
 /* 오른쪽에 표시되는 선택된 날짜 */
 export const SelectedDateText = styled.span`
   font-size: 13px;

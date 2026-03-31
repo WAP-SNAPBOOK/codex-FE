@@ -4,12 +4,16 @@ import CalendarMonthControl from '@/components/calendar/CalendarMonthControl';
 import Calendar from '@/components/calendar/Calendar';
 import TimeSlots from '@/components/time/TimeSlots';
 import { formatKoreanDate } from '@/utils/dateTime';
+import { useMonthlyAvailability, useDailyAvailability } from '@/query/scheduleQueries';
 import * as S from '../steps.styles';
 
-export default function StepDateTime({ initialData = {}, onChange }) {
+export default function StepDateTime({ shopId, staffId, initialData = {}, onChange }) {
   const [selectedDate, setSelectedDate] = useState(initialData.date ?? null); //선택된 날짜
   const [selectedTime, setSelectedTime] = useState(initialData.time ?? null); //선택된 시간  //선택된 날짜의 month, 없다면 현재 달
   const [currentMonth, setCurrentMonth] = useState(selectedDate ? dayjs(selectedDate) : dayjs());
+  const yearMonth = currentMonth.format('YYYY-MM');
+  const { data: monthlyData } = useMonthlyAvailability(shopId, staffId, yearMonth);
+  const { data: dailyData } = useDailyAvailability(shopId, staffId, selectedDate);
 
   //이전 달 이동 헨들러
   const goPrevMonth = () => {
@@ -54,13 +58,26 @@ export default function StepDateTime({ initialData = {}, onChange }) {
         />
       </S.SectionHeader>
 
-      <Calendar value={selectedDate} currentMonth={currentMonth} onSelect={setSelectedDate} />
+      <Calendar
+        value={selectedDate}
+        currentMonth={currentMonth}
+        onSelect={(date) => {
+          setSelectedDate(date);
+          setSelectedTime(null);
+        }}
+        availabilityData={monthlyData}
+      />
       <S.SectionTitle>
         시간 선택
         {selectedDate && <S.SelectedDateText>{formatKoreanDate(selectedDate)}</S.SelectedDateText>}
       </S.SectionTitle>
 
-      <TimeSlots date={selectedDate} value={selectedTime} onSelect={setSelectedTime} />
+      <TimeSlots
+        date={selectedDate}
+        value={selectedTime}
+        onSelect={setSelectedTime}
+        slots={dailyData?.slots}
+      />
     </>
   );
 }

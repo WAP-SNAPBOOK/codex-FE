@@ -2,7 +2,6 @@ import dayjs from 'dayjs';
 
 export function getCalendarDays(month) {
   const startOfMonth = month.startOf('month');
-  const endOfMonth = month.endOf('month');
 
   const startDay = startOfMonth.day(); // 0(SUN) ~ 6(SAT)
   const daysInMonth = month.daysInMonth();

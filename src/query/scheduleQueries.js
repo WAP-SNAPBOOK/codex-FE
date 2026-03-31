@@ -51,3 +51,31 @@ export const useCreateHoliday = () => {
     mutationFn: ({ shopId, ...payload }) => scheduleService.createHoliday(shopId, payload),
   });
 };
+
+/**
+ * 월별 예약 가능 캘린더 조회 훅 (고객용)
+ * @param {number} shopId
+ * @param {number} staffId
+ * @param {string} yearMonth - 'YYYY-MM'
+ */
+export const useMonthlyAvailability = (shopId, staffId, yearMonth) => {
+  return useQuery({
+    queryKey: ['monthly-availability', shopId, staffId, yearMonth],
+    queryFn: () => scheduleService.getMonthlyAvailability(shopId, staffId, yearMonth),
+    enabled: !!shopId && !!staffId && !!yearMonth,
+  });
+};
+
+/**
+ * 일별 예약 가능 시간 조회 훅 (고객용)
+ * @param {number} shopId
+ * @param {number} staffId
+ * @param {string} date - 'YYYY-MM-DD'
+ */
+export const useDailyAvailability = (shopId, staffId, date) => {
+  return useQuery({
+    queryKey: ['daily-availability', shopId, staffId, date],
+    queryFn: () => scheduleService.getDailyAvailability(shopId, staffId, date),
+    enabled: !!shopId && !!staffId && !!date,
+  });
+};

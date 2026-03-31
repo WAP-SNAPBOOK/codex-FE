@@ -21,10 +21,7 @@ export const scheduleService = {
    * @returns {Promise<void>}
    */
   updateOperatingTimes: async (shopId, payload) => {
-    const res = await axiosClient.put(
-      `/api/v1/shops/${shopId}/schedule/operating-times`,
-      payload
-    );
+    const res = await axiosClient.put(`/api/v1/shops/${shopId}/schedule/operating-times`, payload);
     return res.data;
   },
 
@@ -76,9 +73,46 @@ export const scheduleService = {
    *   + scheduleType에 따라 times / weekdayTimes+weekendTimes / dayTimes 포함
    */
   getOperatingTimes: async (shopId) => {
+    const res = await axiosClient.get(`/api/v1/shops/${shopId}/schedule/operating-times`);
+    return res.data;
+  },
+
+  /**
+   * 월별 예약 가능 캘린더 조회 (고객용)
+   * @param {number} shopId - 매장 ID (path param)
+   * @param {number} staffId - 스태프 ID (path param)
+   * @param {string} yearMonth - 조회 월 (예: '2026-03')
+   * @returns {Promise<{
+   *   yearMonth: string,
+   *   availableDates: number[],
+   *   holidayDates: number[],
+   *   closedDates: number[]
+   * }>}
+   */
+  getMonthlyAvailability: async (shopId, staffId, yearMonth) => {
     const res = await axiosClient.get(
-      `/api/v1/shops/${shopId}/schedule/operating-times`
+      `/api/v1/shops/${shopId}/staff/${staffId}/availability/monthly`,
+      { params: { yearMonth } }
     );
+    return res.data;
+  },
+
+  /**
+   * 일별 예약 가능 시간 조회 (고객용)
+   * @param {number} shopId - 매장 ID (path param)
+   * @param {number} staffId - 스태프 ID (path param)
+   * @param {string} date - 조회 날짜 (예: '2026-03-05', 'YYYY-MM-DD')
+   * @returns {Promise<{
+   *   date: string,
+   *   intervalMinutes: number,
+   *   slots: { time: string, status: 'AVAILABLE' | 'UNAVAILABLE' }[],
+   *   holiday: boolean
+   * }>}
+   */
+  getDailyAvailability: async (shopId, staffId, date) => {
+    const res = await axiosClient.get(`/api/v1/shops/${shopId}/staff/${staffId}/availability`, {
+      params: { date },
+    });
     return res.data;
   },
 };

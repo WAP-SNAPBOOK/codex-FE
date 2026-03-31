@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import theme from '@/styles/theme';
 
 export const TimeGrid = styled.div`
   display: grid;
@@ -13,6 +14,12 @@ export const TimeButton = styled.button`
   border: 1px solid #eee;
   background: ${({ $selected }) => ($selected ? '#FF8A8A' : '#fff')};
   color: ${({ $selected }) => ($selected ? '#fff' : '#333')};
+
+  &:disabled {
+    background: ${theme.colors.gray[20]};
+    color: ${theme.colors.gray.DEFAULT};
+    cursor: not-allowed;
+  }
 `;
 
 export const HelperText = styled.p`

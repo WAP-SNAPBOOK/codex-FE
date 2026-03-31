@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { shopLinkService } from '../api/services/shopLinkService';
 
 //매장 링크 조회 (점주용)
-export const useShopLink = () => {
+export const useShopLink = (options = {}) => {
   return useQuery({
     queryKey: ['shopLink'],
     queryFn: () => shopLinkService.getShopLink(),
+    ...options,
   });
 };
 

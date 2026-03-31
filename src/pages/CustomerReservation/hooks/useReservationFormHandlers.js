@@ -39,10 +39,10 @@ export function useReservationFormHandlers(setFormData, setCanNext) {
 
   //태그, 메뉴 선택 헨들러
   const handleTagMenuChange = useCallback(
-    ({ tagId, menuIds, menuCounts, isValid }) => {
+    ({ tagId, menuIds, inputFieldValues, isValid }) => {
       setFormData((p) => ({
         ...p,
-        tagMenu: { tagId, menuIds, menuCounts },
+        tagMenu: { tagId, menuIds, inputFieldValues },
       }));
       setCanNext(isValid);
     },

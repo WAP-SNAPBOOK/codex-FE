@@ -60,15 +60,6 @@ export const EmptyPhoto = styled.div`
   font-size: 20px;
 `;
 
-export const TextArea = styled.textarea`
-  width: 100%;
-  min-height: 96px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  padding: 12px;
-  resize: none;
-`;
-
 export const TextCount = styled.div`
   margin: 6px 0px 200px;
   font-size: 12px;

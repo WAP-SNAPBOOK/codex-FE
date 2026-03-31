@@ -10,7 +10,7 @@ import {
   useCreateHoliday,
 } from './scheduleQueries';
 import { useCreateShopTag } from './shopManage/tagQueries';
-import { useCreateShopMenu, useLinkMenuTag } from './shopManage/menuQueries';
+import { useCreateShopMenu, useLinkMenuTag, useCreateMenuInputField } from './shopManage/menuQueries';
 import { useDeleteUser } from './authQueries';
 
 export const useSignupCustomer = () => {
@@ -49,6 +49,7 @@ export const useOwnerSignupFlow = () => {
   const createShopTag = useCreateShopTag();
   const createShopMenu = useCreateShopMenu();
   const linkMenuTag = useLinkMenuTag();
+  const createMenuInputField = useCreateMenuInputField();
   const deleteUser = useDeleteUser();
 
   const submit = async (step1Data, schedulePayload, holidayPayload, menuItems = []) => {
@@ -82,7 +83,7 @@ export const useOwnerSignupFlow = () => {
     const tagMap = {}; // tagName → tagId
     let sortOrder = 1;
     try {
-      for (const { tagName, menuName, description } of menuItems) {
+      for (const { tagName, menuName, description, inputFields = [] } of menuItems) {
         //태그 중복 생성 제어
         if (!tagMap[tagName]) {
           const tag = await createShopTag.mutateAsync(tagName);
@@ -97,6 +98,11 @@ export const useOwnerSignupFlow = () => {
           sortOrder: sortOrder++,
         });
         await linkMenuTag.mutateAsync({ shopId, menuId: menu.id, tagId: tagMap[tagName] });
+
+        // 입력 필드 생성
+        for (const field of inputFields) {
+          await createMenuInputField.mutateAsync({ shopId, menuId: menu.id, ...field });
+        }
       }
     } catch {
       alert('메뉴 설정 중 오류가 발생했습니다. 관리 페이지에서 추가로 설정할 수 있습니다.');
@@ -114,6 +120,7 @@ export const useOwnerSignupFlow = () => {
       createShopTag.isPending ||
       createShopMenu.isPending ||
       linkMenuTag.isPending ||
+      createMenuInputField.isPending ||
       deleteUser.isPending,
     isError:
       signup.isError ||
