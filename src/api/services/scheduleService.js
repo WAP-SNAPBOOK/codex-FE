@@ -21,10 +21,7 @@ export const scheduleService = {
    * @returns {Promise<void>}
    */
   updateOperatingTimes: async (shopId, payload) => {
-    const res = await axiosClient.put(
-      `/api/v1/shops/${shopId}/schedule/operating-times`,
-      payload
-    );
+    const res = await axiosClient.put(`/api/v1/shops/${shopId}/schedule/operating-times`, payload);
     return res.data;
   },
 
@@ -76,9 +73,7 @@ export const scheduleService = {
    *   + scheduleType에 따라 times / weekdayTimes+weekendTimes / dayTimes 포함
    */
   getOperatingTimes: async (shopId) => {
-    const res = await axiosClient.get(
-      `/api/v1/shops/${shopId}/schedule/operating-times`
-    );
+    const res = await axiosClient.get(`/api/v1/shops/${shopId}/schedule/operating-times`);
     return res.data;
   },
 
@@ -110,15 +105,14 @@ export const scheduleService = {
    * @returns {Promise<{
    *   date: string,
    *   intervalMinutes: number,
-   *   slots: { time: string, status: 'AVAILABLE' | 'BOOKED' }[],
+   *   slots: { time: string, status: 'AVAILABLE' | 'UNAVAILABLE' }[],
    *   holiday: boolean
    * }>}
    */
   getDailyAvailability: async (shopId, staffId, date) => {
-    const res = await axiosClient.get(
-      `/api/v1/shops/${shopId}/staff/${staffId}/availability`,
-      { params: { date } }
-    );
+    const res = await axiosClient.get(`/api/v1/shops/${shopId}/staff/${staffId}/availability`, {
+      params: { date },
+    });
     return res.data;
   },
 };
