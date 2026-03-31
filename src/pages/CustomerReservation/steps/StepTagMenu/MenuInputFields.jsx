@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useMenuInputFields } from '@/query/shopManage/menuQueries';
 import CountStepper from './CountStepper';
 import { TextArea } from '@/pages/CustomerReservation/steps/steps.styles';
@@ -7,6 +8,15 @@ export default function MenuInputFields({ shopId, menuId, values, onChange }) {
   const { data: fields = [] } = useMenuInputFields(shopId, menuId);
 
   const activeFields = fields.filter((f) => f.isActive);
+
+  // NUMBER 필드 기본값 초기화 (아직 값이 없는 경우에만)
+  useEffect(() => {
+    activeFields.forEach((field) => {
+      if (field.inputType === 'NUMBER' && !(field.id in values)) {
+        onChange(field.id, field.minValue ?? 1);
+      }
+    });
+  }, [activeFields.length]);
 
   if (activeFields.length === 0) return null;
 
