@@ -61,7 +61,10 @@ export default function StepDateTime({ shopId, staffId, initialData = {}, onChan
       <Calendar
         value={selectedDate}
         currentMonth={currentMonth}
-        onSelect={setSelectedDate}
+        onSelect={(date) => {
+          setSelectedDate(date);
+          setSelectedTime(null);
+        }}
         availabilityData={monthlyData}
       />
       <S.SectionTitle>
