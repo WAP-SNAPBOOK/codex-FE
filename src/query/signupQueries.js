@@ -79,15 +79,15 @@ export const useOwnerSignupFlow = () => {
       throw error;
     }
 
-    // 6) 태그(카테고리) 생성 → 메뉴 생성 → 메뉴-태그 연결 (실패 시 롤백 없음)
-    const tagMap = {}; // tagName → tagId
+    // 6) 상점 태그(카테고리) 생성 → 메뉴 생성 → 메뉴-태그 연결 (실패 시 롤백 없음)
+    const tagMap = {}; // tagName → shopTagId
     let sortOrder = 1;
     try {
       for (const { tagName, menuName, description, inputFields = [] } of menuItems) {
-        //태그 중복 생성 제어
+        // 같은 이름의 상점 태그는 한 번만 만들고 재사용한다.
         if (!tagMap[tagName]) {
-          const tag = await createShopTag.mutateAsync(tagName);
-          tagMap[tagName] = tag.id;
+          const shopTag = await createShopTag.mutateAsync({ shopId, name: tagName });
+          tagMap[tagName] = shopTag.id;
         }
 
         //메뉴 생성
@@ -97,7 +97,11 @@ export const useOwnerSignupFlow = () => {
           description,
           sortOrder: sortOrder++,
         });
-        await linkMenuTag.mutateAsync({ shopId, menuId: menu.id, tagId: tagMap[tagName] });
+        await linkMenuTag.mutateAsync({
+          shopId,
+          menuId: menu.id,
+          shopTagId: tagMap[tagName],
+        });
 
         // 입력 필드 생성
         for (const field of inputFields) {
