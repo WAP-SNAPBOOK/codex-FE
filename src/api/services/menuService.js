@@ -48,22 +48,22 @@ export const menuService = {
    * 메뉴에 태그 연결
    * @param {number} shopId - 상점 ID (path param)
    * @param {number} menuId - 메뉴 ID (path param)
-   * @param {number} tagId - 태그 ID
+   * @param {number} shopTagId - /api/shops/{shopId}/tags 에서 받은 상점 태그 ID
    * @returns {Promise<void>}
    */
-  linkMenuTag: async (shopId, menuId, tagId) => {
-    await axiosClient.post(`/api/shops/${shopId}/menus/${menuId}/tags`, { tagId });
+  linkMenuTag: async (shopId, menuId, shopTagId) => {
+    await axiosClient.post(`/api/shops/${shopId}/menus/${menuId}/tags`, { tagId: shopTagId });
   },
 
   /**
    * 태그에서 메뉴 제거
    * @param {number} shopId - 상점 ID (path param)
    * @param {number} menuId - 메뉴 ID (path param)
-   * @param {number} tagId - 태그 ID (path param)
+   * @param {number} shopTagId - 상점 태그 ID (path param)
    * @returns {Promise<void>}
    */
-  unlinkMenuTag: async (shopId, menuId, tagId) => {
-    await axiosClient.delete(`/api/shops/${shopId}/menus/${menuId}/tags/${tagId}`);
+  unlinkMenuTag: async (shopId, menuId, shopTagId) => {
+    await axiosClient.delete(`/api/shops/${shopId}/menus/${menuId}/tags/${shopTagId}`);
   },
 
   /**
