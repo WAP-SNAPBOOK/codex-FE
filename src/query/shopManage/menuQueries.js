@@ -69,7 +69,8 @@ export const useDeactivateShopMenu = () => {
  */
 export const useLinkMenuTag = () => {
   return useMutation({
-    mutationFn: ({ shopId, menuId, tagId }) => menuService.linkMenuTag(shopId, menuId, tagId),
+    mutationFn: ({ shopId, menuId, shopTagId }) =>
+      menuService.linkMenuTag(shopId, menuId, shopTagId),
     onError: (error) => {
       console.error('태그 연결 실패:', error);
       alert('태그 연결 중 오류가 발생했습니다.');
@@ -82,7 +83,8 @@ export const useLinkMenuTag = () => {
  */
 export const useUnlinkMenuTag = () => {
   return useMutation({
-    mutationFn: ({ shopId, menuId, tagId }) => menuService.unlinkMenuTag(shopId, menuId, tagId),
+    mutationFn: ({ shopId, menuId, shopTagId }) =>
+      menuService.unlinkMenuTag(shopId, menuId, shopTagId),
     onSuccess: () => {
       alert('메뉴가 태그에서 제거되었습니다.');
     },
