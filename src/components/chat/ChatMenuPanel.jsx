@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import reservationListIcon from '../../assets/icons/reservation-list-icon.svg';
-import pictureIcon from '../../assets/icons/picture-icon.svg';
+import chatPhotoIcon from '../../assets/icons/chat-photo-icon.svg';
 import { BaseButton } from '../common/Button';
 
 export default function ChatMenuPanel({ visible, onClickPhoto, isUploadingImage = false }) {
@@ -20,7 +20,7 @@ export default function ChatMenuPanel({ visible, onClickPhoto, isUploadingImage 
           <span>예약 내역</span>
         </MenuActionButton>
         <MenuActionButton $column onClick={onClickPhoto} disabled={isUploadingImage}>
-          <img src={pictureIcon} alt="pictureIcon" />
+          <img src={chatPhotoIcon} alt="chatPhotoIcon" />
           <span>{isUploadingImage ? '전송 중' : '사진 전송'}</span>
         </MenuActionButton>
       </PanelInner>
