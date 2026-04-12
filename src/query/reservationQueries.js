@@ -55,7 +55,7 @@ export const useOwnerChatReservations = (shopId, customerId) => {
  */
 export const useConfirmReservation = () => {
   return useMutation({
-    mutationFn: ({ id, message }) => shopReservationService.confirmReservation(id, message),
+    mutationFn: (payload) => shopReservationService.confirmReservation(payload),
 
     onSuccess: () => {
       alert('예약이 확정되었습니다.');

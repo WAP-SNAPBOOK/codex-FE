@@ -4,6 +4,99 @@ import { shopReservationService } from '../../api/services/shopReservation';
 import { useConfirmReservation, useRejectReservation } from '../../query/reservationQueries';
 import ImageModal from '@/components/modal/ImageModal';
 
+const DURATION_OPTIONS = [
+  { label: '30분', minutes: 30 },
+  { label: '1시간', minutes: 60 },
+  { label: '1시간 30분', minutes: 90 },
+  { label: '2시간', minutes: 120 },
+];
+
+const statusMap = {
+  PENDING: '접수 중',
+  CONFIRMED: '예약 확정',
+  REJECTED: '예약 거절',
+};
+
+const toArray = (value) => (Array.isArray(value) ? value : []);
+
+const normalizeReservationMenus = (menus) =>
+  toArray(menus).map((menu, index) => ({
+    id: menu.shopMenuId ?? `${menu.menuNameSnapshot ?? 'menu'}-${index}`,
+    name: menu.menuNameSnapshot ?? '메뉴',
+    inputValues: toArray(menu.inputValues)
+      .map((inputValue) => {
+        const rawValue =
+          inputValue.valueText ??
+          (typeof inputValue.valueNumber === 'number' ? inputValue.valueNumber : null);
+
+        if (rawValue === null || rawValue === '') {
+          return inputValue.fieldLabelSnapshot;
+        }
+
+        return `${inputValue.fieldLabelSnapshot}: ${rawValue}`;
+      })
+      .filter(Boolean),
+  }));
+
+const normalizeReservation = (item) => {
+  const imageUrls = toArray(item.imageUrls);
+  const legacyPhotoUrls = toArray(item.photoUrls);
+  const normalizedImageUrls = imageUrls.length > 0 ? imageUrls : legacyPhotoUrls;
+
+  return {
+    id: item.id,
+    name: item.customerName,
+    date: item.date,
+    time: item.time,
+    imageUrls: normalizedImageUrls,
+    imageCount: item.imageCount ?? item.photoCount ?? normalizedImageUrls.length,
+    requirements: item.requirements ?? item.requests ?? '',
+    menus: normalizeReservationMenus(item.menus),
+    originalStatus: item.status,
+    confirmationMessage: item.confirmationMessage,
+    rejectionReason: item.rejectionReason,
+  };
+};
+
+const formatTime = (value) => {
+  if (!value) {
+    return '-';
+  }
+
+  const match = String(value).match(/^(\d{2}):(\d{2})/);
+  if (match) {
+    return `${match[1]}:${match[2]}`;
+  }
+
+  return value;
+};
+
+const formatDurationClock = (mins) => {
+  const hours = Math.floor(mins / 60);
+  const minutes = mins % 60;
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+};
+
+const formatDurationLabel = (mins) => {
+  const preset = DURATION_OPTIONS.find((option) => option.minutes === mins);
+  if (preset) {
+    return preset.label;
+  }
+
+  const hours = Math.floor(mins / 60);
+  const minutes = mins % 60;
+
+  if (hours && minutes) {
+    return `${hours}시간 ${minutes}분`;
+  }
+
+  if (hours) {
+    return `${hours}시간`;
+  }
+
+  return `${minutes}분`;
+};
+
 export default function OwnerReservationList() {
   const [reservations, setReservations] = useState([]);
 
@@ -12,30 +105,7 @@ export default function OwnerReservationList() {
     async function fetchData() {
       try {
         const data = await shopReservationService.getShopReservations();
-
-        // FE에서 쓰기 좋은 형태로 변환
-        const formatted = data.map((item) => ({
-          id: item.id,
-          name: item.customerName,
-          date: item.date,
-          time: item.time,
-          photoUrls: item.photoUrls || [],
-          requestText: item.requests || '', // 변경됨
-          part: item.part, // 추가됨
-          removal: item.removal, // 추가됨
-          extendCount: item.extendCount,
-          wrappingCount: item.wrappingCount,
-          extendStatus: item.extendStatus, // 추가됨
-          wrappingStatus: item.wrappingStatus, // 추가됨
-
-          // 상태
-          originalStatus: item.status,
-
-          // 결과 메시지
-          confirmationMessage: item.confirmationMessage,
-          rejectionReason: item.rejectionReason,
-        }));
-        setReservations(formatted);
+        setReservations(data.map(normalizeReservation));
       } catch (err) {
         console.error('예약 데이터를 불러오지 못했습니다:', err);
       }
@@ -57,18 +127,13 @@ export default function OwnerReservationList() {
 }
 
 function ReservationCard({ res }) {
-  const statusMap = {
-    PENDING: '접수 중',
-    CONFIRMED: '예약 확정',
-    REJECTED: '예약 거절',
-  };
-
   const [status, setStatus] = useState(statusMap[res.originalStatus] || '접수 중');
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState(null);
   const [message, setMessage] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
   const [totalMinutes, setTotalMinutes] = useState(60);
+  const [confirmationMessage, setConfirmationMessage] = useState(res.confirmationMessage || '');
+  const [rejectionReason, setRejectionReason] = useState(res.rejectionReason || '');
   const [activeIndex, setActiveIndex] = useState(null); //모달 활성화된 사진 idx
 
   //예약 확정 훅
@@ -80,24 +145,37 @@ function ReservationCard({ res }) {
     setTotalMinutes((prev) => Math.max(30, Math.min(prev + delta, 180)));
   };
 
-  const formatTime = (mins) => {
-    const h = Math.floor(mins / 60);
-    const m = mins % 60;
-    return `${h.toString().padStart(2, '0')}:${m === 0 ? '00' : m}`;
+  const handleConfirm = () => {
+    setMode('confirm');
+    setMessage('');
   };
 
-  const handleConfirm = () => setMode('confirm');
-  const handleReject = () => setMode('reject');
+  const handleReject = () => {
+    setMode('reject');
+    setMessage('');
+  };
 
   const handleSubmit = () => {
+    const trimmedMessage = message.trim();
+
     if (mode === 'confirm') {
-      // 🔥 실제 API 호출 추가됨
+      if (!trimmedMessage) {
+        alert('전달 사항을 입력해주세요.');
+        return;
+      }
+
       confirmReservation(
-        { id: res.id, message },
+        {
+          id: res.id,
+          message: trimmedMessage,
+          durationMinutes: totalMinutes,
+        },
         {
           onSuccess: () => {
             setStatus('예약 확정');
+            setConfirmationMessage(trimmedMessage);
             setMode(null);
+            setMessage('');
           },
         }
       );
@@ -105,12 +183,19 @@ function ReservationCard({ res }) {
     }
 
     if (mode === 'reject') {
+      if (!trimmedMessage) {
+        alert('거절 사유를 입력해주세요.');
+        return;
+      }
+
       rejectReservation(
-        { id: res.id, reason: message },
+        { id: res.id, reason: trimmedMessage },
         {
           onSuccess: () => {
             setStatus('예약 거절');
+            setRejectionReason(trimmedMessage);
             setMode(null);
+            setMessage('');
           },
         }
       );
@@ -153,7 +238,7 @@ function ReservationCard({ res }) {
         </div>
         <div className="info-row">
           <span>예약 시간</span>
-          <span className="pink">{res.time}</span>
+          <span className="pink">{formatTime(res.time)}</span>
         </div>
         <div className="divider indented" />
       </div>
@@ -166,53 +251,56 @@ function ReservationCard({ res }) {
 
       {isOpen && (
         <div className="detail-section">
-          {/* 손/발 / 제거 */}
-          {['손/발', '제거'].map((label) => (
-            <div className="detail-row" key={label}>
-              <span className="detail-key">{label}</span>
-              <div className="detail-values">
-                <span className="yes">유</span>
-                <span className="no">무</span>
+          {res.menus.length > 0 && (
+            <div className="menu-wrap">
+              <span className="detail-key">선택 메뉴</span>
+              <div className="menu-list">
+                {res.menus.map((menu) => (
+                  <div className="menu-item" key={menu.id}>
+                    <span className="menu-name">{menu.name}</span>
+                    {menu.inputValues.length > 0 ? (
+                      <span className="menu-inputs">{menu.inputValues.join(' / ')}</span>
+                    ) : (
+                      <span className="empty-detail">옵션 없음</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-
-          {/* 연장 */}
-          <div className="detail-row">
-            <span className="detail-key">연장</span>
-            <span className="detail-count">{res.extendCount ?? 0}회</span>
-          </div>
-
-          {/* 랩핑 */}
-          <div className="detail-row">
-            <span className="detail-key">랩핑</span>
-            <span className="detail-count">{res.wrappingCount ?? 0}개</span>
-          </div>
+          )}
 
           {/* 사진 */}
           <div className="photo-wrap">
-            <span className="photo-label">사진</span>
-            <div className="photo-list">
-              {res.photoUrls.map((url, i) => (
-                <img
-                  key={i}
-                  src={url}
-                  alt={`photo-${i}`}
-                  onClick={() => setActiveIndex(i)}
-                  className="photo"
-                />
-              ))}
-              {/*예약 사진 모달 활성화*/}
-              {activeIndex !== null && (
-                <ImageModal src={res.photoUrls[activeIndex]} onClose={() => setActiveIndex(null)} />
-              )}
+            <div className="detail-row">
+              <span className="detail-key">이미지</span>
+              <span className="detail-count">{res.imageCount}장</span>
             </div>
+
+            {res.imageUrls.length > 0 ? (
+              <div className="photo-list">
+                {res.imageUrls.map((url, i) => (
+                  <img
+                    key={`${res.id}-photo-${i}`}
+                    src={url}
+                    alt={`photo-${i}`}
+                    onClick={() => setActiveIndex(i)}
+                    className="photo"
+                  />
+                ))}
+                {/*예약 사진 모달 활성화*/}
+                {activeIndex !== null && (
+                  <ImageModal src={res.imageUrls[activeIndex]} onClose={() => setActiveIndex(null)} />
+                )}
+              </div>
+            ) : (
+              <div className="empty-detail">등록된 이미지가 없습니다.</div>
+            )}
           </div>
 
           {/* 요구사항 */}
           <div className="request-wrap">
             <span className="request-label">요구사항</span>
-            <div className="request-box">{res.requestText}</div>
+            <div className="request-box">{res.requirements || '요구사항이 없습니다.'}</div>
             <div className="divider indented" />
           </div>
         </div>
@@ -236,13 +324,13 @@ function ReservationCard({ res }) {
           <div className="divider indented" />
 
           <div className="time-buttons">
-            {['30분', '1시간', '1시간 30분', '2시간'].map((time) => (
+            {DURATION_OPTIONS.map((option) => (
               <button
-                key={time}
-                className={`time-btn ${selectedTime === time ? 'active' : ''}`}
-                onClick={() => setSelectedTime(time)}
+                key={option.minutes}
+                className={`time-btn ${totalMinutes === option.minutes ? 'active' : ''}`}
+                onClick={() => setTotalMinutes(option.minutes)}
               >
-                {time}
+                {option.label}
               </button>
             ))}
           </div>
@@ -253,8 +341,8 @@ function ReservationCard({ res }) {
             </button>
 
             <div className="time-display">
-              <div className="main-time">{formatTime(totalMinutes)}</div>
-              <div className="sub-time">{selectedTime || '시간 선택'}</div>
+              <div className="main-time">{formatDurationClock(totalMinutes)}</div>
+              <div className="sub-time">{formatDurationLabel(totalMinutes)}</div>
             </div>
 
             <button className="circle-btn plus" onClick={() => adjustTime(30)}>
@@ -299,7 +387,7 @@ function ReservationCard({ res }) {
       {status === '예약 확정' && (
         <div className="final-box">
           <strong className="final-title">전달 사항</strong>
-          {res.confirmationMessage || message || '전달사항이 없습니다.'}
+          {confirmationMessage || '전달사항이 없습니다.'}
         </div>
       )}
 
@@ -307,7 +395,7 @@ function ReservationCard({ res }) {
       {status === '예약 거절' && (
         <div className="final-box">
           <strong className="final-title">거절 사유</strong>
-          {res.rejectionReason || message || '사유 없음'}
+          {rejectionReason || '사유 없음'}
         </div>
       )}
     </div>
