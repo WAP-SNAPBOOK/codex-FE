@@ -3,6 +3,67 @@ import './CustomerReservationList.css';
 import { myReservation } from '../../api/services/myReservation';
 import ImageModal from '@/components/modal/ImageModal';
 
+const STATUS_STYLES = {
+  PENDING: { bg: '#ababFF', text: '#3131f7' },
+  CONFIRMED: { bg: '#E6FFE8', text: '#2ECC71' },
+  REJECTED: { bg: '#FFE8E8', text: '#FF5A5A' },
+};
+
+const STATUS_LABELS = {
+  PENDING: '접수중',
+  CONFIRMED: '예약 확정',
+  REJECTED: '예약 거절',
+};
+
+const toArray = (value) => (Array.isArray(value) ? value : []);
+
+const normalizeMenus = (menus) =>
+  toArray(menus).map((menu, index) => ({
+    id: menu.shopMenuId ?? `${menu.menuNameSnapshot ?? 'menu'}-${index}`,
+    name: menu.menuNameSnapshot ?? '메뉴',
+    inputValues: toArray(menu.inputValues)
+      .map((inputValue) => {
+        const rawValue =
+          inputValue.valueText ??
+          (typeof inputValue.valueNumber === 'number' ? inputValue.valueNumber : null);
+
+        if (rawValue === null || rawValue === '') {
+          return inputValue.fieldLabelSnapshot;
+        }
+
+        return `${inputValue.fieldLabelSnapshot}: ${rawValue}`;
+      })
+      .filter(Boolean),
+  }));
+
+const normalizeReservation = (item) => {
+  const imageUrls = toArray(item.imageUrls);
+  const legacyPhotoUrls = toArray(item.photoUrls);
+  const normalizedImageUrls = imageUrls.length > 0 ? imageUrls : legacyPhotoUrls;
+
+  return {
+    ...item,
+    imageUrls: normalizedImageUrls,
+    imageCount: item.imageCount ?? item.photoCount ?? normalizedImageUrls.length,
+    requirements: item.requirements ?? item.requests ?? '',
+    menus: normalizeMenus(item.menus),
+    ownerMessage: item.status === 'REJECTED' ? item.rejectionReason : item.confirmationMessage,
+  };
+};
+
+const formatTime = (value) => {
+  if (!value) {
+    return '-';
+  }
+
+  const match = String(value).match(/^(\d{2}):(\d{2})/);
+  if (match) {
+    return `${match[1]}:${match[2]}`;
+  }
+
+  return value;
+};
+
 export default function CustomerReservationList() {
   const [reservations, setReservations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -14,7 +75,7 @@ export default function CustomerReservationList() {
         setIsLoading(true);
         setError(null);
         const data = await myReservation.getMyReservations();
-        setReservations(Array.isArray(data) ? data : []);
+        setReservations((Array.isArray(data) ? data : []).map(normalizeReservation));
       } catch (err) {
         console.error('예약 내역 불러오기 실패:', err);
         setError('예약 내역을 불러오는데 실패했습니다. 다시 시도해주세요.');
@@ -55,45 +116,14 @@ function ReservationCard({ data }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null); //모달 활성화된 사진 idx
 
-  const STATUS_STYLES = {
-    PENDING: { bg: '#ababFF', text: '#3131f7' },
-    CONFIRMED: { bg: '#E6FFE8', text: '#2ECC71' },
-    REJECTED: { bg: '#FFE8E8', text: '#FF5A5A' },
-  };
-
-  //에약 상태 라벨링
-  const STATUS_LABELS = {
-    PENDING: '접수중',
-    CONFIRMED: '예약 확정',
-    REJECTED: '예약 거절',
-  };
-
   const statusText = STATUS_LABELS[data.status];
-
   const statusStyle = STATUS_STYLES[data.status] || {
     bg: '#eeeeee',
     text: '#555555',
   };
 
-  const timeText = data.time;
-  const photoUrls = Array.isArray(data.photoUrls) ? data.photoUrls : [];
-  const mapYesNoToYn = (v) => {
-    if (v === '예') return '유';
-    if (v === '아니오') return '무';
-    return v ?? '';
-  };
-
-  const isYes = (v) => v === '유' || v === '예';
-
-  const selectedOptions = {
-    hand: data.part ?? '',
-    remove: mapYesNoToYn(data.removal) ?? '',
-    extension: data.extendStatus ?? '',
-    wrap: data.wrappingStatus ?? '',
-    requestText: data.requests ?? '',
-  };
-
-  const ownerMessage = data.status === 'REJECTED' ? data.rejectionReason : data.confirmationMessage;
+  const ownerMessage =
+    data.ownerMessage || (data.status === 'REJECTED' ? '사유 없음' : '전달 사항이 없습니다.');
 
   return (
     <div className="card">
@@ -136,7 +166,7 @@ function ReservationCard({ data }) {
           </div>
           <div className="info-row">
             <span className="label">예약 시간</span>
-            <span className="value-1 highlight">{timeText}</span>
+            <span className="value-1 highlight">{formatTime(data.time)}</span>
           </div>
         </div>
 
@@ -149,57 +179,35 @@ function ReservationCard({ data }) {
 
         {isOpen && (
           <div className="details">
-            {[
-              { key: 'hand', label: '손/발', options: ['손', '발'] },
-              { key: 'remove', label: '제거', options: ['유', '무'] },
-              { key: 'extension', label: '연장', options: ['유', '무'], countKey: 'extendCount' },
-              { key: 'wrap', label: '랩핑', options: ['유', '무'], countKey: 'wrappingCount' },
-            ].map((item) => {
-              const selected = selectedOptions[item.key];
-              const count =
-                item.countKey && typeof data[item.countKey] === 'number' ? data[item.countKey] : 0;
-              const showOptions = !(item.countKey && isYes(selected)); // ← 유일 때 false
-              const showCount = item.countKey && isYes(selected) && count > 0;
-
-              return (
-                <div key={item.key} className="option-row">
-                  <span className="option-label">{item.label}</span>
-
-                  <div className="option-row">
-                    {/* 손/발, 제거는 항상 / 연장·랩핑은 "무"일 때만 유/무 노출 */}
-                    {showOptions && (
-                      <div className="option-values">
-                        {item.options.map((option) => {
-                          const isSelected =
-                            option === selected ||
-                            // 손발 같이 선택된 경우(예: "손발") → 둘 다 강조
-                            (item.key === 'hand' &&
-                              selected === '손발' &&
-                              (option === '손' || option === '발'));
-
-                          return (
-                            <span key={option} className={`option ${isSelected ? 'selected' : ''}`}>
-                              {option}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {/* 연장/랩핑이 "유"일 때만 개수 pill 표시 */}
-                    {showCount && <span className="option-count">{count}개</span>}
-                  </div>
+            {data.menus.length > 0 && (
+              <div className="menu-section">
+                <span className="section-title">선택 메뉴</span>
+                <div className="menu-list">
+                  {data.menus.map((menu) => (
+                    <div key={menu.id} className="menu-item">
+                      <span className="menu-name">{menu.name}</span>
+                      {menu.inputValues.length > 0 ? (
+                        <span className="menu-inputs">{menu.inputValues.join(' / ')}</span>
+                      ) : (
+                        <span className="empty-detail">옵션 없음</span>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            )}
 
-            {photoUrls.length > 0 && (
-              <div className="photo-section">
-                <span className="section-title">사진</span>
+            <div className="photo-section">
+              <div className="section-header">
+                <span className="section-title">이미지</span>
+                <span className="image-count">{data.imageCount}장</span>
+              </div>
+
+              {data.imageUrls.length > 0 ? (
                 <div className="photo-list">
-                  {photoUrls.map((url, i) => (
+                  {data.imageUrls.map((url, i) => (
                     <img
-                      key={i}
+                      key={`${data.id}-photo-${i}`}
                       className="photo-item"
                       src={url}
                       alt={`예약 사진 ${i + 1}`}
@@ -208,18 +216,21 @@ function ReservationCard({ data }) {
                   ))}
                   {/*예약 사진 모달 활성화*/}
                   {activeIndex !== null && (
-                    <ImageModal src={photoUrls[activeIndex]} onClose={() => setActiveIndex(null)} />
+                    <ImageModal
+                      src={data.imageUrls[activeIndex]}
+                      onClose={() => setActiveIndex(null)}
+                    />
                   )}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="empty-detail">등록된 이미지가 없습니다.</div>
+              )}
+            </div>
 
-            {selectedOptions?.requestText && (
-              <div className="request-section">
-                <span className="section-title">요구사항</span>
-                <div className="request-box">{selectedOptions.requestText}</div>
-              </div>
-            )}
+            <div className="request-section">
+              <span className="section-title">요구사항</span>
+              <div className="request-box">{data.requirements || '요구사항이 없습니다.'}</div>
+            </div>
 
             {(data.status === 'CONFIRMED' || data.status === 'REJECTED') && (
               <div className="owner-section">

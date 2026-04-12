@@ -16,7 +16,9 @@ import { useUploadMultipleFiles } from '@/query/fileQueries';
 export default function ReservationCreatePage() {
   const { shopId } = useParams();
   const [searchParams] = useSearchParams();
-  const staffId = Number(searchParams.get('staffId'));
+  const rawStaffId = searchParams.get('staffId');
+  const parsedStaffId = rawStaffId ? Number(rawStaffId) : NaN;
+  const staffId = Number.isInteger(parsedStaffId) && parsedStaffId > 0 ? parsedStaffId : null;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -71,6 +73,8 @@ export default function ReservationCreatePage() {
   const prev = () => setStep((s) => Math.max(s - 1, 1));
 
   const handleNextClick = () => {
+    if (!staffId) return;
+
     // step 4는  제출
     if (step === 4) {
       submitReservation();
@@ -85,6 +89,11 @@ export default function ReservationCreatePage() {
   };
 
   const submitReservation = async () => {
+    if (!staffId) {
+      alert('담당자 정보가 없어 예약을 진행할 수 없습니다.');
+      return;
+    }
+
     const { basic, tagMenu, photoNote } = formData;
 
     // 이미지 업로드
@@ -140,32 +149,51 @@ export default function ReservationCreatePage() {
         </S.ProgressBar>
 
         <S.Content>
-          {step === 1 && <StepUserInfo initialData={formData.basic} onChange={stepHandlers[1]} />}
-          {step === 2 && (
-            <StepDateTime
-              shopId={shopId}
-              staffId={staffId}
-              initialData={formData.basic}
-              onChange={stepHandlers[2]}
-            />
+          {!staffId ? (
+            <>
+              <S.ErrorBox>
+                담당자 정보가 없어 예약을 진행할 수 없습니다. 채팅 화면에서 다시 진입해 주세요.
+              </S.ErrorBox>
+              <NextButton $width="100%" onClick={handleClose}>
+                이전 화면으로 돌아가기
+              </NextButton>
+            </>
+          ) : (
+            <>
+              {step === 1 && <StepUserInfo initialData={formData.basic} onChange={stepHandlers[1]} />}
+              {step === 2 && (
+                <StepDateTime
+                  shopId={shopId}
+                  staffId={staffId}
+                  initialData={formData.basic}
+                  onChange={stepHandlers[2]}
+                />
+              )}
+              {step === 3 && (
+                <StepTagMenu
+                  shopId={shopId}
+                  initialData={formData.tagMenu}
+                  onChange={stepHandlers[3]}
+                />
+              )}
+              {step === 4 && (
+                <StepPhotoNote initialData={formData.photoNote} onChange={stepHandlers[4]} />
+              )}
+              <NextButton
+                $width="100%"
+                disabled={
+                  (step !== 4 && !canNext) || uploadFiles.isPending || createReservation.isPending
+                }
+                onClick={handleNextClick}
+              >
+                {uploadFiles.isPending || createReservation.isPending
+                  ? '처리중...'
+                  : step === 4
+                    ? '예약 신청'
+                    : '다음 단계로'}
+              </NextButton>
+            </>
           )}
-          {step === 3 && (
-            <StepTagMenu
-              shopId={shopId}
-              initialData={formData.tagMenu}
-              onChange={stepHandlers[3]}
-            />
-          )}
-          {step === 4 && (
-            <StepPhotoNote initialData={formData.photoNote} onChange={stepHandlers[4]} />
-          )}
-          <NextButton
-            $width="100%"
-            disabled={(step !== 4 && !canNext) || uploadFiles.isPending || createReservation.isPending}
-            onClick={handleNextClick}
-          >
-            {uploadFiles.isPending || createReservation.isPending ? '처리중...' : step === 4 ? '예약 신청' : '다음 단계로'}
-          </NextButton>
         </S.Content>
       </S.PageWrapper>
     </Container>

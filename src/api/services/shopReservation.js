@@ -14,13 +14,23 @@ export const shopReservationService = {
   /**
    * 예약 확정
    * PUT /api/reservations/{id}/confirm
-   * @param {number} id - 예약 ID
-   * @param {string} message - 점주가 남기는 메시지
+   * @param {Object} payload
+   * @param {number} payload.id - 예약 ID
+   * @param {string} payload.message - 점주가 남기는 메시지
+   * @param {number} payload.durationMinutes - 시술 시간(분)
+   * @param {string} [payload.startAt] - 예약 시간 변경 시 시작 시각(HH:mm)
    */
-  confirmReservation: async (id, message) => {
-    const res = await axiosClient.put(`/api/reservations/${id}/confirm`, {
+  confirmReservation: async ({ id, message, durationMinutes, startAt }) => {
+    const payload = {
       message,
-    });
+      durationMinutes,
+    };
+
+    if (startAt) {
+      payload.startAt = startAt;
+    }
+
+    const res = await axiosClient.put(`/api/reservations/${id}/confirm`, payload);
     return res.data;
   },
 

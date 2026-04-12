@@ -12,6 +12,7 @@ const LABEL_MAP = {
 export default function ReservationConfirmForm({ onConfirm, isConfirming, confirmed }) {
   const [duration, setDuration] = useState(60);
   const [memo, setMemo] = useState('');
+  const canConfirm = memo.trim().length > 0;
 
   const hour = Math.floor(duration / 60);
   const min = duration % 60;
@@ -55,12 +56,11 @@ export default function ReservationConfirmForm({ onConfirm, isConfirming, confir
         maxLength={200}
         onChange={(e) => setMemo(e.target.value)}
       />
-      {/*TODO: 대기시간도 예약확정으로 보낼 수 있도록 수정*/}
       <div className="flex justify-end">
         <S.ConfirmButton
           $confirmed={confirmed}
-          onClick={() => onConfirm({ memo })}
-          disabled={isConfirming || confirmed}
+          onClick={() => onConfirm({ memo: memo.trim(), durationMinutes: duration })}
+          disabled={isConfirming || confirmed || !canConfirm}
         >
           {isConfirming ? '예약 중...' : confirmed ? '예약 완료' : '확인'}
         </S.ConfirmButton>

@@ -21,7 +21,7 @@ export const DetailRow = styled.div`
 `;
 
 export const DetailBlock = styled.div`
-  margin-top: 8px;
+  margin-top: 12px;
 `;
 
 export const DetailValues = styled.div`
@@ -32,6 +32,7 @@ export const DetailValues = styled.div`
 
 export const PhotoGrid = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 10px 0;
 `;
@@ -48,6 +49,7 @@ export const RequestBox = styled.div`
   margin-top: 8px;
   padding: 10px;
   background: #fafafa;
+  border: 1px solid #f0f0f0;
   border-radius: 10px;
   color: #555;
 `;
@@ -68,13 +70,66 @@ export const Label = styled.span`
   font-weight: 600;
 `;
 
-export const OptionGroup = styled.div`
-  display: flex;
-  gap: 10px;
+export const CountText = styled.div`
+  margin-top: 8px;
+  color: #777;
+  font-size: 12px;
 `;
 
-export const Option = styled.span`
-  font-size: 13px;
-  font-weight: ${({ active }) => (active ? 600 : 500)};
-  color: ${({ active }) => (active ? '#222' : '#cfcfcf')};
+export const MenuList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+`;
+
+export const MenuCard = styled.div`
+  padding: 10px;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  background: #fcfcfc;
+`;
+
+export const MenuHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+`;
+
+export const MenuName = styled.div`
+  font-weight: 600;
+  color: #333;
+`;
+
+export const MenuMeta = styled.div`
+  font-size: 12px;
+  color: #888;
+`;
+
+export const InputList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+`;
+
+export const InputRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+`;
+
+export const InputLabel = styled.div`
+  color: #888;
+`;
+
+export const InputValue = styled.div`
+  color: #333;
+  font-weight: 500;
+`;
+
+export const EmptyText = styled.div`
+  margin-top: 8px;
+  color: #999;
 `;
