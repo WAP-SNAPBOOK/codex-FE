@@ -49,7 +49,9 @@ export function useNewMessageNotice(liveMessages, messageListRef, scrollToBottom
       scrollToBottom(true);
     } else {
       setShowNewMessageCard(true);
-      setNewMessagePreview(latest.message ?? '예약 알림');
+      setNewMessagePreview(
+        latest.imageUrl ? latest.message?.trim() || '사진을 보냈습니다.' : latest.message ?? '예약 알림'
+      );
     }
   }, [liveMessages, messageListRef, scrollToBottom, userId]);
 

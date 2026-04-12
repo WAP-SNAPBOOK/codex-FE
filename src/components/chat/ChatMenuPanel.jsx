@@ -2,22 +2,27 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import reservationListIcon from '../../assets/icons/reservation-list-icon.svg';
+import pictureIcon from '../../assets/icons/picture-icon.svg';
 import { BaseButton } from '../common/Button';
 
-export default function ChatMenuPanel({ visible }) {
+export default function ChatMenuPanel({ visible, onClickPhoto, isUploadingImage = false }) {
   const navigate = useNavigate();
 
   //예약 내역 이동 헨들러
-  const handleClick = () => {
+  const handleClickReservationList = () => {
     navigate('/reservations');
   };
   return (
     <Panel $visible={visible}>
       <PanelInner>
-        <ReservationListButton $column onClick={handleClick}>
+        <MenuActionButton $column onClick={handleClickReservationList}>
           <img src={reservationListIcon} alt="reservationListIcon" />
           <span>예약 내역</span>
-        </ReservationListButton>
+        </MenuActionButton>
+        <MenuActionButton $column onClick={onClickPhoto} disabled={isUploadingImage}>
+          <img src={pictureIcon} alt="pictureIcon" />
+          <span>{isUploadingImage ? '전송 중' : '사진 전송'}</span>
+        </MenuActionButton>
       </PanelInner>
     </Panel>
   );
@@ -42,6 +47,9 @@ export const Panel = styled.div`
   transform: ${({ $visible }) => ($visible ? 'translateY(0)' : 'translateY(100%)')};
 `;
 
-const PanelInner = styled.div``;
+const PanelInner = styled.div`
+  display: flex;
+  gap: 20px;
+`;
 
-const ReservationListButton = styled(BaseButton)``;
+const MenuActionButton = styled(BaseButton)``;

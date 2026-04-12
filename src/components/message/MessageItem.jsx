@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as S from './MessageItem.style';
 import { formatTime } from '../../utils/formatTime';
 import ReservationCompleteMessage from '../message/ReservationCompleteMessage';
 import ReservationDecisionMessage from '../message/ReservationDecisionMessage';
 import DecisionCard from '../message/DecisionCard';
 import { useAuth } from '../../context/AuthContext';
+import ImageModal from '../modal/ImageModal';
 
 export default function MessageItem({ msg, isMine, reservationUpdates }) {
+  const [isImageOpen, setIsImageOpen] = useState(false);
   const authContext = useAuth();
   const auth = authContext?.auth;
   const isOwner = auth?.userType === 'OWNER'; //점주 여부
@@ -20,7 +22,7 @@ export default function MessageItem({ msg, isMine, reservationUpdates }) {
         }
       : msg.payload;
 
-  if (!msg?.isReservationCard && !msg?.message?.trim()) {
+  if (!msg?.isReservationCard && !msg?.message?.trim() && !msg?.imageUrl) {
     return null;
   }
 
@@ -73,6 +75,37 @@ export default function MessageItem({ msg, isMine, reservationUpdates }) {
       <S.MessageRow $isMine={false}>
         <S.Bubble $isMine={false}>{CardComponent}</S.Bubble>
         <S.Time>{formatTime(msg.sentAt)}</S.Time>
+      </S.MessageRow>
+    );
+  }
+
+  if (msg.imageUrl) {
+    return (
+      <S.MessageRow $isMine={isMine}>
+        {isMine ? (
+          <>
+            <S.Time>{formatTime(msg.sentAt)}</S.Time>
+            <S.ImageMessage $isMine>
+              <S.ImageBubble type="button" onClick={() => setIsImageOpen(true)}>
+                <S.MessageImage src={msg.imageUrl} alt="chat attachment" />
+              </S.ImageBubble>
+              {msg.message?.trim() ? <S.CaptionBubble $isMine>{msg.message}</S.CaptionBubble> : null}
+            </S.ImageMessage>
+          </>
+        ) : (
+          <>
+            <S.ImageMessage $isMine={false}>
+              <S.ImageBubble type="button" onClick={() => setIsImageOpen(true)}>
+                <S.MessageImage src={msg.imageUrl} alt="chat attachment" />
+              </S.ImageBubble>
+              {msg.message?.trim() ? (
+                <S.CaptionBubble $isMine={false}>{msg.message}</S.CaptionBubble>
+              ) : null}
+            </S.ImageMessage>
+            <S.Time>{formatTime(msg.sentAt)}</S.Time>
+          </>
+        )}
+        {isImageOpen ? <ImageModal src={msg.imageUrl} onClose={() => setIsImageOpen(false)} /> : null}
       </S.MessageRow>
     );
   }

@@ -51,13 +51,14 @@ class ChatSocketService {
   /**
    * 메시지 전송
    * @param {number} chatRoomId
-   * @param {string} message
+   * @param {string|Object} messageOrPayload
    */
-  sendMessage(chatRoomId, message) {
+  sendMessage(chatRoomId, messageOrPayload) {
     if (!this.client || !this.client.connected) return;
 
     const destination = `/pub/chat/${chatRoomId}`;
-    const payload = { message };
+    const payload =
+      typeof messageOrPayload === 'string' ? { message: messageOrPayload } : messageOrPayload;
 
     this.client.publish({
       destination,

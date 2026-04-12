@@ -23,6 +23,32 @@ export const Bubble = styled.div`
   font-size: 14px;
 `;
 
+export const ImageMessage = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: ${({ $isMine }) => ($isMine ? 'flex-end' : 'flex-start')};
+`;
+
+export const ImageBubble = styled.button`
+  width: 220px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+`;
+
+export const MessageImage = styled.img`
+  display: block;
+  width: 100%;
+  border-radius: 18px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+`;
+
+export const CaptionBubble = styled(Bubble)`
+  margin-top: 6px;
+`;
+
 export const Time = styled.span`
   font-size: 11px;
   color: ${theme.colors.black[50]};

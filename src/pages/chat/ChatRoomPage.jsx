@@ -24,6 +24,7 @@ import { useShopInfoById } from '../../query/shopQueries';
 import { useInitFullReadyScroll } from '../../hooks/chat/useInitFullReadyScroll';
 import { useNormalizedMessages } from '../../hooks/chat/useNormalizedMessages';
 import { useReservationSocketHandler } from '../../hooks/chat/useReservationSocketHandler';
+import { useUploadSingleFile } from '../../query/fileQueries';
 
 export default function ChatRoomPage() {
   const [input, setInput] = useState(''); //메시지 입력 상태
@@ -106,12 +107,17 @@ export default function ChatRoomPage() {
     }, 150);
   };
 
+  const handleClickPhoto = () => {
+    imageInputRef.current?.click();
+  };
+
   //스크롤 위치 제어용 ref
   const messageListRef = useRef(null);
   //스크롤 감지용 ref
   const topObserverRef = useRef(null);
   //스크롤 제어 ref
   const bottomRef = useRef(null);
+  const imageInputRef = useRef(null);
 
   //초기 메시지 조회 정보
   const rawOldMessages = useMemo(
@@ -140,6 +146,7 @@ export default function ChatRoomPage() {
     //메시지 낙관적 업데이트
     addOptimisticMessage(message);
   });
+  const uploadSingleFile = useUploadSingleFile();
 
   // React Query 캐시 초기화
   useEffect(() => {
@@ -212,6 +219,34 @@ export default function ChatRoomPage() {
     setInput('');
   };
 
+  const handleSelectPhoto = async (event) => {
+    const selectedFile = event.target.files?.[0];
+
+    if (!selectedFile) {
+      return;
+    }
+
+    try {
+      const uploaded = await uploadSingleFile.mutateAsync(selectedFile);
+      const imageUrl = uploaded?.fileUrl;
+
+      if (!imageUrl) {
+        throw new Error('이미지 업로드 응답에 fileUrl이 없습니다.');
+      }
+
+      sendMessage({
+        imageUrl,
+        messageType: 'IMAGE',
+      });
+      setShowMenu(false);
+    } catch (error) {
+      console.error('채팅 이미지 전송 실패:', error);
+      alert('사진 전송 중 오류가 발생했습니다.');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
   //예약 생성 페이지 이동 헨들러
   const handleClickReservation = () => {
     if (!shopInfo?.shopId) return; //shopId 없을 시 예약 진행 X
@@ -258,7 +293,11 @@ export default function ChatRoomPage() {
           <div ref={bottomRef} />
         </S.Messages>
         {/* 채팅 메뉴 패널 */}
-        <ChatMenuPanel visible={showMenu} />
+        <ChatMenuPanel
+          visible={showMenu}
+          onClickPhoto={handleClickPhoto}
+          isUploadingImage={uploadSingleFile.isPending}
+        />
         {/*새 메시지 알림 카드 */}
         {
           <NewMessageCard
@@ -282,6 +321,13 @@ export default function ChatRoomPage() {
           {/*채팅 전송 버튼*/}
           <ChatSumbitButton onClick={handleSend} />
         </S.InputBar>
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={handleSelectPhoto}
+        />
       </S.PageWrapper>
     </Container>
   );

@@ -1,5 +1,12 @@
 import { useCallback } from 'react';
 
+const resolveMessageType = (payload = {}) => {
+  if (payload.messageType) return payload.messageType;
+  if (payload.imageUrl && payload.message) return 'TEXT_IMAGE';
+  if (payload.imageUrl) return 'IMAGE';
+  return 'TEXT';
+};
+
 /**
  * 낙관적 메시지 전송 훅
  * @param {Function} setLiveMessages - 이전 상태를 받아 새 메시지를 추가할 때 사용.
@@ -13,9 +20,11 @@ import { useCallback } from 'react';
  */
 export function useOptimisticMessage(setLiveMessages, userId, chatRoomId) {
   const addOptimisticMessage = useCallback(
-    (message) => {
+    (messageOrPayload) => {
       const now = new Date();
       const tempId = `temp-${Date.now()}`;
+      const payload =
+        typeof messageOrPayload === 'string' ? { message: messageOrPayload } : messageOrPayload;
 
       // 서버와 동일한 구조로 임시 메시지 반영
       const optimisticMsg = {
@@ -23,7 +32,9 @@ export function useOptimisticMessage(setLiveMessages, userId, chatRoomId) {
         messageId: Date.now(), //임시 ID
         senderId: userId, //사용자 본인 ID
         senderName: 'me', // TODO: 백앤드에서 보낸 실제 사용자 본인 이름으로 교체
-        message,
+        message: payload.message ?? '',
+        imageUrl: payload.imageUrl ?? null,
+        messageType: resolveMessageType(payload),
         sentAt: now.toISOString(),
         pending: true,
         roomId: Number(chatRoomId),
@@ -39,7 +50,11 @@ export function useOptimisticMessage(setLiveMessages, userId, chatRoomId) {
       setLiveMessages((prev) => {
         // 1. 같은 메시지(내가 낙관적으로 추가한 메시지)인지 확인
         const idx = prev.findIndex(
-          (m) => m.pending && m.clientId && m.message === incoming.message
+          (m) =>
+            m.pending &&
+            m.clientId &&
+            (m.message ?? '') === (incoming.message ?? '') &&
+            (m.imageUrl ?? '') === (incoming.imageUrl ?? '')
         );
 
         if (idx >= 0) {
