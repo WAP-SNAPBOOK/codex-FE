@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { reservationService } from '../../api/services/reservationService';
+import { normalizeReservationPayload } from '../../utils/normalizeReservationPayload';
 
 export function useNormalizedMessages(rawMessages) {
   const cacheRef = useRef(new Map());
@@ -19,19 +20,28 @@ export function useNormalizedMessages(rawMessages) {
 
           // 이미 처리한 예약이면 재요청 X
           if (cacheRef.current.has(msg.reservationId)) {
-            return cacheRef.current.get(msg.reservationId);
+            return {
+              ...msg,
+              isReservationCard: true,
+              type: msg.messageType,
+              payload: cacheRef.current.get(msg.reservationId),
+            };
           }
 
           try {
             const r = await reservationService.getReservationById(msg.reservationId);
+            const payload = normalizeReservationPayload(r);
             const converted = {
+              ...msg,
               messageId: msg.messageId,
+              senderId: msg.senderId,
+              senderName: msg.senderName,
               sentAt: msg.sentAt,
               isReservationCard: true,
               type: msg.messageType,
-              payload: r,
+              payload,
             };
-            cacheRef.current.set(msg.reservationId, converted);
+            cacheRef.current.set(msg.reservationId, payload);
             return converted;
           } catch (err) {
             console.error('예약 상세 조회 실패:', err);

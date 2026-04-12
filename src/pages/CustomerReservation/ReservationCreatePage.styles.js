@@ -69,6 +69,16 @@ export const Content = styled.div`
   padding: 24px 26px;
 `;
 
+export const ErrorBox = styled.div`
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #fff4f4;
+  color: #c04f4f;
+  font-size: 14px;
+  line-height: 1.5;
+`;
+
 /* 하단 버튼 영역 */
 export const BottomArea = styled.div`
   display: flex;

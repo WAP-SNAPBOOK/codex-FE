@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { reservationService } from '../../api/services/reservationService';
+import { normalizeReservationPayload } from '../../utils/normalizeReservationPayload';
 
 const RESERVATION_MESSAGE_TYPES = [
   'RESERVATION_CREATED',
@@ -29,23 +30,7 @@ export function useReservationSocketHandler(setLiveMessages) {
 
               isReservationCard: true,
               type: incoming.messageType, // 예약 상태의  기준
-              payload: {
-                id: incoming.reservationId,
-                customerName: reservation.customerName,
-                date: reservation.date,
-                time: reservation.time,
-                photoCount: reservation.photoCount,
-                photoUrls: reservation.photoUrls,
-                part: reservation.part,
-                removal: reservation.removal,
-                requests: reservation.requests,
-                extendCount: reservation.extendCount,
-                wrappingCount: reservation.wrappingCount,
-                extendStatus: reservation.extendStatus,
-                wrappingStatus: reservation.wrappingStatus,
-                confirmationMessage: reservation.confirmationMessage,
-                rejectionReason: reservation.rejectionReason,
-              },
+              payload: normalizeReservationPayload(reservation),
             },
           ];
         });

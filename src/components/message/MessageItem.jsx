@@ -7,7 +7,8 @@ import DecisionCard from '../message/DecisionCard';
 import { useAuth } from '../../context/AuthContext';
 
 export default function MessageItem({ msg, isMine }) {
-  const { auth } = useAuth();
+  const authContext = useAuth();
+  const auth = authContext?.auth;
   const isOwner = auth?.userType === 'OWNER'; //점주 여부
 
   if (!msg?.isReservationCard && !msg?.message?.trim()) {
@@ -30,7 +31,9 @@ export default function MessageItem({ msg, isMine }) {
               name={msg.payload.customerName}
               date={msg.payload.date}
               time={msg.payload.time}
-              photoCount={msg.payload.photoCount}
+              photoCount={
+                msg.payload.imageCount ?? msg.payload.photoCount ?? msg.payload.imageUrls?.length ?? 0
+              }
             />
           );
         }
@@ -44,7 +47,7 @@ export default function MessageItem({ msg, isMine }) {
             customerName={msg.payload.customerName}
             dateText={msg.payload.date}
             timeText={msg.payload.time}
-            noteText={msg.payload.confirmationMessage}
+            noteText={msg.payload.confirmationMessage ?? msg.payload.message}
           />
         );
         break;
@@ -56,7 +59,11 @@ export default function MessageItem({ msg, isMine }) {
             customerName={msg.payload.customerName}
             dateText={msg.payload.date}
             timeText={msg.payload.time}
-            noteText={msg.payload.rejectionReason ?? '예약이 불가한 시간입니다.'}
+            noteText={
+              msg.payload.rejectionReason ??
+              msg.payload.rejectReason ??
+              '예약이 불가한 시간입니다.'
+            }
           />
         );
         break;

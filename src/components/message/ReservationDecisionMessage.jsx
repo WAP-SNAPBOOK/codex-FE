@@ -24,11 +24,19 @@ export default function ReservationDecisionMessage({ reservation }) {
   const { id, customerName, date, time } = reservation;
 
   //예약 확정 헨들러
-  const handleConfirm = ({ memo }) => {
+  const handleConfirm = ({ memo, durationMinutes }) => {
+    const trimmedMemo = memo.trim();
+
+    if (!trimmedMemo) {
+      alert('전달 사항을 입력해주세요.');
+      return;
+    }
+
     confirm(
       {
         id,
-        message: memo,
+        message: trimmedMemo,
+        durationMinutes,
       },
       {
         onSuccess: () => {
