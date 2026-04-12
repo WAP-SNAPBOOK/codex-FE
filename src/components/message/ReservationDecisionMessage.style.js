@@ -27,8 +27,10 @@ export const StatusBadge = styled.span`
   padding: 6px 10px;
   font-size: 12px;
   font-weight: 700;
-  color: ${({ $status }) => ($status === 'CONFIRMED' ? '#136f63' : '#8a1c1c')};
-  background: ${({ $status }) => ($status === 'CONFIRMED' ? '#e1f4ef' : '#fde8e8')};
+  color: ${({ $status }) =>
+    $status === 'CONFIRMED' ? '#136f63' : $status === 'REJECTED' ? '#8a1c1c' : '#7a5a00'};
+  background: ${({ $status }) =>
+    $status === 'CONFIRMED' ? '#e1f4ef' : $status === 'REJECTED' ? '#fde8e8' : '#fff3cd'};
 `;
 
 export const InfoRow = styled.div`
