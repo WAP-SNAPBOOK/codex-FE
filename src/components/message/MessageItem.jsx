@@ -35,19 +35,7 @@ export default function MessageItem({ msg, isMine, reservationUpdates }) {
           CardComponent = <ReservationDecisionMessage reservation={resolvedReservation} />;
         } else {
           //일반 고객
-          CardComponent = (
-            <ReservationCompleteMessage
-              name={resolvedReservation.customerName}
-              date={resolvedReservation.date}
-              time={resolvedReservation.time}
-              photoCount={
-                resolvedReservation.imageCount ??
-                resolvedReservation.photoCount ??
-                resolvedReservation.imageUrls?.length ??
-                0
-              }
-            />
-          );
+          CardComponent = <ReservationCompleteMessage reservation={resolvedReservation} />;
         }
 
         break;

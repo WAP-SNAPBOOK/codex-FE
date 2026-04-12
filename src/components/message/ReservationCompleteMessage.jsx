@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CheckIcon from '../../assets/icons/check-icon.svg';
+import ReservationInfoView from '../reservation/ReservationInfoView';
 import './ReservationCompleteMessage.css';
 
-export default function ReservationCompleteMessage({ name, date, time, photoCount }) {
+export default function ReservationCompleteMessage({ reservation }) {
+  const [open, setOpen] = useState(false);
+  const name = reservation?.customerName;
+  const date = reservation?.date;
+  const time = reservation?.time;
+  const photoCount =
+    reservation?.imageCount ?? reservation?.photoCount ?? reservation?.imageUrls?.length ?? 0;
+
   return (
     <div className="reservation-message">
       {/* 체크 아이콘 */}
@@ -32,6 +40,19 @@ export default function ReservationCompleteMessage({ name, date, time, photoCoun
           <span className="value-1 photo-count">{photoCount ?? 0}장</span>
         </div>
       </div>
+
+      <div className="message-divider" />
+
+      <button type="button" className="detail-toggle" onClick={() => setOpen((prev) => !prev)}>
+        상세 보기
+        <span>{open ? '▲' : '▼'}</span>
+      </button>
+
+      {open ? (
+        <div className="reservation-detail-wrap">
+          <ReservationInfoView info={reservation} />
+        </div>
+      ) : null}
     </div>
   );
 }

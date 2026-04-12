@@ -3,7 +3,6 @@
   border: 4px solid #ededed;
   border-radius: 16px;
   width: 225px;
-  min-height: 235px;
   padding: 15px;
   box-shadow: 0 2px 8px #eee;
   position: relative;
@@ -67,4 +66,27 @@
 
 .photo-count {
   color: #c0c0c0;
+}
+
+.message-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 12px 0;
+}
+
+.detail-toggle {
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #b3b3b3;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.reservation-detail-wrap {
+  margin-top: 12px;
 }
