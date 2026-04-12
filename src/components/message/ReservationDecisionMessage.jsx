@@ -6,8 +6,7 @@ import ReservationConfirmForm from '../reservation/ReservationConfirmForm';
 import ReservationRejectForm from '../reservation/ReservationRejectForm';
 
 export default function ReservationDecisionMessage({ reservation }) {
-  const [confirmed, setConfirmed] = useState(false); //예약 완료 상태
-  const [rejected, setRejected] = useState(false); //예약 거절 상태
+  const [localDecisionStatus, setLocalDecisionStatus] = useState(null);
   const [open, setOpen] = useState(false); //상세보기 토글
   const [mode, setMode] = useState('VIEW'); // 상세보기(VIEW) | 예약 확정(CONFIRM) | 예약거절(REJECT)
 
@@ -17,11 +16,14 @@ export default function ReservationDecisionMessage({ reservation }) {
   const { mutate: reject, isLoading: isRejecting } = useRejectReservation();
 
   //예약 결정 여부
-  const isDecisionDone = confirmed || rejected;
-
   if (!reservation) return null;
 
+  const resolvedStatus = localDecisionStatus ?? reservation.status ?? 'PENDING';
+  const isConfirmed = resolvedStatus === 'CONFIRMED';
+  const isRejected = resolvedStatus === 'REJECTED';
+  const isDecisionDone = isConfirmed || isRejected;
   const { id, customerName, date, time } = reservation;
+  const statusLabel = isConfirmed ? '예약 확정됨' : isRejected ? '예약 거절됨' : null;
 
   //예약 확정 헨들러
   const handleConfirm = ({ memo, durationMinutes }) => {
@@ -40,7 +42,8 @@ export default function ReservationDecisionMessage({ reservation }) {
       },
       {
         onSuccess: () => {
-          setConfirmed(true); // 예약 확정 활성화
+          setLocalDecisionStatus('CONFIRMED');
+          setMode('VIEW');
         },
       }
     );
@@ -55,7 +58,8 @@ export default function ReservationDecisionMessage({ reservation }) {
       },
       {
         onSuccess: () => {
-          setRejected(true); //예약 거절 활성화
+          setLocalDecisionStatus('REJECTED');
+          setMode('VIEW');
         },
       }
     );
@@ -63,7 +67,10 @@ export default function ReservationDecisionMessage({ reservation }) {
 
   return (
     <S.Card>
-      <S.Title>{customerName}</S.Title>
+      <S.Header>
+        <S.Title>{customerName}</S.Title>
+        {statusLabel ? <S.StatusBadge $status={resolvedStatus}>{statusLabel}</S.StatusBadge> : null}
+      </S.Header>
 
       <S.InfoRow>
         <S.Label>예약 날짜</S.Label>
@@ -76,7 +83,7 @@ export default function ReservationDecisionMessage({ reservation }) {
 
       <S.Divider />
 
-      <S.Toggle disabled={isDecisionDone} onClick={() => setOpen((v) => !v)}>
+      <S.Toggle onClick={() => setOpen((v) => !v)}>
         상세 보기
         <span>{open ? '▲' : '▼'}</span>
       </S.Toggle>
@@ -89,38 +96,36 @@ export default function ReservationDecisionMessage({ reservation }) {
           <ReservationConfirmForm
             onConfirm={handleConfirm}
             isConfirming={isConfirming}
-            confirmed={confirmed}
+            confirmed={isConfirmed}
           />
         ) : (
           <ReservationRejectForm
             onReject={handleReject}
             isRejecting={isRejecting}
-            rejected={rejected}
+            rejected={isRejected}
           />
         ))}
 
-      <S.Actions>
-        {mode === 'VIEW' ? (
-          <>
-            <S.RejectButton
-              onClick={() => {
-                setMode('REJECT');
-                setOpen(true);
-              }}
-            >
-              거절
-            </S.RejectButton>
-            <S.ApproveButton
-              onClick={() => {
-                setMode('CONFIRM');
-                setOpen(true);
-              }}
-            >
-              수락
-            </S.ApproveButton>
-          </>
-        ) : null}
-      </S.Actions>
+      {mode === 'VIEW' && !isDecisionDone ? (
+        <S.Actions>
+          <S.RejectButton
+            onClick={() => {
+              setMode('REJECT');
+              setOpen(true);
+            }}
+          >
+            거절
+          </S.RejectButton>
+          <S.ApproveButton
+            onClick={() => {
+              setMode('CONFIRM');
+              setOpen(true);
+            }}
+          >
+            수락
+          </S.ApproveButton>
+        </S.Actions>
+      ) : null}
     </S.Card>
   );
 }

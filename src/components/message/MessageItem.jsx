@@ -6,10 +6,19 @@ import ReservationDecisionMessage from '../message/ReservationDecisionMessage';
 import DecisionCard from '../message/DecisionCard';
 import { useAuth } from '../../context/AuthContext';
 
-export default function MessageItem({ msg, isMine }) {
+export default function MessageItem({ msg, isMine, reservationUpdates }) {
   const authContext = useAuth();
   const auth = authContext?.auth;
   const isOwner = auth?.userType === 'OWNER'; //점주 여부
+  const reservationId = msg?.reservationId ?? msg?.payload?.id;
+  const reservationUpdate = reservationId ? reservationUpdates?.get(reservationId) : null;
+  const resolvedReservation =
+    msg?.type === 'RESERVATION_CREATED' && reservationUpdate
+      ? {
+          ...msg.payload,
+          ...reservationUpdate,
+        }
+      : msg.payload;
 
   if (!msg?.isReservationCard && !msg?.message?.trim()) {
     return null;
@@ -23,16 +32,19 @@ export default function MessageItem({ msg, isMine }) {
       case 'RESERVATION_CREATED':
         // 점주 → 수락/거절 카드
         if (isOwner) {
-          CardComponent = <ReservationDecisionMessage reservation={msg.payload} />;
+          CardComponent = <ReservationDecisionMessage reservation={resolvedReservation} />;
         } else {
           //일반 고객
           CardComponent = (
             <ReservationCompleteMessage
-              name={msg.payload.customerName}
-              date={msg.payload.date}
-              time={msg.payload.time}
+              name={resolvedReservation.customerName}
+              date={resolvedReservation.date}
+              time={resolvedReservation.time}
               photoCount={
-                msg.payload.imageCount ?? msg.payload.photoCount ?? msg.payload.imageUrls?.length ?? 0
+                resolvedReservation.imageCount ??
+                resolvedReservation.photoCount ??
+                resolvedReservation.imageUrls?.length ??
+                0
               }
             />
           );

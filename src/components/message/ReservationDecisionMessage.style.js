@@ -8,10 +8,27 @@ export const Card = styled.div`
   width: 225px;
 `;
 
+export const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+`;
+
 export const Title = styled.h3`
   font-size: 22px;
   font-weight: 800;
-  margin-bottom: 16px;
+  margin: 0;
+`;
+
+export const StatusBadge = styled.span`
+  align-self: flex-start;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: ${({ $status }) => ($status === 'CONFIRMED' ? '#136f63' : '#8a1c1c')};
+  background: ${({ $status }) => ($status === 'CONFIRMED' ? '#e1f4ef' : '#fde8e8')};
 `;
 
 export const InfoRow = styled.div`

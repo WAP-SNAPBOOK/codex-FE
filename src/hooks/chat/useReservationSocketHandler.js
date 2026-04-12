@@ -24,6 +24,7 @@ export function useReservationSocketHandler(setLiveMessages) {
             ...prev,
             {
               messageId: incoming.messageId,
+              reservationId: incoming.reservationId,
               senderId: incoming.senderId,
               senderName: incoming.senderName,
               sentAt: incoming.sentAt,

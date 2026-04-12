@@ -1,9 +1,47 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import dayjs from 'dayjs';
 import DateDivider from '../chat/DateDivider';
 import MessageItem from './MessageItem';
 
 export default function MessageList({ messages, userId }) {
+  const reservationUpdates = useMemo(() => {
+    const updates = new Map();
+
+    messages.forEach((msg) => {
+      if (!msg?.isReservationCard) {
+        return;
+      }
+
+      const reservationId = msg.reservationId ?? msg.payload?.id;
+      if (!reservationId) {
+        return;
+      }
+
+      const status =
+        msg.type === 'RESERVATION_CONFIRMED'
+          ? 'CONFIRMED'
+          : msg.type === 'RESERVATION_REJECTED'
+            ? 'REJECTED'
+            : msg.payload?.status;
+
+      if (status === 'CONFIRMED') {
+        updates.set(reservationId, {
+          status,
+          confirmationMessage: msg.payload?.confirmationMessage ?? msg.payload?.message,
+        });
+      }
+
+      if (status === 'REJECTED') {
+        updates.set(reservationId, {
+          status,
+          rejectionReason: msg.payload?.rejectionReason ?? msg.payload?.rejectReason,
+        });
+      }
+    });
+
+    return updates;
+  }, [messages]);
+
   return (
     <>
       {messages.map((msg, index) => {
@@ -16,7 +54,7 @@ export default function MessageList({ messages, userId }) {
           <React.Fragment key={msg.messageId}>
             {/*이전 날짜와 현재 날짜과 다르다면 구분선 추가*/}
             {showDateDivider && <DateDivider date={msg.sentAt} />}
-            <MessageItem msg={msg} isMine={isMine} />
+            <MessageItem msg={msg} isMine={isMine} reservationUpdates={reservationUpdates} />
           </React.Fragment>
         );
       })}
