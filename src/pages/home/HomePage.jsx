@@ -37,7 +37,7 @@ export default function HomePage() {
 
   return (
     <Container $start $padding="23px 0">
-      <Header title="SNAPBOOK" showSetting={true} />
+      <Header title="SNAPBOOK" showSetting={true} onSettingClick={() => navigate('/mypage')} />
       <S.CenterArea>
         <S.ButtonGroup>
           <MainActionButton onClick={goToChat} icon={ChatIcon} label="채팅방 조회" />

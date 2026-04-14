@@ -1,6 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { kakaoAuthService } from '../api/services/kakaoAuthService';
-import { authStorage } from '../utils/auth/authStorage';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -56,4 +55,16 @@ export function useDeleteUser() {
       console.error('로그아웃 실패:', error);
     },
   });
+}
+
+export function useLogout() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  return () => {
+    logout();
+    queryClient.clear();
+    navigate('/', { replace: true });
+  };
 }
