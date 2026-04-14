@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const AUTO_SCROLL_THRESHOLD = 160;
+const AUTO_SCROLL_THRESHOLD = 80;
 
 const getDistanceFromBottom = (container) => {
   if (!container) return Infinity;
