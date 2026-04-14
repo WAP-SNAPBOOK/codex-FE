@@ -8,7 +8,14 @@ const MAX_LENGTH = 30;
 
 export default function ChatRoomItem({ room }) {
   const navigate = useNavigate();
-  const { shopBusinessName, otherUserName, lastMessageContent, lastMessageAt, unreadCount } = room;
+  const {
+    shopBusinessName,
+    otherUserName,
+    lastMessageSenderId,
+    lastMessageContent,
+    lastMessageAt,
+    unreadCount,
+  } = room;
   //현재 유저 정보 전역 상태
   const { auth } = useAuth();
   const userType = auth?.userType;
@@ -27,7 +34,11 @@ export default function ChatRoomItem({ room }) {
   };
 
   //일정 길이 이상일때 마지막 메시지 길이 줄이기
-  const shortMessage = truncateByVisualLength(lastMessageContent, MAX_LENGTH);
+  const resolvedPreview =
+    lastMessageContent?.trim() ||
+    (lastMessageSenderId === 0 ? '예약 알림' : '메시지를 확인해 주세요');
+
+  const shortMessage = truncateByVisualLength(resolvedPreview, MAX_LENGTH);
 
   return (
     <S.Container>
