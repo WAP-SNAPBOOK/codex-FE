@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { sanitizeDigits, validateMobile010 } from '@/utils/phoneNumber';
 import userIcon from '@/assets/icons/user-icon_gray.svg';
 import phoneIcon from '@/assets/icons/phone-icon.svg';
@@ -7,8 +7,26 @@ import * as S from '../steps.styles';
 export default function StepUserInfo({ initialData, onChange }) {
   const [name, setName] = useState(initialData.name ?? '');
   const [phone, setPhone] = useState(initialData.phoneNumber ?? '');
+  const hasEditedNameRef = useRef(false);
+  const hasEditedPhoneRef = useRef(false);
 
   const isValid = (name ?? '').trim().length > 0 && validateMobile010(phone).valid;
+
+  useEffect(() => {
+    if (!hasEditedNameRef.current && initialData.name && initialData.name !== name) {
+      setName(initialData.name);
+    }
+  }, [initialData.name, name]);
+
+  useEffect(() => {
+    if (
+      !hasEditedPhoneRef.current &&
+      initialData.phoneNumber &&
+      initialData.phoneNumber !== phone
+    ) {
+      setPhone(initialData.phoneNumber);
+    }
+  }, [initialData.phoneNumber, phone]);
 
   //예약 폼 정보 변경(이름, 전화 번호)
   useEffect(() => {
@@ -28,7 +46,10 @@ export default function StepUserInfo({ initialData, onChange }) {
             <S.Input
               placeholder="이름을 입력해 주세요"
               value={name}
-              onChange={(e) => setName(e.target.value.slice(0, 5))}
+              onChange={(e) => {
+                hasEditedNameRef.current = true;
+                setName(e.target.value.slice(0, 5));
+              }}
             />
             <S.InputIcon>
               <img src={userIcon} alt="userIcon" />
@@ -44,7 +65,10 @@ export default function StepUserInfo({ initialData, onChange }) {
               placeholder="전화번호를 입력해 주세요"
               inputMode="numeric"
               value={phone}
-              onChange={(e) => setPhone(sanitizeDigits(e.target.value).slice(0, 11))}
+              onChange={(e) => {
+                hasEditedPhoneRef.current = true;
+                setPhone(sanitizeDigits(e.target.value).slice(0, 11));
+              }}
             />
             <S.InputIcon>
               <img src={phoneIcon} alt="phoneIcon" />

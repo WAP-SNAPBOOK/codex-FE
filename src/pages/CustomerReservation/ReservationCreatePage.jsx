@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as S from './ReservationCreatePage.styles';
 import Container from '../../components/common/Container';
 import StepUserInfo from './steps/StepUserInfo/StepUserInfo';
@@ -12,6 +12,8 @@ import { useReservationFormHandlers } from './hooks/useReservationFormHandlers';
 import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useCreateReservation } from '@/query/reservationQueries';
 import { useUploadMultipleFiles } from '@/query/fileQueries';
+import { useAuth } from '@/context/AuthContext';
+import { useMyProfile } from '@/query/userQueries';
 
 export default function ReservationCreatePage() {
   const { shopId } = useParams();
@@ -21,14 +23,18 @@ export default function ReservationCreatePage() {
   const staffId = Number.isInteger(parsedStaffId) && parsedStaffId > 0 ? parsedStaffId : null;
   const navigate = useNavigate();
   const location = useLocation();
+  const { auth } = useAuth();
+  const { data: me } = useMyProfile({
+    enabled: Boolean(auth),
+  });
 
   const [step, setStep] = useState(1);
   const [canNext, setCanNext] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     basic: {
-      name: '',
-      phoneNumber: '',
+      name: auth?.name ?? '',
+      phoneNumber: auth?.phoneNumber ?? '',
       date: '',
       time: '',
     },
@@ -41,7 +47,34 @@ export default function ReservationCreatePage() {
       files: [],
       notes: '',
     },
-  });
+  }));
+
+  const profileName = me?.name ?? auth?.name ?? '';
+  const profilePhoneNumber = me?.phoneNumber ?? auth?.phoneNumber ?? '';
+
+  useEffect(() => {
+    if (!profileName && !profilePhoneNumber) return;
+
+    setFormData((prev) => {
+      const nextBasic = {
+        ...prev.basic,
+        name: prev.basic.name || profileName,
+        phoneNumber: prev.basic.phoneNumber || profilePhoneNumber,
+      };
+
+      if (
+        nextBasic.name === prev.basic.name &&
+        nextBasic.phoneNumber === prev.basic.phoneNumber
+      ) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        basic: nextBasic,
+      };
+    });
+  }, [profileName, profilePhoneNumber]);
 
   //예약 생성 페이지 나가기 헨들러
   const handleClose = () => {
