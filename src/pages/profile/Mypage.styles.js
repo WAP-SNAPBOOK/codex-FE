@@ -18,7 +18,7 @@ export const Content = styled.div`
 export const AccountCard = styled.section`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
   padding: 24px 20px;
   border: 1px solid ${theme.colors.gray.border};
   border-radius: 24px;
@@ -37,8 +37,16 @@ export const Name = styled.strong`
   color: ${theme.colors.black.DEFAULT};
 `;
 
-export const Meta = styled.span`
+export const InfoRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+`;
+
+export const InfoTitle = styled.span`
   font-size: 15px;
+  font-weight: 600;
   color: ${theme.colors.gray.dark.DEFAULT};
 `;
 

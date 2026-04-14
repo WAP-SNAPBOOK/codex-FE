@@ -1,4 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+const AUTO_SCROLL_THRESHOLD = 160;
+
+const getDistanceFromBottom = (container) => {
+  if (!container) return Infinity;
+  return container.scrollHeight - container.scrollTop - container.clientHeight;
+};
 
 /**
  * 새 메시지 알림 카드 & 스크롤 동기화 훅
@@ -16,18 +23,24 @@ import { useState, useEffect, useCallback } from 'react';
 export function useNewMessageNotice(liveMessages, messageListRef, scrollToBottom, userId) {
   const [showNewMessageCard, setShowNewMessageCard] = useState(false);
   const [newMessagePreview, setNewMessagePreview] = useState('');
+  const wasNearBottomRef = useRef(true);
 
-  //스크롤 감지
-  const handleScroll = useCallback(() => {
+  const syncBottomState = useCallback(() => {
     const container = messageListRef.current;
     if (!container) return;
 
-    //하단 주시 여부
-    const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 30;
+    const isNearBottom = getDistanceFromBottom(container) <= AUTO_SCROLL_THRESHOLD;
+    wasNearBottomRef.current = isNearBottom;
 
-    //하단으로 스크롤 이동시 새 메시지 카드 X
-    if (isAtBottom) setShowNewMessageCard(false);
+    if (isNearBottom) {
+      setShowNewMessageCard(false);
+    }
   }, [messageListRef]);
+
+  //스크롤 감지
+  const handleScroll = useCallback(() => {
+    syncBottomState();
+  }, [syncBottomState]);
 
   //새 메시지 수신 시 동작
   useEffect(() => {
@@ -36,17 +49,13 @@ export function useNewMessageNotice(liveMessages, messageListRef, scrollToBottom
     const latest = liveMessages[liveMessages.length - 1];
     if (!latest || latest.senderId === userId) return; // 내가 보낸 건 제외
 
-    // 내가 보낸 메시지 + silent 메시지 모두 제외
-    if (latest.senderId === userId || latest?.isSilent) return;
+    // silent 메시지는 자동 이동/팝업 모두 제외
+    if (latest?.isSilent) return;
 
-    const container = messageListRef.current;
-    if (!container) return;
-
-    //현재 하단 주시 여부
-    const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 15;
-
-    if (isAtBottom) {
+    if (wasNearBottomRef.current) {
       scrollToBottom(true);
+      wasNearBottomRef.current = true;
+      setShowNewMessageCard(false);
     } else {
       setShowNewMessageCard(true);
       setNewMessagePreview(
@@ -58,8 +67,13 @@ export function useNewMessageNotice(liveMessages, messageListRef, scrollToBottom
   // 카드 클릭 핸들러
   const handleClickCard = useCallback(() => {
     scrollToBottom(true); //최하단 이동
+    wasNearBottomRef.current = true;
     setShowNewMessageCard(false); //세 메시지 알림 카드 끄기
   }, [scrollToBottom]);
+
+  useEffect(() => {
+    syncBottomState();
+  }, [syncBottomState]);
 
   return {
     showNewMessageCard,

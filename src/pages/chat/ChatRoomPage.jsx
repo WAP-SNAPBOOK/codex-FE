@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useSendMessage, useChatMessages } from '../../query/chatQueries';
 import { chatSocketService } from '../../api/services/chatSocketService';
@@ -178,9 +178,9 @@ export default function ChatRoomPage() {
 
   //스크롤 제어(새로운 메시지 추가시 추가된 매시지 보기)
   // 메시지 전송 후 호출, behavior를 선택 가능
-  const scrollToBottom = (smooth = false) => {
+  const scrollToBottom = useCallback((smooth = false) => {
     bottomRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' });
-  };
+  }, []);
 
   // 실시간(내가 보낸 메시지)일 때만 하단 이동
   useEffect(() => {
@@ -192,7 +192,7 @@ export default function ChatRoomPage() {
     if (latest.senderId === userId) {
       scrollToBottom(true);
     }
-  }, [liveMessages]);
+  }, [liveMessages, scrollToBottom, userId]);
 
   // 새 메시지 관련 스크롤 동기화 훅
   const { showNewMessageCard, newMessagePreview, handleScroll, handleClickCard } =
