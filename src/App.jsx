@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthRedirectPage from './pages/redirect/AuthRedirectPage';
 import SignupGatePage from './pages/signup/SignupGatePage';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -56,24 +56,64 @@ function AppRoutes() {
       <Route path="/signup" element={<SignupGatePage />} />
       <Route path="/signup/customer" element={<CustomerSignupPage />} />
       <Route path="/signup/owner" element={<OwnerSignupPage />} />
-      <Route path="/chat" element={<ChatListPage />} />
-      <Route path="/chat/:chatRoomId" element={<ChatRoomPage />} />
-      <Route path="/shops/:shopId/reservations/create" element={<ReservationCreatePage />} />
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute>
+            <ChatListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/chat/:chatRoomId"
+        element={
+          <ProtectedRoute>
+            <ChatRoomPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shops/:shopId/reservations/create"
+        element={
+          <ProtectedRoute>
+            <ReservationCreatePage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/reservations"
         element={
-          !auth ? (
-            <LoginPage />
-          ) : auth.userType === 'CUSTOMER' ? (
-            <CustomerReservationList />
-          ) : (
-            <OwnerReservationList />
-          )
+          <ProtectedRoute>
+            <ReservationRoute />
+          </ProtectedRoute>
         }
       />
-      <Route path="/mypage" element={<Mypage />} />
+      <Route
+        path="/mypage"
+        element={
+          <ProtectedRoute>
+            <Mypage />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
+}
+
+function ProtectedRoute({ children }) {
+  const { auth } = useAuth();
+
+  if (!auth) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+function ReservationRoute() {
+  const { auth } = useAuth();
+
+  return auth.userType === 'CUSTOMER' ? <CustomerReservationList /> : <OwnerReservationList />;
 }
 
 export default App;
