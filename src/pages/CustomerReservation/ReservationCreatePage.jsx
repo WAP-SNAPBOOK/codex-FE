@@ -31,6 +31,29 @@ export default function ReservationCreatePage() {
   const [step, setStep] = useState(1);
   const [canNext, setCanNext] = useState(false);
 
+  const navigateToReturnTarget = (returnTo) => {
+    if (!returnTo) {
+      navigate('/chat');
+      return;
+    }
+
+    if (typeof returnTo === 'string') {
+      navigate(returnTo, { replace: true });
+      return;
+    }
+
+    navigate(
+      {
+        pathname: returnTo.pathname,
+        search: returnTo.search ?? '',
+      },
+      {
+        replace: true,
+        state: returnTo.state,
+      }
+    );
+  };
+
   const [formData, setFormData] = useState(() => ({
     basic: {
       name: auth?.name ?? '',
@@ -78,12 +101,7 @@ export default function ReservationCreatePage() {
 
   //예약 생성 페이지 나가기 헨들러
   const handleClose = () => {
-    const returnTo = location.state?.returnTo;
-    if (returnTo) {
-      navigate(returnTo, { replace: true });
-    } else {
-      navigate('/chat'); // fallback
-    }
+    navigateToReturnTarget(location.state?.returnTo);
   };
 
   const createReservation = useCreateReservation(handleClose);

@@ -43,6 +43,7 @@ export default function ChatRoomPage() {
   const location = useLocation();
 
   const [searchParams] = useSearchParams();
+  const shouldSkipAutoReservation = location.state?.skipAutoReservation === true;
 
   //점주 입장의 채팅방 이름(상대 고객명)
   const titleFromQuery = searchParams.get('title');
@@ -257,10 +258,41 @@ export default function ChatRoomPage() {
     navigate(`/shops/${shopInfo.shopId}/reservations/create${query}`, {
       state: {
         //돌아올 경로 확정(채팅방) - 현재 쿼리 파라미터 포함
-        returnTo: `/chat/${chatRoomId}${location.search}`,
+        returnTo: {
+          pathname: `/chat/${chatRoomId}`,
+          search: location.search,
+          state: { skipAutoReservation: true },
+        },
       },
     });
   };
+
+  useEffect(() => {
+    if (userType !== 'CUSTOMER' || shouldSkipAutoReservation) return;
+    if (!shopInfo?.shopId) return;
+
+    const staffId = shopInfo.defaultStaffId;
+    const query = staffId ? `?staffId=${staffId}` : '';
+
+    navigate(`/shops/${shopInfo.shopId}/reservations/create${query}`, {
+      replace: true,
+      state: {
+        returnTo: {
+          pathname: `/chat/${chatRoomId}`,
+          search: location.search,
+          state: { skipAutoReservation: true },
+        },
+      },
+    });
+  }, [
+    chatRoomId,
+    location.search,
+    navigate,
+    shopInfo?.defaultStaffId,
+    shopInfo?.shopId,
+    shouldSkipAutoReservation,
+    userType,
+  ]);
 
   //페이지 첫 마운트 시 스크롤 하단 제어
   useInitFullReadyScroll(
