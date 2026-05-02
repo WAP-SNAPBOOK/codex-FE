@@ -99,6 +99,17 @@ export const CopyStatus = styled.p`
   font-weight: 700;
 `;
 
+export const MenuManageButton = styled(BaseButton).attrs({
+  $fullWidth: true,
+  $height: '52px',
+  $radius: '16px',
+})`
+  margin-top: 16px;
+  background: ${theme.colors.white};
+  color: ${theme.colors.black.DEFAULT};
+  border: 1px solid ${theme.colors.gray.border};
+`;
+
 export const LogoutButton = styled(BaseButton).attrs({
   $fullWidth: true,
   $height: '52px',

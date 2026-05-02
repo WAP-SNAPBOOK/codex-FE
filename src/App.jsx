@@ -14,6 +14,7 @@ import { useAuth } from './context/AuthContext';
 import ChatListPage from './pages/chat/ChatListPage';
 import ChatRoomPage from './pages/chat/ChatRoomPage';
 import Mypage from './pages/profile/Mypage';
+import OwnerMenuManagePage from './pages/OwnerMenuManage/OwnerMenuManagePage';
 import OwnerReservationList from './pages/OwnerReservation/ownerReservationList';
 import CustomerReservationList from './pages/CustomerReservation/CustomerReservationList';
 import LinkRedirectPage from './pages/redirect/LinkRedirectPage';
@@ -72,6 +73,7 @@ function AppRoutes() {
         }
       />
       <Route path="/mypage" element={<Mypage />} />
+      <Route path="/mypage/menus" element={<OwnerMenuManagePage />} />
     </Routes>
   );
 }
