@@ -17,8 +17,9 @@ export const menuService = {
    * @param {number} shopId - 상점 ID (path param)
    * @returns {Promise<Array>} 메뉴 목록 [{id, shopId, name, description, isActive, sortOrder}, ...]
    */
-  getMenus: async (shopId) => {
-    const res = await axiosClient.get(`/api/shops/${shopId}/menus`);
+  getMenus: async (shopId, tagIds) => {
+    const params = tagIds ? { tagIds } : undefined;
+    const res = await axiosClient.get(`/api/shops/${shopId}/menus`, { params });
     return res.data;
   },
 

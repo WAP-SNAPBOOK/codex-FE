@@ -1,13 +1,13 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { menuService } from '../../api/services/menuService';
 
 /**
  * 메뉴 목록 조회 훅
  */
-export const useShopManageMenus = (shopId) => {
+export const useShopManageMenus = (shopId, tagId) => {
   return useQuery({
-    queryKey: ['shop-manage-menus', shopId],
-    queryFn: () => menuService.getMenus(shopId),
+    queryKey: ['shop-manage-menus', shopId, tagId ?? 'all'],
+    queryFn: () => menuService.getMenus(shopId, tagId),
     enabled: !!shopId,
   });
 };
@@ -15,11 +15,20 @@ export const useShopManageMenus = (shopId) => {
 /**
  * 메뉴 생성 훅
  */
-export const useCreateShopMenu = () => {
+export const useCreateShopMenu = (options = {}) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ shopId, name, description, sortOrder }) =>
       menuService.createMenu(shopId, { name, description, sortOrder }),
+    onSuccess: (_, { shopId }) => {
+      queryClient.invalidateQueries({ queryKey: ['shop-manage-menus', shopId] });
+      options.onSuccess?.();
+    },
     onError: (error) => {
+      if (options.onError) {
+        options.onError(error);
+        return;
+      }
       const status = error?.response?.status;
       if (status === 409) {
         alert('동일한 이름의 메뉴가 이미 존재합니다.');
@@ -34,14 +43,23 @@ export const useCreateShopMenu = () => {
 /**
  * 메뉴 수정 훅
  */
-export const useUpdateShopMenu = () => {
+export const useUpdateShopMenu = (options = {}) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ shopId, menuId, name, description, sortOrder }) =>
       menuService.updateMenu(shopId, menuId, { name, description, sortOrder }),
-    onSuccess: () => {
-      alert('메뉴가 수정되었습니다.');
+    onSuccess: (_, { shopId }) => {
+      queryClient.invalidateQueries({ queryKey: ['shop-manage-menus', shopId] });
+      if (!options.silent) {
+        alert('메뉴가 수정되었습니다.');
+      }
+      options.onSuccess?.();
     },
     onError: (error) => {
+      if (options.onError) {
+        options.onError(error);
+        return;
+      }
       console.error('메뉴 수정 실패:', error);
       alert('메뉴 수정 중 오류가 발생했습니다.');
     },
@@ -51,13 +69,23 @@ export const useUpdateShopMenu = () => {
 /**
  * 메뉴 비활성화 훅
  */
-export const useDeactivateShopMenu = () => {
+export const useDeactivateShopMenu = (options = {}) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ shopId, menuId }) => menuService.deactivateMenu(shopId, menuId),
-    onSuccess: () => {
-      alert('메뉴가 비활성화되었습니다.');
+    onSuccess: (_, { shopId }) => {
+      queryClient.invalidateQueries({ queryKey: ['shop-manage-menus', shopId] });
+      queryClient.invalidateQueries({ queryKey: ['shop-manage-tags', shopId] });
+      if (!options.silent) {
+        alert('메뉴가 비활성화되었습니다.');
+      }
+      options.onSuccess?.();
     },
     onError: (error) => {
+      if (options.onError) {
+        options.onError(error);
+        return;
+      }
       console.error('메뉴 비활성화 실패:', error);
       alert('메뉴 비활성화 중 오류가 발생했습니다.');
     },
@@ -67,11 +95,22 @@ export const useDeactivateShopMenu = () => {
 /**
  * 메뉴에 태그 연결 훅
  */
-export const useLinkMenuTag = () => {
+export const useLinkMenuTag = (options = {}) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ shopId, menuId, shopTagId }) =>
       menuService.linkMenuTag(shopId, menuId, shopTagId),
+    onSuccess: (_, { shopId }) => {
+      queryClient.invalidateQueries({ queryKey: ['shop-manage-menus', shopId] });
+      queryClient.invalidateQueries({ queryKey: ['shop-manage-tags', shopId] });
+      queryClient.invalidateQueries({ queryKey: ['shop-tags', shopId] });
+      options.onSuccess?.();
+    },
     onError: (error) => {
+      if (options.onError) {
+        options.onError(error);
+        return;
+      }
       console.error('태그 연결 실패:', error);
       alert('태그 연결 중 오류가 발생했습니다.');
     },
@@ -81,14 +120,25 @@ export const useLinkMenuTag = () => {
 /**
  * 태그에서 메뉴 제거 훅
  */
-export const useUnlinkMenuTag = () => {
+export const useUnlinkMenuTag = (options = {}) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ shopId, menuId, shopTagId }) =>
       menuService.unlinkMenuTag(shopId, menuId, shopTagId),
-    onSuccess: () => {
-      alert('메뉴가 태그에서 제거되었습니다.');
+    onSuccess: (_, { shopId }) => {
+      queryClient.invalidateQueries({ queryKey: ['shop-manage-menus', shopId] });
+      queryClient.invalidateQueries({ queryKey: ['shop-manage-tags', shopId] });
+      queryClient.invalidateQueries({ queryKey: ['shop-tags', shopId] });
+      if (!options.silent) {
+        alert('메뉴가 태그에서 제거되었습니다.');
+      }
+      options.onSuccess?.();
     },
     onError: (error) => {
+      if (options.onError) {
+        options.onError(error);
+        return;
+      }
       console.error('태그에서 메뉴 제거 실패:', error);
       alert('태그에서 메뉴 제거 중 오류가 발생했습니다.');
     },

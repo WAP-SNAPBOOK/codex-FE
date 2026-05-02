@@ -40,4 +40,36 @@ export const tagService = {
     const res = await axiosClient.get(`/api/shops/${shopId}/tags`);
     return res.data;
   },
+
+  /**
+   * 점주 관리용 상점별 태그(카테고리) 전체 조회
+   * @param {number} shopId - 상점 ID
+   * @returns {Promise<Array>} 상점 태그 목록 [{id, name}, ...]
+   */
+  getShopManageTags: async (shopId) => {
+    const res = await axiosClient.get(`/api/shops/${shopId}/tags/manage`);
+    return res.data;
+  },
+
+  /**
+   * 상점별 태그(카테고리) 이름 수정
+   * @param {number} shopId - 상점 ID
+   * @param {number} tagId - 상점 태그 ID
+   * @param {string} name - 태그 이름
+   * @returns {Promise<Object>} 수정된 상점 태그 정보
+   */
+  updateShopTag: async (shopId, tagId, name) => {
+    const res = await axiosClient.patch(`/api/shops/${shopId}/tags/${tagId}`, { name });
+    return res.data;
+  },
+
+  /**
+   * 상점별 태그(카테고리) 삭제
+   * @param {number} shopId - 상점 ID
+   * @param {number} tagId - 상점 태그 ID
+   * @returns {Promise<void>}
+   */
+  deleteShopTag: async (shopId, tagId) => {
+    await axiosClient.delete(`/api/shops/${shopId}/tags/${tagId}`);
+  },
 };

@@ -62,6 +62,62 @@ export const RoleBadge = styled.span`
   font-weight: 700;
 `;
 
+export const ShareLinkCard = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid ${theme.colors.gray.border};
+  border-radius: 20px;
+  background: ${theme.colors.white};
+`;
+
+export const ShareLinkButton = styled.button`
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 14px;
+  background: ${theme.colors.gray[20]};
+  color: ${theme.colors.black.DEFAULT};
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+`;
+
+export const LinkStatus = styled.p`
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: ${theme.colors.gray[20]};
+  color: ${theme.colors.gray.dark.DEFAULT};
+  font-size: 14px;
+  line-height: 1.45;
+`;
+
+export const CopyStatus = styled.p`
+  margin: 0;
+  color: ${theme.colors.primary};
+  font-size: 13px;
+  font-weight: 700;
+`;
+
+export const MenuManageButton = styled(BaseButton).attrs({
+  $fullWidth: true,
+  $height: '52px',
+  $radius: '16px',
+})`
+  margin-top: 16px;
+  background: ${theme.colors.white};
+  color: ${theme.colors.black.DEFAULT};
+  border: 1px solid ${theme.colors.gray.border};
+`;
+
 export const LogoutButton = styled(BaseButton).attrs({
   $fullWidth: true,
   $height: '52px',
