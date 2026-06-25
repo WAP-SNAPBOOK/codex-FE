@@ -30,6 +30,7 @@ const MENU_DESCRIPTION_MAX_LENGTH = 80;
 const EMPTY_MENU_FORM = {
   name: '',
   description: '',
+  price: '',
   tagIds: [],
 };
 
@@ -38,6 +39,18 @@ const getMenuTagIds = (menu = {}) =>
   Array.isArray(menu.tags) ? menu.tags.map((tag) => Number(tag.id)).filter(Boolean) : [];
 
 const getUniqueIds = (ids) => [...new Set(ids.map(Number).filter(Boolean))];
+
+const formatPrice = (price) => {
+  const numericPrice = Number(price);
+
+  if (!Number.isFinite(numericPrice)) {
+    return '';
+  }
+
+  return `${numericPrice.toLocaleString('ko-KR')}원`;
+};
+
+const normalizePriceInput = (value) => value.replace(/[^\d]/g, '');
 
 export default function OwnerMenuManagePage() {
   const navigate = useNavigate();
@@ -207,6 +220,7 @@ export default function OwnerMenuManagePage() {
     setMenuForm({
       name: menu.name ?? '',
       description: menu.description ?? '',
+      price: menu.price === null || menu.price === undefined ? '' : String(menu.price),
       tagIds: menuTagIds.length > 0 ? menuTagIds : selectedTagId ? [selectedTagId] : [],
     });
     setMenuError('');
@@ -237,10 +251,16 @@ export default function OwnerMenuManagePage() {
     event.preventDefault();
     const name = menuForm.name.trim();
     const description = menuForm.description.trim();
+    const price = Number(menuForm.price);
     const nextTagIds = getUniqueIds(menuForm.tagIds);
 
-    if (!shopId || !name || !description || nextTagIds.length === 0) {
-      setMenuError('카테고리, 메뉴명, 메뉴 설명을 모두 입력해주세요.');
+    if (!shopId || !name || !description || menuForm.price === '' || nextTagIds.length === 0) {
+      setMenuError('카테고리, 메뉴명, 메뉴 설명, 가격을 모두 입력해주세요.');
+      return;
+    }
+
+    if (menuForm.price !== '' && (!Number.isInteger(price) || price < 0)) {
+      setMenuError('가격은 0 이상의 숫자로 입력해주세요.');
       return;
     }
 
@@ -250,6 +270,7 @@ export default function OwnerMenuManagePage() {
           shopId,
           name,
           description,
+          price,
           sortOrder: nextSortOrder,
         });
 
@@ -266,6 +287,7 @@ export default function OwnerMenuManagePage() {
           menuId: menuModal.menu.id,
           name,
           description,
+          price,
           sortOrder: menuModal.menu.sortOrder,
         });
 
@@ -342,7 +364,6 @@ export default function OwnerMenuManagePage() {
             <S.PrimaryTextButton
               type="button"
               onClick={() => setIsEditing((prev) => !prev)}
-              disabled={tags.length === 0}
             >
               {isEditing ? '완료' : '편집'}
             </S.PrimaryTextButton>
@@ -383,7 +404,7 @@ export default function OwnerMenuManagePage() {
                     </S.TagButtonWrapper>
                   ))
                 )}
-                {isEditing && (
+                {(isEditing || tags.length === 0) && (
                   <S.AddTagButton type="button" aria-label="카테고리 추가" onClick={openCreateCategory}>
                     +
                   </S.AddTagButton>
@@ -393,7 +414,7 @@ export default function OwnerMenuManagePage() {
               {!isTagsLoading && tags.length === 0 && (
                 <S.EmptyState>
                   <strong>아직 카테고리가 없습니다.</strong>
-                  <span>카테고리를 먼저 추가한 뒤 메뉴를 등록해주세요.</span>
+                  <span>상단의 + 버튼을 눌러 카테고리를 추가해주세요.</span>
                 </S.EmptyState>
               )}
 
@@ -412,6 +433,7 @@ export default function OwnerMenuManagePage() {
                         <S.MenuInfo>
                           <S.MenuName>{menu.name}</S.MenuName>
                           <S.MenuDescription>{menu.description || '설명 없음'}</S.MenuDescription>
+                          <S.MenuPrice>{formatPrice(menu.price)}</S.MenuPrice>
                           {Array.isArray(menu.tags) && menu.tags.length > 0 && (
                             <S.MenuTagList>
                               {menu.tags.map((tag) => (
@@ -525,6 +547,17 @@ export default function OwnerMenuManagePage() {
                 placeholder="메뉴 설명"
                 onChange={(event) =>
                   setMenuForm((prev) => ({ ...prev, description: event.target.value }))
+                }
+              />
+              <S.Input
+                value={menuForm.price}
+                inputMode="numeric"
+                placeholder="가격"
+                onChange={(event) =>
+                  setMenuForm((prev) => ({
+                    ...prev,
+                    price: normalizePriceInput(event.target.value),
+                  }))
                 }
               />
               {menuError && <S.ErrorText>{menuError}</S.ErrorText>}

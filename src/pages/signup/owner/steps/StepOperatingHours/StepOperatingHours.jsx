@@ -41,13 +41,10 @@ export default function StepOperatingHours({ initialData, onChange }) {
   };
 
   return (
-    <div className="w-full mb-[30px]">
+    <S.Root>
       {/* 시간 간격 */}
-      <S.SectionTitle>
-        예약 받는 시간 간격은
-        <br /> 어떻게 되나요?
-      </S.SectionTitle>
-      <div className="flex gap-[10px] mb-[20px]">
+      <S.SectionTitle>예약 받는 시간 간격은 어떻게 되나요?</S.SectionTitle>
+      <S.IntervalGroup>
         {SLOT_INTERVALS.map(({ value, label }) => (
           <S.ToggleButton
             key={value}
@@ -58,11 +55,11 @@ export default function StepOperatingHours({ initialData, onChange }) {
             {label}
           </S.ToggleButton>
         ))}
-      </div>
+      </S.IntervalGroup>
 
       {/* 운영 유형 */}
       <S.SectionTitle>예약 운영 시간을 알려주세요.</S.SectionTitle>
-      <div className="flex gap-[8px] mb-[20px]">
+      <S.ScheduleTypeGroup>
         {SCHEDULE_TYPES.map(({ value, label }) => (
           <S.ToggleButton
             key={value}
@@ -74,7 +71,7 @@ export default function StepOperatingHours({ initialData, onChange }) {
             {label}
           </S.ToggleButton>
         ))}
-      </div>
+      </S.ScheduleTypeGroup>
 
       {/* 시간 입력 */}
       {scheduleType === 'DAILY' && (
@@ -82,6 +79,8 @@ export default function StepOperatingHours({ initialData, onChange }) {
           <S.SubLabel>운영 시간</S.SubLabel>
           <TimeSlots
             list={times}
+            showLastTimeHint
+            showAddButton={false}
             onUpdate={(next) => {
               setTimes(next);
               notify({ times: next });
@@ -95,6 +94,7 @@ export default function StepOperatingHours({ initialData, onChange }) {
           <S.SubLabel>평일 운영 시간</S.SubLabel>
           <TimeSlots
             list={weekdayTimes}
+            showLastTimeHint
             onUpdate={(next) => {
               setWeekdayTimes(next);
               notify({ weekdayTimes: next });
@@ -103,6 +103,7 @@ export default function StepOperatingHours({ initialData, onChange }) {
           <S.SubLabel style={{ marginTop: '24px' }}>주말 운영 시간</S.SubLabel>
           <TimeSlots
             list={weekendTimes}
+            showLastTimeHint
             onUpdate={(next) => {
               setWeekendTimes(next);
               notify({ weekendTimes: next });
@@ -114,12 +115,13 @@ export default function StepOperatingHours({ initialData, onChange }) {
       {scheduleType === 'BY_DAY' && (
         <ByDaySlots
           dayTimes={dayTimes}
+          showLastTimeHint
           onUpdate={(next) => {
             setDayTimes(next);
             notify({ dayTimes: next });
           }}
         />
       )}
-    </div>
+    </S.Root>
   );
 }

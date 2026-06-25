@@ -1,45 +1,48 @@
-import { AuthInput } from '../../../../../components/auth/AuthInput';
+import * as S from './StepBasicInfo.styles';
 
 export default function StepBasicInfo({ initialData, onChange }) {
   return (
-    <div className="w-full flex flex-col gap-[15px]">
-      <div className="flex flex-col gap-[7px]">
-        <span className="font-bold">이름</span>
-        <AuthInput
+    <S.Form>
+      <S.Field>
+        이름
+        <S.Input
           name="name"
           value={initialData.name}
-          placeholder="이름"
+          placeholder="이름을 입력해 주세요."
           maxLength={5}
           onChange={onChange}
         />
-      </div>
-      <div className="flex flex-col gap-[7px]">
-        <span className="font-bold">전화번호</span>
-        <AuthInput
+      </S.Field>
+      <S.Field>
+        전화번호
+        <S.Input
           name="phoneNumber"
           value={initialData.phoneNumber}
-          placeholder="전화번호"
+          placeholder="전화번호를 입력해 주세요."
           onChange={onChange}
         />
-      </div>
-      <div className="flex flex-col gap-[7px]">
-        <span className="font-bold">상호명</span>
-        <AuthInput
+      </S.Field>
+      <S.Field>
+        상호명
+        <S.Input
           name="businessName"
           value={initialData.businessName}
-          placeholder="상호명"
+          placeholder="상호명을 입력해 주세요."
           onChange={onChange}
         />
-      </div>
-      <div className="flex flex-col gap-[7px]">
-        <span className="font-bold">주소</span>
-        <AuthInput
-          name="address"
-          value={initialData.address}
-          placeholder="주소"
-          onChange={onChange}
-        />
-      </div>
-    </div>
+      </S.Field>
+      <S.Field>
+        주소
+        <S.AddressWrapper>
+          <S.Input
+            name="address"
+            value={initialData.address}
+            placeholder="주소를 입력해 주세요."
+            onChange={onChange}
+          />
+          <S.AddressIcon aria-hidden="true" />
+        </S.AddressWrapper>
+      </S.Field>
+    </S.Form>
   );
 }

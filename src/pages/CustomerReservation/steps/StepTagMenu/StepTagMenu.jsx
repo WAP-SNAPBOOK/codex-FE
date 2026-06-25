@@ -1,9 +1,21 @@
 import { useState, useEffect } from 'react';
-import * as C from '../steps.styles';
 import * as S from './StepTagMenu.styles';
-import RadioButton from '@/components/common/RadioButton';
 import { useShopTags, useMenusByTag } from '@/query/reservationQueries';
 import MenuInputFields from './MenuInputFields';
+
+const formatPrice = (price) => {
+  if (price === null || price === undefined) {
+    return null;
+  }
+
+  const numericPrice = Number(price);
+
+  if (!Number.isFinite(numericPrice)) {
+    return null;
+  }
+
+  return `${numericPrice.toLocaleString('ko-KR')}원`;
+};
 
 export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
   const [selectedTagId, setSelectedTagId] = useState(initialData.tagId ?? null);
@@ -15,7 +27,8 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
 
   useEffect(() => {
     if (!initialData.tagId && tags.length > 0 && selectedTagId === null) {
-      setSelectedTagId(tags[0].id);
+      const initialTag = tags.find((tag) => tag.name === initialData.tagName);
+      setSelectedTagId(initialTag?.id ?? tags[0].id);
     }
   }, [tags]);
 
@@ -45,12 +58,11 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
 
   return (
     <>
-      <C.SectionHeading>
-        시술 메뉴를 <br />
-        선택해주세요.
-      </C.SectionHeading>
+      <S.SectionTitle>시술 메뉴를 선택해 주세요.</S.SectionTitle>
+      <S.SectionDescription>
+        매장에서 디자이너와 상담 후 확정된 시술 메뉴와 금액으로 결제됩니다.
+      </S.SectionDescription>
 
-      {/* 태그 버튼 */}
       <S.ButtonGrid>
         {tags.map((tag) => (
           <S.SelectButton
@@ -64,7 +76,6 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
         ))}
       </S.ButtonGrid>
 
-      {/* 메뉴 카드 목록 */}
       {selectedTagId && (
         <S.MenuList>
           {menusLoading ? (
@@ -76,11 +87,25 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
 
               return (
                 <S.MenuCard key={menu.id} $disabled={isDisabled}>
-                  <RadioButton checked={isSelected} onChange={() => handleMenuClick(menu)} />
-                  <S.MenuContent>
-                    <S.MenuName $disabled={isDisabled}>{menu.name}</S.MenuName>
-                    <S.MenuDescription $disabled={isDisabled}>{menu.description}</S.MenuDescription>
-                    {isSelected && (
+                  <S.MenuSummary
+                    type="button"
+                    disabled={isDisabled}
+                    aria-pressed={isSelected}
+                    onClick={() => handleMenuClick(menu)}
+                  >
+                    <S.RadioIndicator $selected={isSelected} aria-hidden="true" />
+                    <S.MenuContent>
+                      <S.MenuName $disabled={isDisabled}>{menu.name}</S.MenuName>
+                      <S.MenuDescription $disabled={isDisabled}>
+                        {menu.description}
+                      </S.MenuDescription>
+                      {formatPrice(menu.price) ? (
+                        <S.MenuPrice $disabled={isDisabled}>{formatPrice(menu.price)}</S.MenuPrice>
+                      ) : null}
+                    </S.MenuContent>
+                  </S.MenuSummary>
+                  {isSelected && (
+                    <S.MenuInputSlot>
                       <MenuInputFields
                         shopId={shopId}
                         menuId={menu.id}
@@ -92,8 +117,8 @@ export default function StepTagMenu({ shopId, initialData = {}, onChange }) {
                           }))
                         }
                       />
-                    )}
-                  </S.MenuContent>
+                    </S.MenuInputSlot>
+                  )}
                 </S.MenuCard>
               );
             })

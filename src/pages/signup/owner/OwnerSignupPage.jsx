@@ -6,17 +6,17 @@ import { useOwnerSignupFlow } from '../../../query/signupQueries';
 import { validateStep1, validateStep2, validateStep4 } from './validateSteps';
 import StepBasicInfo from './steps/StepBasicInfo/StepBasicInfo';
 import StepOperatingHours from './steps/StepOperatingHours/StepOperatingHours';
-import StepHolidays from './steps/StepHolidays/StepHolidays';
 import StepMenuSetup from './steps/StepMenuSetup/StepMenuSetup';
 import * as S from './OwnerSignupPage.styles';
+import backIcon from '@/assets/icons/back-icon.svg';
 
 const STEPS = [
   { label: '기본\n정보' },
   { label: '운영시간\n설정' },
-  { label: '휴무일\n설정' },
-  { label: '메뉴\n추가' },
+  { label: '메뉴\n관리' },
 ];
 const TOTAL_STEPS = STEPS.length;
+const EMPTY_HOLIDAYS = { publicHolidayOff: false, holidays: [] };
 
 function OwnerSignupPage() {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ function OwnerSignupPage() {
   useEffect(() => {
     //비인가된 접근 시 홈으로
     if (!isSignupRequired) navigate('/');
-  }, [navigate]);
+  }, [isSignupRequired, navigate]);
 
   const [step, setStep] = useState(1);
 
@@ -43,10 +43,6 @@ function OwnerSignupPage() {
       dayTimes: {},
     },
     step3: {
-      publicHolidayOff: false,
-      holidays: [],
-    },
-    step4: {
       items: [],
     },
   });
@@ -69,15 +65,11 @@ function OwnerSignupPage() {
     setFormData((prev) => ({ ...prev, step3: data }));
   };
 
-  const handleStep4Change = (data) => {
-    setFormData((prev) => ({ ...prev, step4: data }));
-  };
-
   // 다음 단계 or 최종 제출
   const handleNextClick = async () => {
     if (step === 1 && !validateStep1(formData.step1)) return;
     if (step === 2 && !validateStep2(formData.step2)) return;
-    if (step === 4 && !validateStep4(formData.step4)) return;
+    if (step === 3 && !validateStep4(formData.step3)) return;
 
     if (step < TOTAL_STEPS) {
       next();
@@ -98,8 +90,8 @@ function OwnerSignupPage() {
       await ownerSignup.submit(
         formData.step1,
         schedulePayload,
-        formData.step3,
-        formData.step4.items
+        EMPTY_HOLIDAYS,
+        formData.step3.items
       );
       navigate('/');
     } catch {
@@ -112,38 +104,47 @@ function OwnerSignupPage() {
 
   return (
     <Container $start>
-      <div className="w-[305px] flex flex-col items-center pt-[40px] flex-1 pb-[40px]">
-        {/* 단계 진행 바 */}
-        <S.StepBar>
+      <S.PageFrame>
+        <S.Header>
+          <S.BackButton
+            type="button"
+            aria-label="뒤로가기"
+            onClick={() => (step === 1 ? navigate('/') : setStep((prev) => prev - 1))}
+          >
+            <img src={backIcon} alt="" />
+          </S.BackButton>
+        </S.Header>
+
+        <S.StepNav>
           {STEPS.map((s, i) => (
-            <S.StepItemWrapper
-              key={i}
-              $first={i === 0}
-              $last={i === STEPS.length - 1}
-              $zIndex={STEPS.length - i}
-              $clickable={i + 1 < step}
-              onClick={() => i + 1 < step && setStep(i + 1)}
-              role="button"
-              tabIndex={i + 1 < step ? 0 : -1}
-            >
-              <S.StepItem $active={step === i + 1} $first={i === 0} $last={i === STEPS.length - 1}>
+            <React.Fragment key={s.label}>
+              <S.StepTab
+                type="button"
+                $active={step === i + 1}
+                $clickable={i + 1 < step}
+                onClick={() => i + 1 < step && setStep(i + 1)}
+              >
                 {s.label}
-              </S.StepItem>
-            </S.StepItemWrapper>
+              </S.StepTab>
+              {i < STEPS.length - 1 && <S.StepDivider aria-hidden="true">›</S.StepDivider>}
+            </React.Fragment>
           ))}
-        </S.StepBar>
+        </S.StepNav>
 
-        {step === 1 && <StepBasicInfo initialData={formData.step1} onChange={handleStep1Change} />}
-        {step === 2 && (
-          <StepOperatingHours initialData={formData.step2} onChange={handleStep2Change} />
-        )}
-        {step === 3 && <StepHolidays initialData={formData.step3} onChange={handleStep3Change} />}
-        {step === 4 && <StepMenuSetup initialData={formData.step4} onChange={handleStep4Change} />}
+        <S.Content>
+          {step === 1 && <StepBasicInfo initialData={formData.step1} onChange={handleStep1Change} />}
+          {step === 2 && (
+            <StepOperatingHours initialData={formData.step2} onChange={handleStep2Change} />
+          )}
+          {step === 3 && <StepMenuSetup initialData={formData.step3} onChange={handleStep3Change} />}
+        </S.Content>
 
-        <NextButton disabled={isPending} onClick={handleNextClick} className="mt-auto">
-          {isPending ? '처리중...' : isLastStep ? '가입하기' : '다음 단계로'}
-        </NextButton>
-      </div>
+        <S.BottomArea>
+          <NextButton disabled={isPending} onClick={handleNextClick}>
+            {isPending ? '처리중...' : isLastStep ? '가입하기' : '다음'}
+          </NextButton>
+        </S.BottomArea>
+      </S.PageFrame>
     </Container>
   );
 }

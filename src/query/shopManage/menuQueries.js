@@ -18,8 +18,8 @@ export const useShopManageMenus = (shopId, tagId) => {
 export const useCreateShopMenu = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ shopId, name, description, sortOrder }) =>
-      menuService.createMenu(shopId, { name, description, sortOrder }),
+    mutationFn: ({ shopId, name, description, price, sortOrder }) =>
+      menuService.createMenu(shopId, { name, description, price, sortOrder }),
     onSuccess: (_, { shopId }) => {
       queryClient.invalidateQueries({ queryKey: ['shop-manage-menus', shopId] });
       options.onSuccess?.();
@@ -46,8 +46,8 @@ export const useCreateShopMenu = (options = {}) => {
 export const useUpdateShopMenu = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ shopId, menuId, name, description, sortOrder }) =>
-      menuService.updateMenu(shopId, menuId, { name, description, sortOrder }),
+    mutationFn: ({ shopId, menuId, name, description, price, sortOrder }) =>
+      menuService.updateMenu(shopId, menuId, { name, description, price, sortOrder }),
     onSuccess: (_, { shopId }) => {
       queryClient.invalidateQueries({ queryKey: ['shop-manage-menus', shopId] });
       if (!options.silent) {

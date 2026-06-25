@@ -4,7 +4,7 @@ export const menuService = {
   /**
    * 메뉴 생성
    * @param {number} shopId - 상점 ID (path param)
-   * @param {Object} body - { name, description, sortOrder }
+   * @param {Object} body - { name, description, price, sortOrder }
    * @returns {Promise<Object>} 생성된 메뉴 정보
    */
   createMenu: async (shopId, body) => {
@@ -27,7 +27,7 @@ export const menuService = {
    * 메뉴 수정
    * @param {number} shopId - 상점 ID (path param)
    * @param {number} menuId - 메뉴 ID (path param)
-   * @param {Object} body - { name, description, sortOrder }
+   * @param {Object} body - { name, description, price, sortOrder }
    * @returns {Promise<Object>} 수정된 메뉴 정보
    */
   updateMenu: async (shopId, menuId, body) => {

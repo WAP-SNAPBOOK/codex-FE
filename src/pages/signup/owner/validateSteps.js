@@ -86,5 +86,25 @@ export const validateStep4 = ({ items }) => {
     alert('메뉴를 하나 이상 추가해주세요.');
     return false;
   }
+
+  const hasInvalidMenu = items.some(({ tagName, menuName, description, price }) => {
+    const numericPrice = Number(price);
+    return (
+      !tagName?.trim() ||
+      !menuName?.trim() ||
+      !description?.trim() ||
+      price === '' ||
+      price === null ||
+      price === undefined ||
+      !Number.isInteger(numericPrice) ||
+      numericPrice < 0
+    );
+  });
+
+  if (hasInvalidMenu) {
+    alert('카테고리, 메뉴명, 메뉴 설명, 가격을 모두 입력해주세요.');
+    return false;
+  }
+
   return true;
 };

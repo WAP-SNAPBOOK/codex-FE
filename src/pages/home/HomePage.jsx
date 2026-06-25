@@ -30,18 +30,18 @@ export default function HomePage() {
     navigate('/chat');
   };
 
-  // 예약 내역 이동
+  // 예약 캘린더 이동
   const goToReservationList = () => {
     navigate('/reservations'); // or 실제 라우트 이름에 맞게 수정
   };
 
   return (
     <Container $start $padding="23px 0">
-      <Header title="SNAPBOOK" showSetting={true} />
+      <Header title="SNAPBOOK" showSetting={true} onSettingClick={() => navigate('/mypage')} />
       <S.CenterArea>
         <S.ButtonGroup>
           <MainActionButton onClick={goToChat} icon={ChatIcon} label="채팅방 조회" />
-          <MainActionButton onClick={goToReservationList} icon={BookIcon} label="예약 내역" />
+          <MainActionButton onClick={goToReservationList} icon={BookIcon} label="예약 캘린더" />
         </S.ButtonGroup>
         <BottomNav />
       </S.CenterArea>

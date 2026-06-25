@@ -237,16 +237,26 @@ export const MenuInfo = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
   min-width: 0;
 `;
 
 export const MenuName = styled.h3`
   margin: 0;
+  min-width: 0;
   color: #000;
   font-size: 17px;
   font-weight: 800;
   line-height: 1.3;
   overflow-wrap: anywhere;
+`;
+
+export const MenuPrice = styled.span`
+  color: #000;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+  white-space: nowrap;
 `;
 
 export const MenuDescription = styled.p`

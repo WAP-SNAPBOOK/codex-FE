@@ -7,26 +7,53 @@ import StepPhotoNote from './steps/StepPhotoNote/StepPhotoNote';
 import StepTagMenu from './steps/StepTagMenu/StepTagMenu';
 import { NextButton } from '@/components/common/NextButton';
 import backIcon from '@/assets/icons/back-icon.svg';
-import xIcon from '@/assets/icons/X-icon.svg';
+import closeIcon from '@/assets/icons/X-icon.svg';
 import { useReservationFormHandlers } from './hooks/useReservationFormHandlers';
 import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useCreateReservation } from '@/query/reservationQueries';
 import { useUploadMultipleFiles } from '@/query/fileQueries';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ReservationCreatePage() {
   const { shopId } = useParams();
   const [searchParams] = useSearchParams();
-  const staffId = Number(searchParams.get('staffId'));
+  const rawStaffId = searchParams.get('staffId');
+  const parsedStaffId = rawStaffId ? Number(rawStaffId) : NaN;
+  const staffId = Number.isInteger(parsedStaffId) && parsedStaffId > 0 ? parsedStaffId : null;
   const navigate = useNavigate();
   const location = useLocation();
+  const { auth } = useAuth();
 
   const [step, setStep] = useState(1);
   const [canNext, setCanNext] = useState(false);
 
+  const navigateToReturnTarget = (returnTo) => {
+    if (!returnTo) {
+      navigate('/chat');
+      return;
+    }
+
+    if (typeof returnTo === 'string') {
+      navigate(returnTo, { replace: true });
+      return;
+    }
+
+    navigate(
+      {
+        pathname: returnTo.pathname,
+        search: returnTo.search ?? '',
+      },
+      {
+        replace: true,
+        state: returnTo.state,
+      }
+    );
+  };
+
   const [formData, setFormData] = useState({
     basic: {
-      name: '',
-      phoneNumber: '',
+      name: auth?.name ?? '',
+      phoneNumber: auth?.phoneNumber ?? '',
       date: '',
       time: '',
     },
@@ -43,12 +70,7 @@ export default function ReservationCreatePage() {
 
   //예약 생성 페이지 나가기 헨들러
   const handleClose = () => {
-    const returnTo = location.state?.returnTo;
-    if (returnTo) {
-      navigate(returnTo, { replace: true });
-    } else {
-      navigate('/chat'); // fallback
-    }
+    navigateToReturnTarget(location.state?.returnTo);
   };
 
   const createReservation = useCreateReservation(handleClose);
@@ -70,7 +92,18 @@ export default function ReservationCreatePage() {
   //이전 단계 이동으로 step감소
   const prev = () => setStep((s) => Math.max(s - 1, 1));
 
+  const handleBackClick = () => {
+    if (step === 1) {
+      navigate('/chat');
+      return;
+    }
+
+    prev();
+  };
+
   const handleNextClick = () => {
+    if (!staffId) return;
+
     // step 4는  제출
     if (step === 4) {
       submitReservation();
@@ -85,6 +118,11 @@ export default function ReservationCreatePage() {
   };
 
   const submitReservation = async () => {
+    if (!staffId) {
+      alert('담당자 정보가 없어 예약을 진행할 수 없습니다.');
+      return;
+    }
+
     const { basic, tagMenu, photoNote } = formData;
 
     // 이미지 업로드
@@ -95,6 +133,7 @@ export default function ReservationCreatePage() {
     // menuSelections 변환: { [menuId]: { [fieldId]: value } } → API 형식
     const menuSelections = tagMenu.menuIds.map((menuId) => ({
       menuId,
+      tagId: tagMenu.tagId,
       inputValues: Object.entries(tagMenu.inputFieldValues[menuId] ?? {}).map(
         ([fieldId, value]) => ({
           fieldId: Number(fieldId),
@@ -121,14 +160,13 @@ export default function ReservationCreatePage() {
     <Container $start>
       <S.PageWrapper>
         <S.Header>
-          <S.IconButton onClick={prev} aria-label="뒤로가기">
+          <S.IconButton onClick={handleBackClick} aria-label="뒤로가기">
             <img src={backIcon} alt="back" />
           </S.IconButton>
 
           <S.Title>예약하기</S.Title>
-
-          <S.IconButton onClick={handleClose} aria-label="닫기">
-            <img src={xIcon} alt="close" />
+          <S.IconButton onClick={handleClose} aria-label="채팅방으로 돌아가기">
+            <img src={closeIcon} alt="close" />
           </S.IconButton>
         </S.Header>
 
@@ -140,32 +178,53 @@ export default function ReservationCreatePage() {
         </S.ProgressBar>
 
         <S.Content>
-          {step === 1 && <StepUserInfo initialData={formData.basic} onChange={stepHandlers[1]} />}
-          {step === 2 && (
-            <StepDateTime
-              shopId={shopId}
-              staffId={staffId}
-              initialData={formData.basic}
-              onChange={stepHandlers[2]}
-            />
+          {!staffId ? (
+            <>
+              <S.ErrorBox>
+                담당자 정보가 없어 예약을 진행할 수 없습니다. 채팅 화면에서 다시 진입해 주세요.
+              </S.ErrorBox>
+              <NextButton $width="100%" onClick={handleClose}>
+                이전 화면으로 돌아가기
+              </NextButton>
+            </>
+          ) : (
+            <>
+              {step === 1 && (
+                <StepUserInfo initialData={formData.basic} onChange={stepHandlers[1]} />
+              )}
+              {step === 2 && (
+                <StepDateTime
+                  shopId={shopId}
+                  staffId={staffId}
+                  initialData={formData.basic}
+                  onChange={stepHandlers[2]}
+                />
+              )}
+              {step === 3 && (
+                <StepTagMenu
+                  shopId={shopId}
+                  initialData={formData.tagMenu}
+                  onChange={stepHandlers[3]}
+                />
+              )}
+              {step === 4 && (
+                <StepPhotoNote initialData={formData.photoNote} onChange={stepHandlers[4]} />
+              )}
+              <NextButton
+                $width="100%"
+                disabled={
+                  (step !== 4 && !canNext) || uploadFiles.isPending || createReservation.isPending
+                }
+                onClick={handleNextClick}
+              >
+                {uploadFiles.isPending || createReservation.isPending
+                  ? '처리중...'
+                  : step === 4
+                    ? '예약 신청'
+                    : '다음'}
+              </NextButton>
+            </>
           )}
-          {step === 3 && (
-            <StepTagMenu
-              shopId={shopId}
-              initialData={formData.tagMenu}
-              onChange={stepHandlers[3]}
-            />
-          )}
-          {step === 4 && (
-            <StepPhotoNote initialData={formData.photoNote} onChange={stepHandlers[4]} />
-          )}
-          <NextButton
-            $width="100%"
-            disabled={(step !== 4 && !canNext) || uploadFiles.isPending || createReservation.isPending}
-            onClick={handleNextClick}
-          >
-            {uploadFiles.isPending || createReservation.isPending ? '처리중...' : step === 4 ? '예약 신청' : '다음 단계로'}
-          </NextButton>
         </S.Content>
       </S.PageWrapper>
     </Container>

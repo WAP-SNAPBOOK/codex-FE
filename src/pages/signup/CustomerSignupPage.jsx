@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SignupTitle } from '../../components/title/SignupTitle';
-import { AuthInput } from '../../components/auth/AuthInput';
 import Container from '../../components/common/Container';
 import { NextButton } from '../../components/common/NextButton';
 import { useSignupCustomer } from '../../query/signupQueries';
 import { validateMobile010 } from '../../utils/phoneNumber';
+import * as S from './CustomerSignupPage.styles';
 
 // CUSTOMER 전용 회원가입 페이지
 function CustomerSignupPage() {
@@ -25,7 +24,7 @@ function CustomerSignupPage() {
   // 비인가된 접근 시 홈으로
   useEffect(() => {
     if (!isSignupRequired) navigate('/');
-  }, [navigate]);
+  }, [isSignupRequired, navigate]);
 
   //회원가입 입력 폼 헨들러
   const handleChange = (e) => {
@@ -63,37 +62,45 @@ function CustomerSignupPage() {
   };
 
   return (
-    <Container>
-      <div className="w-[305px] h-[530px] flex flex-col items-center">
-        <SignupTitle>고객 회원가입</SignupTitle>
+    <Container $start>
+      <S.PageFrame>
+        <S.TitleSection>
+          <S.Title>고객 회원가입</S.Title>
+        </S.TitleSection>
 
-        <form onSubmit={onSubmit} className="w-full flex flex-col items-center">
-          <label className="w-full block mb-[15px]">
-            <AuthInput
-              name="name"
-              value={formData.name}
-              placeholder="이름"
-              maxLength={5}
-              onChange={handleChange}
-            />
-          </label>
+        <S.Form onSubmit={onSubmit}>
+          <S.Fields>
+            <S.Field>
+              이름
+              <S.Input
+                name="name"
+                value={formData.name}
+                placeholder="이름을 입력해 주세요."
+                maxLength={5}
+                onChange={handleChange}
+              />
+            </S.Field>
 
-          <label className="w-full block mb-[15px]">
-            <AuthInput
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              placeholder="전화번호"
-              onChange={handleChange}
-            />
-          </label>
+            <S.Field>
+              전화번호
+              <S.Input
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                placeholder="전화번호를 입력해 주세요."
+                onChange={handleChange}
+              />
+            </S.Field>
+          </S.Fields>
 
-          <NextButton type="submit" disabled={signup.isPending} className="mt-[30px]">
-            {signup.isPending ? '가입중...' : '가입하기'}
-          </NextButton>
+          <S.BottomArea>
+            <NextButton type="submit" disabled={signup.isPending}>
+              {signup.isPending ? '가입중...' : '가입하기'}
+            </NextButton>
 
-          {signup.isError && <p style={{ color: 'red' }}>가입 실패: {signup.error?.message}</p>}
-        </form>
-      </div>
+            {signup.isError ? <S.ErrorText>가입 실패: {signup.error?.message}</S.ErrorText> : null}
+          </S.BottomArea>
+        </S.Form>
+      </S.PageFrame>
     </Container>
   );
 }
