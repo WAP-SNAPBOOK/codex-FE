@@ -4,7 +4,16 @@ import { registerSW } from 'virtual:pwa-register';
 import App from './App.jsx';
 import './index.css';
 
+async function clearDevServiceWorkers() {
+  if (!import.meta.env.DEV || !('serviceWorker' in navigator)) return;
+
+  const registrations = await navigator.serviceWorker.getRegistrations();
+  await Promise.all(registrations.map((registration) => registration.unregister()));
+}
+
 async function bootstrap() {
+  await clearDevServiceWorkers();
+
   if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK !== 'false') {
     const { worker } = await import('./mocks/browser');
     await worker.start({ onUnhandledRequest: 'bypass' });
