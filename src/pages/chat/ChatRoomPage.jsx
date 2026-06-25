@@ -222,7 +222,11 @@ export default function ChatRoomPage() {
     navigate(`/shops/${shopInfo.shopId}/reservations/create${query}`, {
       state: {
         //돌아올 경로 확정(채팅방) - 현재 쿼리 파라미터 포함
-        returnTo: `/chat/${chatRoomId}${location.search}`,
+        returnTo: {
+          pathname: `/chat/${chatRoomId}`,
+          search: location.search,
+          state: { skipAutoReservation: true },
+        },
       },
     });
   };

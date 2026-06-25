@@ -22,13 +22,23 @@ export const InfoRow = styled.div`
 `;
 
 export const Label = styled.span`
-  color: #c0c0c0;
+  color: #777;
+  font-size: 13px;
   font-weight: 600;
 `;
 
 export const Value = styled.span`
   font-weight: 600;
   color: ${({ highlight }) => (highlight ? '#f08080' : '#222')};
+  text-align: right;
+`;
+
+export const PriceNote = styled.p`
+  margin: 2px 0 0;
+  color: #b3b3b3;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: right;
 `;
 
 export const Toggle = styled.button`
@@ -53,6 +63,23 @@ export const Actions = styled.div`
   display: flex;
   gap: 10px;
   margin-top: 14px;
+`;
+
+export const DetailContent = styled.div`
+  margin-top: 4px;
+`;
+
+export const DetailTitle = styled.div`
+  margin-bottom: 8px;
+  color: #222;
+  font-size: 14px;
+  font-weight: 700;
+`;
+
+export const DecisionFormSection = styled.div`
+  margin-top: 14px;
+  padding-top: ${({ $separated }) => ($separated ? '14px' : '0')};
+  border-top: ${({ $separated }) => ($separated ? '1px solid #f0f0f0' : 'none')};
 `;
 
 export const RejectButton = styled.button`
