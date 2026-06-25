@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import * as S from './ReservationRejectForm.style';
 
-export default function ReservationRejectForm({ onReject, isRejecting, rejected }) {
+export default function ReservationRejectForm({ onReject, onCancel, isRejecting, rejected }) {
   const [reason, setReason] = useState('');
+  const canReject = reason.trim().length > 0;
 
   return (
     <>
@@ -14,15 +15,19 @@ export default function ReservationRejectForm({ onReject, isRejecting, rejected 
         onChange={(e) => setReason(e.target.value)}
       />
 
-      <div className="flex justify-end">
+      <S.ButtonRow>
+        <S.CancelButton type="button" onClick={onCancel} disabled={isRejecting || rejected}>
+          취소
+        </S.CancelButton>
         <S.ConfirmButton
-          disabled={isRejecting || rejected}
+          type="button"
+          disabled={isRejecting || rejected || !canReject}
           $rejected={rejected}
-          onClick={() => onReject({ reason })}
+          onClick={() => onReject({ reason: reason.trim() })}
         >
           {isRejecting ? '처리 중...' : rejected ? '거절 완료' : '확인'}
         </S.ConfirmButton>
-      </div>
+      </S.ButtonRow>
     </>
   );
 }

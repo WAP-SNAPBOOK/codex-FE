@@ -55,7 +55,7 @@ export const useOwnerChatReservations = (shopId, customerId) => {
  */
 export const useConfirmReservation = () => {
   return useMutation({
-    mutationFn: ({ id, message }) => shopReservationService.confirmReservation(id, message),
+    mutationFn: (payload) => shopReservationService.confirmReservation(payload),
 
     onSuccess: () => {
       alert('예약이 확정되었습니다.');
@@ -93,6 +93,29 @@ export const useReservationDetail = (reservationId) => {
     queryKey: ['reservation-detail', reservationId],
     queryFn: () => reservationService.getReservationById(reservationId),
     enabled: !!reservationId,
+  });
+};
+
+export const useUpdateReservation = () => {
+  return useMutation({
+    mutationFn: (payload) => shopReservationService.updateReservation(payload),
+  });
+};
+
+export const useCancelReservation = () => {
+  return useMutation({
+    mutationFn: ({ id, reason }) => shopReservationService.cancelReservation(id, reason),
+  });
+};
+
+/**
+ * 점주용 예약 관리 캘린더 조회 훅
+ */
+export const useOwnerReservationCalendar = (shopId, { date, staffId } = {}) => {
+  return useQuery({
+    queryKey: ['owner-reservation-calendar', shopId, date, staffId ?? 'all'],
+    queryFn: () => reservationService.getOwnerCalendar(shopId, { date, staffId }),
+    enabled: !!shopId,
   });
 };
 
