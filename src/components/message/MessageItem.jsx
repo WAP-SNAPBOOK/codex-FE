@@ -1,13 +1,13 @@
 import React from 'react';
 import * as S from './MessageItem.style';
 import { formatTime } from '../../utils/formatTime';
-import ReservationCompleteMessage from '../message/ReservationCompleteMessage';
 import ReservationDecisionMessage from '../message/ReservationDecisionMessage';
 import DecisionCard from '../message/DecisionCard';
 import { useAuth } from '../../context/AuthContext';
 
 export default function MessageItem({ msg, isMine }) {
-  const { auth } = useAuth();
+  const authContext = useAuth();
+  const auth = authContext?.auth;
   const isOwner = auth?.userType === 'OWNER'; //점주 여부
 
   if (!msg?.isReservationCard && !msg?.message?.trim()) {
@@ -25,14 +25,7 @@ export default function MessageItem({ msg, isMine }) {
           CardComponent = <ReservationDecisionMessage reservation={msg.payload} />;
         } else {
           //일반 고객
-          CardComponent = (
-            <ReservationCompleteMessage
-              name={msg.payload.customerName}
-              date={msg.payload.date}
-              time={msg.payload.time}
-              photoCount={msg.payload.photoCount}
-            />
-          );
+          CardComponent = <ReservationDecisionMessage reservation={msg.payload} readOnly />;
         }
 
         break;
@@ -44,7 +37,8 @@ export default function MessageItem({ msg, isMine }) {
             customerName={msg.payload.customerName}
             dateText={msg.payload.date}
             timeText={msg.payload.time}
-            noteText={msg.payload.confirmationMessage}
+            durationMinutes={msg.payload.durationMinutes}
+            detailInfo={msg.payload}
           />
         );
         break;
@@ -56,7 +50,36 @@ export default function MessageItem({ msg, isMine }) {
             customerName={msg.payload.customerName}
             dateText={msg.payload.date}
             timeText={msg.payload.time}
-            noteText={msg.payload.rejectionReason ?? '예약이 불가한 시간입니다.'}
+            detailInfo={msg.payload}
+          />
+        );
+        break;
+
+      case 'RESERVATION_UPDATED':
+        CardComponent = (
+          <DecisionCard
+            variant="updated"
+            customerName={msg.payload.customerName}
+            dateText={msg.payload.date}
+            timeText={msg.payload.time}
+            durationMinutes={msg.payload.durationMinutes}
+            description={msg.message}
+            reservationChange={msg.reservationChange}
+            ownerMessage={msg.ownerMessage}
+            detailInfo={msg.payload}
+          />
+        );
+        break;
+
+      case 'RESERVATION_CANCELED':
+        CardComponent = (
+          <DecisionCard
+            variant="canceled"
+            customerName={msg.payload.customerName}
+            dateText={msg.payload.date}
+            timeText={msg.payload.time}
+            description={msg.message}
+            detailInfo={msg.payload}
           />
         );
         break;

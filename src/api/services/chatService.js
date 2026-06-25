@@ -1,10 +1,42 @@
 import axiosClient from '../axiosClient';
 
+const SYSTEM_SENDER_ID = 0;
+
+const needsLastMessageDetail = (room) =>
+  room?.lastMessageSenderId === SYSTEM_SENDER_ID && !room?.lastMessageContent;
+
+const getLatestMessage = async (chatRoomId) => {
+  const { messages } = await chatService.getMessages(chatRoomId, null, 1);
+  return messages?.[0] ?? null;
+};
+
 export const chatService = {
   //채팅방 목록 조회
   getChatRooms: async () => {
     const res = await axiosClient.get('/chat/rooms/', { params: { user: {} } });
-    return res.data;
+    const rooms = Array.isArray(res.data) ? res.data : [];
+
+    return Promise.all(
+      rooms.map(async (room) => {
+        if (!needsLastMessageDetail(room)) {
+          return room;
+        }
+
+        try {
+          const latestMessage = await getLatestMessage(room.chatRoomId);
+
+          return {
+            ...room,
+            lastMessage: latestMessage,
+            lastMessageType: latestMessage?.messageType,
+            lastMessageContent: latestMessage?.message ?? latestMessage?.content ?? null,
+          };
+        } catch (error) {
+          console.error('[getChatRooms] 마지막 메시지 상세 조회 실패:', error);
+          return room;
+        }
+      })
+    );
   },
 
   // 특정 채팅방 메시지 조회
