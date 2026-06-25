@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthRedirectPage from './pages/redirect/AuthRedirectPage';
 import SignupGatePage from './pages/signup/SignupGatePage';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -15,7 +15,8 @@ import ChatListPage from './pages/chat/ChatListPage';
 import ChatRoomPage from './pages/chat/ChatRoomPage';
 import Mypage from './pages/profile/Mypage';
 import OwnerMenuManagePage from './pages/OwnerMenuManage/OwnerMenuManagePage';
-import OwnerReservationList from './pages/OwnerReservation/ownerReservationList';
+import OwnerCalendarPage from './pages/OwnerReservation/OwnerCalendarPage';
+import OwnerReservationDetailPage from './pages/OwnerReservation/OwnerReservationDetailPage';
 import CustomerReservationList from './pages/CustomerReservation/CustomerReservationList';
 import LinkRedirectPage from './pages/redirect/LinkRedirectPage';
 import ReservationCreatePage from './pages/CustomerReservation/ReservationCreatePage';
@@ -57,24 +58,89 @@ function AppRoutes() {
       <Route path="/signup" element={<SignupGatePage />} />
       <Route path="/signup/customer" element={<CustomerSignupPage />} />
       <Route path="/signup/owner" element={<OwnerSignupPage />} />
-      <Route path="/chat" element={<ChatListPage />} />
-      <Route path="/chat/:chatRoomId" element={<ChatRoomPage />} />
-      <Route path="/shops/:shopId/reservations/create" element={<ReservationCreatePage />} />
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute>
+            <ChatListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/chat/:chatRoomId"
+        element={
+          <ProtectedRoute>
+            <ChatRoomPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shops/:shopId/reservations/create"
+        element={
+          <ProtectedRoute>
+            <ReservationCreatePage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/reservations"
         element={
-          !auth ? (
-            <LoginPage />
-          ) : auth.userType === 'CUSTOMER' ? (
-            <CustomerReservationList />
-          ) : (
-            <OwnerReservationList />
-          )
+          <ProtectedRoute>
+            <ReservationRoute />
+          </ProtectedRoute>
         }
       />
-      <Route path="/mypage" element={<Mypage />} />
-      <Route path="/mypage/menus" element={<OwnerMenuManagePage />} />
+      <Route
+        path="/reservations/:reservationId"
+        element={
+          <ProtectedRoute>
+            <OwnerReservationDetailRoute />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mypage"
+        element={
+          <ProtectedRoute>
+            <Mypage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mypage/menus"
+        element={
+          <ProtectedRoute>
+            <OwnerMenuManagePage />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
+  );
+}
+
+function ProtectedRoute({ children }) {
+  const { auth } = useAuth();
+
+  if (!auth) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+function ReservationRoute() {
+  const { auth } = useAuth();
+
+  return auth.userType === 'CUSTOMER' ? <CustomerReservationList /> : <OwnerCalendarPage />;
+}
+
+function OwnerReservationDetailRoute() {
+  const { auth } = useAuth();
+
+  return auth.userType === 'OWNER' ? (
+    <OwnerReservationDetailPage />
+  ) : (
+    <Navigate to="/reservations" replace />
   );
 }
 

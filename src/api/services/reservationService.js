@@ -48,6 +48,24 @@ export const reservationService = {
   },
 
   /**
+   * 점주용 예약 관리 캘린더 조회
+   * @param {number} shopId
+   * @param {Object} params
+   * @param {string} [params.date] - yyyy-MM-dd
+   * @param {number} [params.staffId]
+   * @returns {Promise<Object>}
+   */
+  getOwnerCalendar: async (shopId, params = {}) => {
+    const res = await axiosClient.get(`/api/owner/shops/${shopId}/calendar`, {
+      params: {
+        date: params.date,
+        staffId: params.staffId ?? undefined,
+      },
+    });
+    return res.data;
+  },
+
+  /**
    * 상점별 태그(카테고리) 목록 조회
    * @param {number} shopId - 상점 ID (path param)
    * @returns {Promise<Array>} 태그 목록 [{id, name}, ...]

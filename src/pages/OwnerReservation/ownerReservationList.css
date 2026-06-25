@@ -16,9 +16,38 @@
   font-size: 22px;
   font-weight: 700;
   color: #111;
-  align-self: flex-start;
-  margin-left: calc(50% - 170px);
+  margin: 0;
+  text-align: center;
+}
+
+.owner-title-bar {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  width: 341px;
   margin-bottom: 24px;
+}
+
+.owner-back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.owner-back-button img {
+  width: 23px;
+  height: 23px;
+}
+
+.owner-title-spacer {
+  width: 36px;
+  height: 36px;
 }
 
 /* ---- 회색 박스 ---- */
@@ -190,6 +219,47 @@
   margin-bottom: 8px;
 }
 
+.menu-wrap {
+  margin-bottom: 16px;
+  margin-left: -55px;
+  width: calc(100% + 55px);
+}
+
+.detail-section .menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.detail-section .menu-item {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f08080;
+  border: 1px solid #f08080;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.detail-section .menu-name {
+  display: block;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.detail-section .menu-inputs {
+  display: block;
+  color: #fff;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.detail-section .menu-item .empty-detail {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .detail-key {
   color: #808080;
   font-weight: 600;
@@ -213,6 +283,12 @@
 .detail-values .yes {
   color: #222;
   font-weight: 600;
+}
+
+.empty-detail {
+  color: #9a9a9a;
+  font-size: 9px;
+  line-height: 1.5;
 }
 
 /* ---- 사진 ---- */
@@ -448,6 +524,11 @@
   margin-bottom: 6px;
   font-size: 11px;
   font-weight: 600;
+}
+
+.final-text {
+  margin-bottom: 10px;
+  color: #333;
 }
 
 /* ---- 거절 박스 색 변경 ---- */
