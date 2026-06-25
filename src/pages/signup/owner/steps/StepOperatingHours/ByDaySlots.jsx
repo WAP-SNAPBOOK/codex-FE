@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import * as S from './ByDaySlots.styles';
 import { DayButton, DaysRow } from '../StepCommon.styles';
+import {
+  TimeField,
+  TimeSelect,
+  SelectChevron,
+  LastTimeHint,
+} from './StepOperatingHours.styles';
 
 const DAYS = [
   { value: 'MONDAY', label: '월' },
@@ -49,7 +55,7 @@ const toDayTimes = (groups) => {
  * @param {{ [day: string]: { start: string, end: string }[] }} dayTimes - API 형식
  * @param {(dayTimes: typeof dayTimes) => void} onUpdate
  */
-export default function ByDaySlots({ dayTimes, onUpdate }) {
+export default function ByDaySlots({ dayTimes, onUpdate, showLastTimeHint = false }) {
   const [groups, setGroups] = useState(() => toGroups(dayTimes));
 
   const update = (next) => {
@@ -133,17 +139,42 @@ export default function ByDaySlots({ dayTimes, onUpdate }) {
           </DaysRow>
           {group.times.map((time, timeIdx) => (
             <S.TimeRow key={timeIdx}>
-              <S.TimeInput
-                type="time"
-                value={time.start}
-                onChange={(e) => changeTime(groupIdx, timeIdx, 'start', e.target.value)}
-              />
+              <TimeField>
+                <TimeSelect
+                  value={time.start}
+                  onChange={(e) => changeTime(groupIdx, timeIdx, 'start', e.target.value)}
+                >
+                  {Array.from({ length: 24 }, (_, index) => {
+                    const value = `${String(index).padStart(2, '0')}:00`;
+                    return (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    );
+                  })}
+                </TimeSelect>
+                <SelectChevron aria-hidden="true" />
+              </TimeField>
               <S.TimeSeparator>~</S.TimeSeparator>
-              <S.TimeInput
-                type="time"
-                value={time.end}
-                onChange={(e) => changeTime(groupIdx, timeIdx, 'end', e.target.value)}
-              />
+              <TimeField>
+                {showLastTimeHint ? (
+                  <LastTimeHint>고객이 선택할 수 있는 마지막 시간</LastTimeHint>
+                ) : null}
+                <TimeSelect
+                  value={time.end}
+                  onChange={(e) => changeTime(groupIdx, timeIdx, 'end', e.target.value)}
+                >
+                  {Array.from({ length: 24 }, (_, index) => {
+                    const value = `${String(index).padStart(2, '0')}:00`;
+                    return (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    );
+                  })}
+                </TimeSelect>
+                <SelectChevron aria-hidden="true" />
+              </TimeField>
               {group.times.length > 1 && (
                 <S.RemoveButton type="button" onClick={() => removeTime(groupIdx, timeIdx)}>
                   ×

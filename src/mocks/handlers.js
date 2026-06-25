@@ -23,6 +23,7 @@ const menusByShopTag = {
       shopId: 1,
       name: '젤네일',
       description: '기본 젤네일 시술',
+      price: 50000,
       isActive: false,
       sortOrder: 1,
     },
@@ -31,6 +32,7 @@ const menusByShopTag = {
       shopId: 1,
       name: '젤아트',
       description: '아트 시술',
+      price: 70000,
       isActive: true,
       sortOrder: 2,
     },
@@ -39,6 +41,7 @@ const menusByShopTag = {
       shopId: 1,
       name: '젤아트',
       description: '아트 시술',
+      price: 70000,
       isActive: true,
       sortOrder: 2,
     },
@@ -47,6 +50,7 @@ const menusByShopTag = {
       shopId: 1,
       name: '아트',
       description: '아트 시술',
+      price: 65000,
       isActive: true,
       sortOrder: 2,
     },
@@ -55,6 +59,7 @@ const menusByShopTag = {
       shopId: 1,
       name: '아트',
       description: '아트 시술',
+      price: 65000,
       isActive: true,
       sortOrder: 2,
     },
@@ -63,6 +68,7 @@ const menusByShopTag = {
       shopId: 1,
       name: '아트',
       description: '아트 시술',
+      price: 65000,
       isActive: true,
       sortOrder: 2,
     },
@@ -73,6 +79,7 @@ const menusByShopTag = {
       shopId: 1,
       name: '브라질리언 왁싱',
       description: '브라질리언 왁싱 시술',
+      price: 90000,
       isActive: true,
       sortOrder: 1,
     },
@@ -81,6 +88,7 @@ const menusByShopTag = {
       shopId: 1,
       name: '페이스 왁싱',
       description: '얼굴 왁싱 시술',
+      price: 40000,
       isActive: true,
       sortOrder: 2,
     },
@@ -91,6 +99,7 @@ const menusByShopTag = {
       shopId: 65,
       name: '기본 손관리',
       description: '손톱 정리와 기본 케어',
+      price: 15000,
       isActive: true,
       sortOrder: 0,
     },
@@ -136,6 +145,158 @@ const getActiveMenus = (shopId, tagIds) => {
     .map(withMenuTags);
 };
 
+const ownerCalendarReservations = [
+  {
+    id: 901,
+    status: 'CONFIRMED',
+    date: '2026-06-18',
+    time: '08:30:00',
+    startAt: '2026-06-18T08:30:00',
+    endAt: '2026-06-18T09:30:00',
+    durationMinutes: 60,
+    displayDurationMinutes: 60,
+    shopId: 65,
+    shopName: '테스트샵',
+    staffId: 1,
+    staffName: '김와플',
+    customerName: '김와플',
+    customerPhone: '01012345678',
+    representativeMenuName: '기본 손관리',
+    menuCount: 1,
+    menuSummary: '기본 손관리',
+    requirements: '짧게 정리해주세요.',
+    imageUrls: [],
+    imageCount: 0,
+    confirmationMessage: '예약 확정되었습니다.',
+    menus: [
+      {
+        shopMenuId: 101,
+        menuNameSnapshot: '기본 손관리',
+        tagNameSnapshot: '손관리',
+        priceSnapshot: 15000,
+        sortOrder: 0,
+        inputValues: [],
+      },
+    ],
+  },
+  {
+    id: 902,
+    status: 'PENDING',
+    date: '2026-06-18',
+    time: '12:00:00',
+    startAt: '2026-06-18T12:00:00',
+    endAt: '2026-06-18T12:30:00',
+    durationMinutes: null,
+    displayDurationMinutes: 30,
+    shopId: 65,
+    shopName: '테스트샵',
+    staffId: 2,
+    staffName: '이소떡',
+    customerName: '이소떡',
+    customerPhone: '01087654321',
+    representativeMenuName: '젤네일',
+    menuCount: 2,
+    menuSummary: '젤네일 외 1개',
+    requirements: '',
+    imageUrls: [],
+    imageCount: 0,
+    menus: [
+      {
+        shopMenuId: 11,
+        menuNameSnapshot: '젤네일',
+        tagNameSnapshot: '손관리',
+        priceSnapshot: 50000,
+        sortOrder: 0,
+        inputValues: [],
+      },
+      {
+        shopMenuId: 12,
+        menuNameSnapshot: '영양제',
+        tagNameSnapshot: '손관리',
+        priceSnapshot: null,
+        sortOrder: 1,
+        inputValues: [],
+      },
+    ],
+  },
+];
+
+const buildOwnerCalendar = (date, staffId) => {
+  const selected = new Date(`${date}T00:00:00`);
+  const day = selected.getDay();
+  const weekStart = new Date(selected);
+  weekStart.setDate(selected.getDate() - day);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const toDateString = (value) => value.toISOString().slice(0, 10);
+  const reservationsForDate = ownerCalendarReservations.filter((reservation) => reservation.date === date);
+  const filteredReservations = staffId
+    ? reservationsForDate.filter((reservation) => reservation.staffId === Number(staffId))
+    : reservationsForDate;
+  const hasUnassigned = filteredReservations.some((reservation) => reservation.staffId == null);
+
+  const staffColumns = [
+    {
+      staffId: 1,
+      staffName: '김와플',
+      unassigned: false,
+      workingRanges: [{ startTime: '09:00', endTime: '18:00' }],
+      unavailableRanges: [{ startTime: '12:00', endTime: '13:00' }],
+      reservations: filteredReservations.filter((reservation) => reservation.staffId === 1),
+    },
+    {
+      staffId: 2,
+      staffName: '이소떡',
+      unassigned: false,
+      workingRanges: [{ startTime: '10:00', endTime: '20:00' }],
+      unavailableRanges: [{ startTime: '15:00', endTime: '16:00' }],
+      reservations: filteredReservations.filter((reservation) => reservation.staffId === 2),
+    },
+  ].filter((column) => !staffId || column.staffId === Number(staffId));
+
+  if (!staffId && hasUnassigned) {
+    staffColumns.push({
+      staffId: null,
+      staffName: '미지정',
+      unassigned: true,
+      workingRanges: [],
+      unavailableRanges: [],
+      reservations: filteredReservations.filter((reservation) => reservation.staffId == null),
+    });
+  }
+
+  return {
+    shopId: 65,
+    selectedDate: date,
+    weekStartDate: toDateString(weekStart),
+    weekEndDate: toDateString(weekEnd),
+    days: Array.from({ length: 7 }, (_, index) => {
+      const current = new Date(weekStart);
+      current.setDate(weekStart.getDate() + index);
+      const currentDate = toDateString(current);
+      const dayReservations = ownerCalendarReservations.filter((reservation) => reservation.date === currentDate);
+      return {
+        date: currentDate,
+        dayOfWeek: ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'][current.getDay()],
+        dayLabel: ['일', '월', '화', '수', '목', '금', '토'][current.getDay()],
+        dayOfMonth: current.getDate(),
+        selected: currentDate === date,
+        holiday: false,
+        hasPending: dayReservations.some((reservation) => reservation.status === 'PENDING'),
+        hasConfirmed: dayReservations.some((reservation) => reservation.status === 'CONFIRMED'),
+      };
+    }),
+    timeline: {
+      date,
+      holiday: false,
+      startTime: '08:00',
+      endTime: '21:00',
+      staffColumns,
+    },
+  };
+};
+
 export const handlers = [
   http.get(`${BASE}/shop/link`, () => {
     return HttpResponse.json({
@@ -145,6 +306,25 @@ export const handlers = [
       slug: 'mock-shop',
       publicCode: 'MOCKSHOP',
     });
+  }),
+
+  http.get(`${BASE}/api/owner/shops/:shopId/calendar`, ({ request }) => {
+    const url = new URL(request.url);
+    const date = url.searchParams.get('date') ?? '2026-06-18';
+    const staffId = url.searchParams.get('staffId');
+    return HttpResponse.json(buildOwnerCalendar(date, staffId));
+  }),
+
+  http.get(`${BASE}/api/reservations/:reservationId`, ({ params }) => {
+    const reservation = ownerCalendarReservations.find(
+      (item) => item.id === Number(params.reservationId)
+    );
+
+    if (!reservation) {
+      return HttpResponse.json({ code: 'RESERVATION_NOT_FOUND' }, { status: 404 });
+    }
+
+    return HttpResponse.json(reservation);
   }),
 
   // 전역 태그 정의 목록 조회
@@ -228,12 +408,13 @@ export const handlers = [
   // 메뉴 생성
   http.post(`${BASE}/api/shops/:shopId/menus`, async ({ params, request }) => {
     const shopId = Number(params.shopId);
-    const { name, description, sortOrder } = await request.json();
+    const { name, description, price, sortOrder } = await request.json();
     const menu = {
       id: nextMenuId++,
       shopId,
       name,
       description,
+      price,
       isActive: true,
       sortOrder,
     };

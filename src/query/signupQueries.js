@@ -83,7 +83,7 @@ export const useOwnerSignupFlow = () => {
     const tagMap = {}; // tagName → shopTagId
     let sortOrder = 1;
     try {
-      for (const { tagName, menuName, description, inputFields = [] } of menuItems) {
+      for (const { tagName, menuName, description, price, inputFields = [] } of menuItems) {
         // 같은 이름의 상점 태그는 한 번만 만들고 재사용한다.
         if (!tagMap[tagName]) {
           const shopTag = await createShopTag.mutateAsync({ shopId, name: tagName });
@@ -95,6 +95,7 @@ export const useOwnerSignupFlow = () => {
           shopId,
           name: menuName,
           description,
+          price,
           sortOrder: sortOrder++,
         });
         await linkMenuTag.mutateAsync({

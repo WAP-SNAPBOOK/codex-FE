@@ -3,11 +3,12 @@ import theme from '@/styles/theme';
 
 // 안내 문구 (요일 선택 가이드)
 export const ByDayNote = styled.p`
-  font-size: 12px;
+  margin: 0;
+  font-size: 10px;
   color: ${theme.colors.primary};
-  background: rgba(240, 128, 128, 0.08);
-  border-radius: 8px;
-  padding: 6px 10px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
   line-height: 1.5;
   text-align: center;
 `;
@@ -16,23 +17,28 @@ export const ByDayNote = styled.p`
 export const TimeRow = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
+  margin-top: 18px;
 `;
 
 export const TimeInput = styled.input`
   flex: 1;
-  height: 48px;
-  border: 1.5px solid ${theme.colors.gray.border};
-  border-radius: ${theme.radius.md};
+  min-width: 0;
+  height: 45px;
+  border: 0;
+  border-radius: 12px;
   text-align: center;
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 900;
   color: ${theme.colors.black.DEFAULT};
-  background: white;
+  background: #f7f7f9;
 `;
 
 export const TimeSeparator = styled.span`
-  color: ${theme.colors.gray.dark.DEFAULT};
+  color: #d1d3d8;
   font-size: 16px;
+  width: 10px;
+  text-align: center;
 `;
 
 export const RemoveButton = styled.button`
@@ -49,8 +55,8 @@ export const RemoveButton = styled.button`
 export const ByDayGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 22px;
+  margin-bottom: 18px;
 `;
 
 // 하단 버튼 행 (그룹 삭제 + 시간 추가)
@@ -61,8 +67,9 @@ export const AddSlotRow = styled.div`
 `;
 
 export const GroupRemoveButton = styled.button`
-  color: ${theme.colors.gray.dark.DEFAULT};
-  font-size: 13px;
+  color: #8a8a8e;
+  font-size: 10px;
+  font-weight: 800;
   background: none;
   border: none;
   cursor: pointer;
@@ -70,8 +77,8 @@ export const GroupRemoveButton = styled.button`
 
 export const AddTimeButton = styled.button`
   color: ${theme.colors.primary};
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 800;
   background: none;
   border: none;
   cursor: pointer;

@@ -1,59 +1,91 @@
 import styled from 'styled-components';
+import theme from '@/styles/theme';
 
-const D = 12; // 화살표 깊이 (px)
-const R = 20; // 모서리 반지름 (px)
-
-export const StepBar = styled.div`
+export const PageFrame = styled.div`
   display: flex;
-  width: 100%;
-  margin-bottom: 28px;
+  flex-direction: column;
+  position: relative;
+  width: min(100%, 402px);
+  min-height: 100dvh;
+  padding: 70px 24px 58px;
+  background: #fff;
 `;
 
-// $last: 마지막 단계 (오른쪽 플랫), 그 외: 오른쪽 방향 화살표 (모두 > 방향)
-// $active: 현재 단계 (색상 강조)
-// $zIndex: 오버랩 우선순위
-const chevronPath = ($last) =>
-  $last
-    ? `polygon(0 0, 100% 0, 100% 100%, 0 100%)`
-    : `polygon(0 0, calc(100% - ${D}px) 0, 100% 50%, calc(100% - ${D}px) 100%, 0 100%)`;
+export const Header = styled.header`
+  display: flex;
+  align-items: center;
+  height: 26px;
+  margin-bottom: 40px;
+`;
 
-export const StepItemWrapper = styled.div`
-  flex: 1;
-  position: relative;
-  z-index: ${({ $zIndex }) => $zIndex};
-  margin-left: ${({ $first }) => ($first ? '0' : `-${D}px`)};
-  border-radius: ${({ $first, $last }) =>
-    $first ? `${R}px 0 0 ${R}px` : $last ? `0 ${R}px ${R}px 0` : '0'};
-  overflow: hidden;
+export const BackButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+
+  img {
+    width: 22px;
+    height: 22px;
+    display: block;
+  }
+`;
+
+export const StepNav = styled.nav`
+  display: grid;
+  grid-template-columns: minmax(56px, 1fr) 26px minmax(82px, 1fr) 26px minmax(56px, 1fr);
+  align-items: center;
+  column-gap: 6px;
+  width: 100%;
+  padding: 0 10px;
+  margin-bottom: 48px;
+`;
+
+export const StepTab = styled.button`
+  min-width: 0;
+  justify-self: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ $active }) => ($active ? theme.colors.primary : '#787a80')};
+  font-size: 18.5px;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+  letter-spacing: -0.025em;
+  white-space: pre-line;
   cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
 `;
 
-export const StepItem = styled.div`
-  width: 100%;
-  height: 52px;
-  display: flex;
+export const StepDivider = styled.span`
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  background: ${({ $active }) => ($active ? '#FF8A8A' : '#EEEEEE')};
-  color: ${({ $active }) => ($active ? '#fff' : '#555')};
-  font-size: 12px;
-  font-weight: ${({ $active }) => ($active ? '700' : '500')};
-  line-height: 1.4;
-  white-space: pre-line;
-  text-align: center;
-  transition: background 0.2s;
-  clip-path: ${({ $last }) => chevronPath($last)};
+  color: #d1d3d8;
+  font-size: 22px;
+  font-weight: 500;
+`;
 
-  /* 비활성 단계: 흰색 내부 레이어로 테두리 효과 (z-index: -1 → 배경 아래, 텍스트 위) */
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 1px;
-    background: ${({ $active }) => ($active ? 'transparent' : 'white')};
-    border-radius: ${({ $first, $last }) =>
-      $first ? `${R}px 0 0 ${R}px` : $last ? `0 ${R}px ${R}px 0` : '0'};
-    clip-path: ${({ $last }) => chevronPath($last)};
-    z-index: -1;
+export const Content = styled.main`
+  flex: 1;
+  width: 100%;
+`;
+
+export const BottomArea = styled.div`
+  width: 100%;
+  margin-top: auto;
+  padding-top: 24px;
+
+  button {
+    width: 100%;
+    height: 56px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    background: ${theme.colors.primary};
   }
 `;

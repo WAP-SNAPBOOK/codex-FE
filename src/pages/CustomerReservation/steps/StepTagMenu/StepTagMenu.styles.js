@@ -1,21 +1,33 @@
 import styled from 'styled-components';
 import theme from '@/styles/theme';
 
-export const Divider = styled.hr`
-  width: 100%;
-  height: 1px;
-  border: none;
-  background-color: #e5e7eb;
-  margin: 16px 0;
+export const SectionTitle = styled.h2`
+  margin: 0 0 8px;
+  color: #000;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 25px;
+  letter-spacing: -0.45px;
 `;
 
-/* 태그 버튼 영역 */
+export const SectionDescription = styled.p`
+  margin: 0 0 22px;
+  color: #8a8a8e;
+  font-size: 12.25px;
+  font-weight: 400;
+  line-height: 13px;
+  letter-spacing: -0.306px;
+`;
+
 export const ButtonGrid = styled.div`
   display: flex;
   flex-wrap: nowrap;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 8px;
+  min-height: 42px;
+  margin: 0 -29px 18px 0;
+  padding: 12px 29px 16px 0;
   overflow-x: auto;
+  border-bottom: 1px solid #e1e2e4;
   -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
@@ -28,16 +40,16 @@ export const SelectButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 38px;
-  padding: 12px 24px;
-  border-radius: ${theme.radius.lg};
-  border: 1.5px solid
-    ${({ $selected }) => ($selected ? theme.colors.primary : theme.colors.gray.DEFAULT)};
-  background-color: ${({ $selected }) => ($selected ? 'rgba(240, 128, 128, 0.1)' : '#fff')};
-  color: ${({ $selected }) => ($selected ? theme.colors.primary : '#333')};
+  flex: 0 0 auto;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid ${({ $selected }) => ($selected ? theme.colors.primary : '#e1e2e4')};
+  background-color: ${({ $selected }) => ($selected ? theme.colors.primary : '#fff')};
+  color: ${({ $selected }) => ($selected ? '#fff' : '#000')};
   font-size: 15px;
   white-space: nowrap;
-  font-weight: ${({ $selected }) => ($selected ? '600' : '400')};
+  font-weight: 600;
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -45,13 +57,11 @@ export const SelectButton = styled.button`
     color 0.15s ease;
 `;
 
-/* 메뉴 카드 영역 */
 export const MenuList = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 450px;
-  height: 450px;
-  gap: 10px;
+  min-height: 390px;
+  max-height: calc(100vh - 390px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 
@@ -62,32 +72,87 @@ export const MenuList = styled.div`
 `;
 
 export const MenuCard = styled.div`
+  width: 100%;
+  padding: 20px 0;
+  border-bottom: 1px solid #eaebec;
+  opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
+`;
+
+export const MenuSummary = styled.button`
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
-  padding: 14px 16px;
-  border-bottom: 1px solid ${theme.colors.gray.DEFAULT};
-  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
-  opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+`;
+
+export const RadioIndicator = styled.span`
+  position: relative;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  margin-top: 0;
+  border: 1px solid ${({ $selected }) => ($selected ? theme.colors.primary : '#d1d3d8')};
+  border-radius: 6px;
+  background: ${({ $selected }) => ($selected ? theme.colors.primary : '#fff')};
+
+  &::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+    opacity: ${({ $selected }) => ($selected ? 1 : 0)};
+    transition:
+      opacity 0.15s ease;
+  }
 `;
 
 export const MenuContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 6px;
   flex: 1;
+  min-width: 0;
 `;
 
 export const MenuName = styled.p`
-  font-size: 18px;
+  min-width: 0;
+  font-size: 17px;
   font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.43px;
   color: ${({ $disabled }) => ($disabled ? '#aaa' : '#000000')};
   margin: 0;
+  overflow-wrap: anywhere;
+`;
+
+export const MenuPrice = styled.span`
+  color: ${({ $disabled }) => ($disabled ? '#aaa' : '#000')};
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+  white-space: nowrap;
 `;
 
 export const MenuDescription = styled.p`
   font-size: 13px;
-  color: ${({ $disabled }) => ($disabled ? '#ccc' : '#888')};
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.31px;
+  color: ${({ $disabled }) => ($disabled ? '#ccc' : '#8a8a8e')};
   margin: 0;
+  white-space: pre-line;
+`;
+
+export const MenuInputSlot = styled.div`
+  margin-left: 36px;
 `;
