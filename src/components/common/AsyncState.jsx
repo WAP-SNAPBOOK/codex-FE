@@ -8,6 +8,7 @@ export default function AsyncState({
   actionLabel,
   onAction,
   withBottomNav = false,
+  compact = false,
 }) {
   const isError = variant === 'error';
 
@@ -15,6 +16,7 @@ export default function AsyncState({
     <StateBox
       role={isError ? 'alert' : 'status'}
       $withBottomNav={withBottomNav}
+      $compact={compact}
       aria-live={isError ? 'assertive' : 'polite'}
     >
       <StateIcon $variant={variant} aria-hidden="true">
@@ -33,11 +35,11 @@ export default function AsyncState({
 
 const StateBox = styled.div`
   display: flex;
-  min-height: 55vh;
+  min-height: ${({ $compact }) => ($compact ? '240px' : '55vh')};
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 24px
+  padding: ${({ $compact }) => ($compact ? '32px 24px' : '40px 24px')}
     ${({ $withBottomNav }) =>
       $withBottomNav
         ? `calc(${theme.layout.bottomNavSpace} + env(safe-area-inset-bottom))`

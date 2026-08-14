@@ -6,7 +6,8 @@ export const Page = styled.div`
   min-height: 100vh;
   margin: 0 auto;
   background: #fff;
-  color: #111;
+  padding-bottom: calc(${theme.layout.bottomNavSpace} + env(safe-area-inset-bottom));
+  color: ${theme.colors.text.primary};
   font-family: Pretendard, sans-serif;
 `;
 
@@ -14,9 +15,29 @@ export const Header = styled.header`
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #fff;
-  padding: 52px 16px 0;
-  border-bottom: 1px solid #f1f1f1;
+  padding: calc(18px + env(safe-area-inset-top)) 20px 0;
+  border-bottom: 1px solid ${theme.colors.border.subtle};
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+`;
+
+export const PageHeading = styled.div`
+  margin-bottom: 18px;
+`;
+
+export const PageTitle = styled.h1`
+  margin: 0;
+  color: ${theme.colors.text.primary};
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+`;
+
+export const PageDescription = styled.p`
+  margin: 7px 0 0;
+  color: ${theme.colors.text.tertiary};
+  font-size: 13px;
+  line-height: 1.45;
 `;
 
 export const MonthBar = styled.div`
@@ -32,8 +53,8 @@ export const MonthButton = styled.button`
   gap: 6px;
   border: 0;
   background: transparent;
-  color: #111;
-  font-size: 20px;
+  color: ${theme.colors.text.primary};
+  font-size: 18px;
   font-weight: 800;
   padding: 0;
 `;
@@ -47,11 +68,11 @@ export const MonthControls = styled.div`
 export const TodayButton = styled.button`
   height: 32px;
   padding: 0 12px;
-  border: 1px solid #e1e2e4;
-  border-radius: 999px;
-  background: #fff;
-  color: #111;
-  font-size: 13px;
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  border-radius: ${theme.radius.pill};
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.primary};
+  font-size: 12px;
   font-weight: 700;
 `;
 
@@ -63,16 +84,16 @@ export const IconButton = styled.button`
   height: 32px;
   border: 0;
   border-radius: 50%;
-  background: #f7f7f9;
-  color: #111;
+  background: ${theme.colors.surface.subtle};
+  color: ${theme.colors.text.primary};
   font-size: 18px;
 `;
 
 export const StaffFilter = styled.div`
   display: flex;
   gap: 8px;
-  margin: 10px -16px 0;
-  padding: 0 16px 12px;
+  margin: 10px -20px 0;
+  padding: 0 20px 12px;
   overflow-x: auto;
 
   &::-webkit-scrollbar {
@@ -84,18 +105,20 @@ export const StaffChip = styled.button`
   flex: 0 0 auto;
   height: 32px;
   padding: 0 12px;
-  border: 1px solid ${({ $selected }) => ($selected ? theme.colors.primary : '#e1e2e4')};
-  border-radius: 999px;
-  background: ${({ $selected }) => ($selected ? theme.colors.primary : '#fff')};
-  color: ${({ $selected }) => ($selected ? '#fff' : '#111')};
-  font-size: 13px;
+  border: 1px solid
+    ${({ $selected }) => ($selected ? theme.colors.primary : theme.colors.border.DEFAULT)};
+  border-radius: ${theme.radius.pill};
+  background: ${({ $selected }) =>
+    $selected ? theme.colors.primary : theme.colors.surface.DEFAULT};
+  color: ${({ $selected }) => ($selected ? theme.colors.text.inverse : theme.colors.text.primary)};
+  font-size: 12px;
   font-weight: 700;
 `;
 
 export const WeekStrip = styled.div`
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 4px;
   padding: 10px 0 12px;
 `;
 
@@ -108,9 +131,9 @@ export const DayButton = styled.button`
   gap: 6px;
   min-height: 52px;
   border: 0;
-  border-radius: 8px;
+  border-radius: ${theme.radius.md};
   background: ${({ $selected }) => ($selected ? theme.colors.primary : 'transparent')};
-  color: ${({ $selected }) => ($selected ? '#fff' : '#111')};
+  color: ${({ $selected }) => ($selected ? theme.colors.text.inverse : theme.colors.text.primary)};
   font-weight: ${({ $selected }) => ($selected ? 800 : 600)};
 `;
 
@@ -128,7 +151,8 @@ export const DayBadge = styled.span`
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: ${({ $pending }) => ($pending ? '#ff9f43' : '#8a8a8e')};
+  background: ${({ $pending }) =>
+    $pending ? theme.colors.status.pending.text : theme.colors.status.success.text};
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
 `;
 
@@ -188,14 +212,21 @@ export const MonthOption = styled.button`
 
 export const Body = styled.main`
   overflow-x: auto;
-  padding: 26px 0 calc(104px + env(safe-area-inset-bottom));
+  padding: 18px 0 0;
+`;
+
+export const CalendarLoading = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
 `;
 
 export const TimelineGrid = styled.div`
   position: relative;
   display: grid;
-  grid-template-columns: 44px repeat(${({ $columns }) => Math.max($columns, 1)}, minmax(248px, 1fr));
-  min-width: ${({ $columns }) => 44 + Math.max($columns, 1) * 248}px;
+  grid-template-columns: 48px repeat(${({ $columns }) => Math.max($columns, 1)}, minmax(228px, 1fr));
+  min-width: ${({ $columns }) => 48 + Math.max($columns, 1) * 228}px;
 `;
 
 export const StaffHeader = styled.div`
@@ -203,7 +234,7 @@ export const StaffHeader = styled.div`
   z-index: 5;
   grid-column: 2 / -1;
   display: grid;
-  grid-template-columns: repeat(${({ $columns }) => Math.max($columns, 1)}, minmax(248px, 1fr));
+  grid-template-columns: repeat(${({ $columns }) => Math.max($columns, 1)}, minmax(228px, 1fr));
   gap: 4px;
   padding-bottom: 8px;
 `;
@@ -236,7 +267,7 @@ export const Columns = styled.div`
   grid-column: 2 / -1;
   grid-row: 2;
   display: grid;
-  grid-template-columns: repeat(${({ $columns }) => Math.max($columns, 1)}, minmax(248px, 1fr));
+  grid-template-columns: repeat(${({ $columns }) => Math.max($columns, 1)}, minmax(228px, 1fr));
 `;
 
 export const StaffColumn = styled.div`
@@ -278,9 +309,17 @@ export const ReservationBlock = styled.button`
   height: ${({ $height }) => $height}px;
   padding: 10px 12px;
   border: 0;
-  border-radius: 8px;
-  background: ${({ $status }) => ($status === 'PENDING' ? '#f0f1f3' : '#ffe5e5')};
-  color: #111;
+  border: 1px solid
+    ${({ $status }) =>
+      $status === 'PENDING'
+        ? theme.colors.status.pending.background
+        : theme.colors.status.success.background};
+  border-radius: ${theme.radius.md};
+  background: ${({ $status }) =>
+    $status === 'PENDING'
+      ? theme.colors.status.pending.background
+      : theme.colors.status.success.background};
+  color: ${theme.colors.text.primary};
   text-align: left;
   overflow: hidden;
 `;
@@ -293,7 +332,7 @@ export const ReservationName = styled.div`
 
 export const ReservationMeta = styled.div`
   margin-top: 4px;
-  color: #666;
+  color: ${theme.colors.text.secondary};
   font-size: 11px;
   line-height: 1.35;
 `;
@@ -305,15 +344,19 @@ export const StatusLabel = styled.span`
   margin-top: 6px;
   padding: 0 6px;
   border-radius: 999px;
-  background: ${({ $status }) => ($status === 'PENDING' ? '#777' : theme.colors.primary)};
-  color: #fff;
+  background: ${({ $status }) =>
+    $status === 'PENDING'
+      ? theme.colors.status.pending.background
+      : theme.colors.status.success.background};
+  color: ${({ $status }) =>
+    $status === 'PENDING' ? theme.colors.status.pending.text : theme.colors.status.success.text};
   font-size: 10px;
   font-weight: 800;
 `;
 
 export const EmptyState = styled.div`
   padding: 84px 24px;
-  color: #8a8a8e;
+  color: ${theme.colors.text.tertiary};
   text-align: center;
   font-size: 14px;
 `;

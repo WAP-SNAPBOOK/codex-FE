@@ -14,12 +14,14 @@ const STATUS_TONES = {
   PENDING: 'pending',
   CONFIRMED: 'success',
   REJECTED: 'error',
+  CANCELLED: 'neutral',
 };
 
 const STATUS_LABELS = {
-  PENDING: '접수중',
+  PENDING: '확인 대기',
   CONFIRMED: '예약 확정',
   REJECTED: '예약 거절',
+  CANCELLED: '예약 취소',
 };
 
 const toArray = (value) => (Array.isArray(value) ? value : []);
@@ -73,6 +75,19 @@ const formatTime = (value) => {
   return value;
 };
 
+const formatDate = (value) => {
+  if (!value) return '-';
+
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat('ko-KR', {
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short',
+  }).format(date);
+};
+
 export default function CustomerReservationList() {
   const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
@@ -97,12 +112,21 @@ export default function CustomerReservationList() {
     fetchReservations();
   }, [fetchReservations]);
 
+  const activeReservationCount = reservations.filter((reservation) =>
+    ['PENDING', 'CONFIRMED'].includes(reservation.status)
+  ).length;
+  const confirmedReservationCount = reservations.filter(
+    (reservation) => reservation.status === 'CONFIRMED'
+  ).length;
+
   return (
     <div className="customer-reservation-page">
       <Header title="내 예약" description="신청한 예약과 진행 상태를 확인하세요." />
       {isLoading && (
-        <main className="reservation-list">
-          <ListSkeleton count={2} label="예약을 불러오는 중" />
+        <main className="reservation-content">
+          <div className="reservation-list">
+            <ListSkeleton count={2} label="예약을 불러오는 중" />
+          </div>
         </main>
       )}
       {!isLoading && error && (
@@ -118,17 +142,37 @@ export default function CustomerReservationList() {
       {!isLoading && !error && reservations.length === 0 && (
         <AsyncState
           title="아직 예약 내역이 없어요"
-          description="매장의 예약 링크에서 첫 예약을 신청해 보세요."
-          actionLabel="홈으로 가기"
-          onAction={() => navigate('/')}
+          description="상담 중인 매장이 있다면 채팅에서 예약을 시작해보세요."
+          actionLabel="채팅 보기"
+          onAction={() => navigate('/chat')}
           withBottomNav
         />
       )}
       {!isLoading && !error && reservations.length > 0 && (
-        <main className="reservation-list">
-          {reservations.map((r) => (
-            <ReservationCard key={r.id ?? `${r.shopName}-${r.date}-${r.time}`} data={r} />
-          ))}
+        <main className="reservation-content">
+          <section className="reservation-overview" aria-label="예약 요약">
+            <div>
+              <span>진행 예약</span>
+              <strong>{activeReservationCount}건</strong>
+            </div>
+            <div>
+              <span>예약 확정</span>
+              <strong>{confirmedReservationCount}건</strong>
+            </div>
+            <div>
+              <span>전체 내역</span>
+              <strong>{reservations.length}건</strong>
+            </div>
+          </section>
+          <div className="list-heading">
+            <h2>예약 내역</h2>
+            <span>최근 신청한 예약부터 확인할 수 있어요.</span>
+          </div>
+          <div className="reservation-list">
+            {reservations.map((r) => (
+              <ReservationCard key={r.id ?? `${r.shopName}-${r.date}-${r.time}`} data={r} />
+            ))}
+          </div>
         </main>
       )}
       <BottomNav />
@@ -173,7 +217,7 @@ function ReservationCard({ data }) {
         <div className="info-section">
           <div className="info-row">
             <span className="label">예약 날짜</span>
-            <span className="value-1 highlight">{data.date}</span>
+            <span className="value-1 highlight">{formatDate(data.date)}</span>
           </div>
           <div className="info-row">
             <span className="label">예약 시간</span>

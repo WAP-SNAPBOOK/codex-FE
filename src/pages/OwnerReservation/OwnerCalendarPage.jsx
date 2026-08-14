@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import { useLocation, useNavigate } from 'react-router-dom';
+import AsyncState from '@/components/common/AsyncState';
 import BottomNav from '@/components/common/BottomNav';
+import { SkeletonBlock } from '@/components/common/Skeleton';
 import { useAuth } from '@/context/AuthContext';
 import { useShopLink } from '@/query/linkQueries';
 import { useOwnerReservationCalendar } from '@/query/reservationQueries';
@@ -82,11 +84,21 @@ export default function OwnerCalendarPage() {
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
   const [pickerYear, setPickerYear] = useState(() => dayjs().year());
 
-  const { data: shopLink, isLoading: isShopLoading } = useShopLink({ enabled: isOwner });
+  const {
+    data: shopLink,
+    isLoading: isShopLoading,
+    isError: isShopError,
+    refetch: refetchShop,
+  } = useShopLink({ enabled: isOwner });
   const shopId = shopLink?.shopId ?? null;
   const dateText = selectedDate.format('YYYY-MM-DD');
 
-  const { data: calendar, isLoading: isCalendarLoading } = useOwnerReservationCalendar(shopId, {
+  const {
+    data: calendar,
+    isLoading: isCalendarLoading,
+    isError: isCalendarError,
+    refetch: refetchCalendar,
+  } = useOwnerReservationCalendar(shopId, {
     date: dateText,
     staffId: selectedStaffId,
   });
@@ -112,7 +124,6 @@ export default function OwnerCalendarPage() {
     () => (calendar?.timeline?.staffColumns ?? []).filter((column) => !column.unassigned),
     [calendar]
   );
-
   const moveWeek = (delta) => {
     setSelectedDate((current) => current.add(delta, 'week'));
   };
@@ -136,6 +147,15 @@ export default function OwnerCalendarPage() {
     setIsMonthPickerOpen(false);
   };
 
+  const retryCalendar = () => {
+    if (isShopError) {
+      refetchShop();
+      return;
+    }
+
+    refetchCalendar();
+  };
+
   if (!isOwner) {
     return <S.EmptyState>점주 계정만 예약 캘린더를 확인할 수 있습니다.</S.EmptyState>;
   }
@@ -143,6 +163,10 @@ export default function OwnerCalendarPage() {
   return (
     <S.Page>
       <S.Header>
+        <S.PageHeading>
+          <S.PageTitle>예약 캘린더</S.PageTitle>
+          <S.PageDescription>날짜와 담당자별 예약 일정을 확인하세요.</S.PageDescription>
+        </S.PageHeading>
         <S.MonthBar>
           <S.MonthButton
             type="button"
@@ -207,9 +231,28 @@ export default function OwnerCalendarPage() {
       </S.Header>
 
       {isShopLoading || isCalendarLoading ? (
-        <S.EmptyState>예약 캘린더를 불러오는 중입니다.</S.EmptyState>
+        <S.CalendarLoading role="status" aria-label="예약 캘린더를 불러오는 중">
+          <SkeletonBlock $width="100%" $height="82px" $radius="18px" />
+          <SkeletonBlock $width="58%" $height="16px" />
+          <SkeletonBlock $width="100%" $height="360px" $radius="18px" />
+        </S.CalendarLoading>
+      ) : isShopError || isCalendarError ? (
+        <AsyncState
+          compact
+          variant="error"
+          title="예약 캘린더를 불러오지 못했어요"
+          description="네트워크 상태를 확인한 뒤 다시 시도해주세요."
+          actionLabel="다시 시도"
+          onAction={retryCalendar}
+        />
       ) : columns.length === 0 ? (
-        <S.EmptyState>표시할 예약이 없습니다.</S.EmptyState>
+        <AsyncState
+          compact
+          title="표시할 일정이 없어요"
+          description="선택한 날짜의 영업 일정과 담당자 정보를 확인해주세요."
+          actionLabel="오늘 일정 보기"
+          onAction={goToToday}
+        />
       ) : (
         <S.Body>
           <S.TimelineGrid $columns={columns.length}>
