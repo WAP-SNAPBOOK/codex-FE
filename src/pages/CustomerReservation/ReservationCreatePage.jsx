@@ -161,13 +161,13 @@ export default function ReservationCreatePage() {
     <Container $start>
       <S.PageWrapper>
         <S.Header>
-          <S.IconButton onClick={handleBackClick} aria-label="뒤로가기">
-            <img src={backIcon} alt="back" />
+          <S.IconButton type="button" onClick={handleBackClick} aria-label="뒤로가기">
+            <img src={backIcon} alt="" />
           </S.IconButton>
 
           <S.Title>예약하기</S.Title>
-          <S.IconButton onClick={handleClose} aria-label="채팅방으로 돌아가기">
-            <img src={closeIcon} alt="close" />
+          <S.IconButton type="button" onClick={handleClose} aria-label="채팅방으로 돌아가기">
+            <img src={closeIcon} alt="" />
           </S.IconButton>
         </S.Header>
 

@@ -8,7 +8,7 @@
 
 /* 카드 컨테이너 */
 .decision-card {
-  width: 263px;
+  width: min(100%, 300px);
   max-width: 100%;
   background: var(--card);
   border-radius: 16px;
@@ -230,7 +230,7 @@
 .menu-change-column-title {
   margin-bottom: 6px;
   color: #8e949b;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -273,13 +273,13 @@
 
 .menu-change-price {
   color: inherit;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 
 .menu-change-inputs {
   margin-top: 5px;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }

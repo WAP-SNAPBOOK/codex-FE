@@ -56,7 +56,7 @@ export default function StepPhotoNote({ initialData = {}, onChange }) {
       <S.UploadBox as="button" type="button" onClick={() => fileInputRef.current.click()}>
         사진을 선택해 주세요
         <S.UploadIcon>
-          <img src={pictureIcon} alt="pictureIcon" />
+          <img src={pictureIcon} alt="" />
         </S.UploadIcon>
       </S.UploadBox>
 
@@ -72,14 +72,22 @@ export default function StepPhotoNote({ initialData = {}, onChange }) {
       <S.PhotoGrid>
         {previews.map((p, idx) => (
           <S.PhotoItem key={idx}>
-            <img src={p.url} alt="" />
-            <S.RemoveButton onClick={() => removeFile(idx)}>×</S.RemoveButton>
+            <img src={p.url} alt={`첨부 사진 ${idx + 1}`} />
+            <S.RemoveButton
+              type="button"
+              aria-label={`첨부 사진 ${idx + 1} 삭제`}
+              onClick={() => removeFile(idx)}
+            >
+              ×
+            </S.RemoveButton>
           </S.PhotoItem>
         ))}
 
         {files.length < MAX_PHOTOS &&
           Array.from({ length: MAX_PHOTOS - files.length }).map((_, i) => (
-            <S.EmptyPhoto key={`empty-${i}`}>+</S.EmptyPhoto>
+            <S.EmptyPhoto key={`empty-${i}`} aria-hidden="true">
+              +
+            </S.EmptyPhoto>
           ))}
       </S.PhotoGrid>
 

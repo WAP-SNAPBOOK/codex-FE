@@ -14,6 +14,7 @@ export default function TimeSlots({ date, value, onSelect, slots }) {
           const isBooked = status === 'UNAVAILABLE';
           return (
             <S.TimeButton
+              type="button"
               key={time}
               $selected={value === time}
               disabled={isBooked}

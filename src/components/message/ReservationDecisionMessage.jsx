@@ -101,7 +101,7 @@ export default function ReservationDecisionMessage({ reservation, readOnly = fal
 
       <S.Divider />
 
-      <S.Toggle onClick={() => setOpen((v) => !v)}>
+      <S.Toggle type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
         상세 보기
         <span>{open ? '▲' : '▼'}</span>
       </S.Toggle>
@@ -143,6 +143,7 @@ export default function ReservationDecisionMessage({ reservation, readOnly = fal
         {mode === 'VIEW' && !isDecisionDone && !readOnly ? (
           <>
             <S.RejectButton
+              type="button"
               onClick={() => {
                 setMode('REJECT');
               }}
@@ -150,6 +151,7 @@ export default function ReservationDecisionMessage({ reservation, readOnly = fal
               거절
             </S.RejectButton>
             <S.ApproveButton
+              type="button"
               onClick={() => {
                 setMode('CONFIRM');
               }}

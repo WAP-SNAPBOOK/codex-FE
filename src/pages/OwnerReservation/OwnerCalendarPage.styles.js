@@ -350,7 +350,7 @@ export const StatusLabel = styled.span`
       : theme.colors.status.success.background};
   color: ${({ $status }) =>
     $status === 'PENDING' ? theme.colors.status.pending.text : theme.colors.status.success.text};
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 `;
 

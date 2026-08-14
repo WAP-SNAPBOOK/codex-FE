@@ -26,6 +26,22 @@ const GlobalStyle = createGlobalStyle`
     background-color: #fff;
   }
 
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid rgba(240, 128, 128, 0.35);
+    outline-offset: 2px;
+  }
+
 `;
 
 export default GlobalStyle;

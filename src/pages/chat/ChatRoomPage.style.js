@@ -60,7 +60,7 @@ export const RoomDescription = styled.span`
   display: block;
   margin-top: 3px;
   color: ${theme.colors.text.tertiary};
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 `;
 

@@ -4,7 +4,7 @@ import theme from '@/styles/theme';
 // 안내 문구 (요일 선택 가이드)
 export const ByDayNote = styled.p`
   margin: 0;
-  font-size: 10px;
+  font-size: 12px;
   color: ${theme.colors.primary};
   background: transparent;
   border-radius: 0;
@@ -68,7 +68,8 @@ export const AddSlotRow = styled.div`
 
 export const GroupRemoveButton = styled.button`
   color: #8a8a8e;
-  font-size: 10px;
+  min-height: 36px;
+  font-size: 12px;
   font-weight: 800;
   background: none;
   border: none;
@@ -77,7 +78,8 @@ export const GroupRemoveButton = styled.button`
 
 export const AddTimeButton = styled.button`
   color: ${theme.colors.primary};
-  font-size: 10px;
+  min-height: 36px;
+  font-size: 12px;
   font-weight: 800;
   background: none;
   border: none;

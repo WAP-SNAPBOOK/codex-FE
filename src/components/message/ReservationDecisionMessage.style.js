@@ -2,10 +2,11 @@ import styled from 'styled-components';
 
 export const Card = styled.div`
   background: #fff;
-  border: 4px solid #ededed;
+  border: 1px solid #e3e4e7;
   border-radius: 18px;
-  padding: 16px;
-  width: 225px;
+  width: min(100%, 300px);
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
 `;
 
 export const Title = styled.h3`
@@ -51,6 +52,7 @@ export const Toggle = styled.button`
   display: flex;
   justify-content: space-between;
   cursor: pointer;
+  min-height: 40px;
 `;
 
 export const Divider = styled.div`
@@ -89,6 +91,7 @@ export const RejectButton = styled.button`
   background: #e5e5e5;
   border: none;
   font-weight: 600;
+  cursor: pointer;
 `;
 
 export const ApproveButton = styled.button`
@@ -99,6 +102,7 @@ export const ApproveButton = styled.button`
   border: none;
   color: white;
   font-weight: 700;
+  cursor: pointer;
 `;
 
 export const TextValue = styled.span`

@@ -22,16 +22,17 @@ export default function StepUserInfo({ initialData, onChange }) {
   return (
     <>
       <S.StepTitle>기본 정보 입력</S.StepTitle>
-      <div className="flex flex-col items-center mb-[320px]">
+      <div className="flex flex-col items-center">
         <S.Field>
           <S.InputWrapper>
             <S.Input
+              aria-label="예약자 이름"
               placeholder="이름을 입력해 주세요"
               value={name}
               onChange={(e) => setName(e.target.value.slice(0, 5))}
             />
             <S.InputIcon>
-              <img src={userIcon} alt="userIcon" />
+              <img src={userIcon} alt="" />
             </S.InputIcon>
           </S.InputWrapper>
         </S.Field>
@@ -41,13 +42,14 @@ export default function StepUserInfo({ initialData, onChange }) {
 
           <S.InputWrapper>
             <S.Input
+              aria-label="예약자 전화번호"
               placeholder="전화번호를 입력해 주세요"
               inputMode="numeric"
               value={phone}
               onChange={(e) => setPhone(sanitizeDigits(e.target.value).slice(0, 11))}
             />
             <S.InputIcon>
-              <img src={phoneIcon} alt="phoneIcon" />
+              <img src={phoneIcon} alt="" />
             </S.InputIcon>
           </S.InputWrapper>
         </S.Field>

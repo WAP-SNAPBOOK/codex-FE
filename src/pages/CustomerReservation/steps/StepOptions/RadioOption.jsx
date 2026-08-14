@@ -27,6 +27,7 @@ export default function RadioOption({
           <S.ButtonGroup $variant={variant}>
             {options.map((opt) => (
               <S.RadioButton
+                type="button"
                 key={opt}
                 $variant={variant}
                 $active={value === opt}
@@ -44,6 +45,8 @@ export default function RadioOption({
           <S.CountLabel>갯수 입력</S.CountLabel>
           <S.CountControl>
             <S.CircleButton
+              type="button"
+              aria-label={`${label} 수량 줄이기`}
               onClick={() => onCountChange(String(Math.max(1, Number(countValue || 1) - 1)))}
             >
               −
@@ -52,6 +55,8 @@ export default function RadioOption({
             <S.CountNumber>{countValue || 1}</S.CountNumber>
 
             <S.CircleButton
+              type="button"
+              aria-label={`${label} 수량 늘리기`}
               $primary
               onClick={() => onCountChange(String(Math.min(maxCount, Number(countValue || 1) + 1)))}
             >
