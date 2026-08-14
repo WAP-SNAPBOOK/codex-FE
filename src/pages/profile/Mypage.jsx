@@ -9,7 +9,7 @@ import StatusBadge from '../../components/common/StatusBadge';
 import { useToast } from '../../components/common/ToastProvider';
 import { useAuth } from '../../context/AuthContext';
 import { useLogout } from '../../query/authQueries';
-import { useShopLink } from '../../query/linkQueries';
+import { useShopLink, useUpdateShopSlug } from '../../query/linkQueries';
 import { useShopInfoById } from '../../query/shopQueries';
 import { getShopProfileLink } from '../../utils/shopProfileLink';
 import * as S from './Mypage.styles';
@@ -137,7 +137,11 @@ export default function Mypage() {
   const logout = useLogout();
   const { showToast } = useToast();
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+  const [isSlugEditing, setIsSlugEditing] = useState(false);
+  const [slugDraft, setSlugDraft] = useState('');
+  const [slugError, setSlugError] = useState('');
   const isOwner = auth?.userType === 'OWNER';
+  const updateShopSlug = useUpdateShopSlug();
   const {
     data: shopLink,
     isLoading: isShopLinkLoading,
@@ -157,6 +161,45 @@ export default function Mypage() {
   const confirmLogout = () => {
     setIsLogoutConfirmOpen(false);
     logout();
+  };
+
+  const openSlugEditor = () => {
+    setSlugDraft(shopLink?.slug || '');
+    setSlugError('');
+    setIsSlugEditing(true);
+  };
+
+  const closeSlugEditor = () => {
+    if (updateShopSlug.isPending) return;
+    setIsSlugEditing(false);
+    setSlugError('');
+  };
+
+  const handleSlugChange = (event) => {
+    const nextValue = event.target.value
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '')
+      .slice(0, 20);
+    setSlugDraft(nextValue);
+    setSlugError('');
+  };
+
+  const saveSlug = async (event) => {
+    event.preventDefault();
+    const normalizedSlug = slugDraft.trim();
+
+    if (!/^[a-z0-9-]{3,20}$/.test(normalizedSlug)) {
+      setSlugError('영문 소문자, 숫자, 하이픈으로 3~20자를 입력해주세요.');
+      return;
+    }
+
+    try {
+      await updateShopSlug.mutateAsync(normalizedSlug);
+      setIsSlugEditing(false);
+      showToast('공개 주소가 수정되었습니다.', { tone: 'success' });
+    } catch {
+      setSlugError('이미 사용 중인 주소이거나 저장할 수 없습니다. 다른 주소를 입력해주세요.');
+    }
   };
 
   const handleShareProfileLink = async () => {
@@ -258,9 +301,44 @@ export default function Mypage() {
                         <S.ShopName>{shopInfo?.shopName || '내 매장'}</S.ShopName>
                         <S.ShopDescription>예약과 상담을 시작하는 공개 페이지</S.ShopDescription>
                       </S.ShopSummary>
-                      <StatusBadge tone="success">공개 중</StatusBadge>
+                      <StatusBadge tone="success">공개 링크 활성</StatusBadge>
                     </S.ShopCardHeader>
                     <S.LinkPreview>{shopProfileLink}</S.LinkPreview>
+                    {isSlugEditing ? (
+                      <S.SlugForm onSubmit={saveSlug}>
+                        <S.SlugField>
+                          <S.SlugPrefix>snapbook.store/s/</S.SlugPrefix>
+                          <S.SlugInput
+                            aria-label="사용자 지정 공개 주소"
+                            value={slugDraft}
+                            placeholder="my-shop"
+                            autoComplete="off"
+                            onChange={handleSlugChange}
+                          />
+                        </S.SlugField>
+                        <S.SlugHelper $error={Boolean(slugError)}>
+                          {slugError || '영문 소문자, 숫자, 하이픈 3~20자'}
+                        </S.SlugHelper>
+                        <S.SlugActions>
+                          <S.CancelSlugButton type="button" onClick={closeSlugEditor}>
+                            취소
+                          </S.CancelSlugButton>
+                          <S.SaveSlugButton type="submit" disabled={updateShopSlug.isPending}>
+                            {updateShopSlug.isPending ? '저장 중...' : '주소 저장'}
+                          </S.SaveSlugButton>
+                        </S.SlugActions>
+                      </S.SlugForm>
+                    ) : (
+                      <S.SlugSummary>
+                        <span>
+                          <small>사용자 지정 주소</small>
+                          <strong>{shopLink?.slug || '아직 설정하지 않음'}</strong>
+                        </span>
+                        <S.EditSlugButton type="button" onClick={openSlugEditor}>
+                          {shopLink?.slug ? '수정' : '설정'}
+                        </S.EditSlugButton>
+                      </S.SlugSummary>
+                    )}
                     <S.ShopActions>
                       <S.PreviewLink href={shopProfileLink} target="_blank" rel="noreferrer">
                         미리보기

@@ -173,6 +173,130 @@ export const LinkPreview = styled.p`
   white-space: nowrap;
 `;
 
+export const SlugSummary = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 54px;
+  margin-top: 10px;
+  padding: 9px 12px;
+  border: 1px solid ${theme.colors.border.subtle};
+  border-radius: ${theme.radius.md};
+
+  > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  small {
+    color: ${theme.colors.text.tertiary};
+    font-size: 11px;
+  }
+
+  strong {
+    overflow: hidden;
+    color: ${theme.colors.text.primary};
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
+
+export const EditSlugButton = styled.button`
+  flex: 0 0 auto;
+  min-width: 52px;
+  min-height: 36px;
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  border-radius: ${theme.radius.sm};
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.secondary};
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+`;
+
+export const SlugForm = styled.form`
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  border-radius: ${theme.radius.md};
+  background: ${theme.colors.surface.subtle};
+`;
+
+export const SlugField = styled.div`
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  border-radius: ${theme.radius.md};
+  background: ${theme.colors.surface.DEFAULT};
+`;
+
+export const SlugPrefix = styled.span`
+  flex: 0 0 auto;
+  padding-left: 11px;
+  color: ${theme.colors.text.tertiary};
+  font-size: 11px;
+`;
+
+export const SlugInput = styled.input`
+  min-width: 0;
+  flex: 1;
+  height: 42px;
+  padding: 0 11px 0 2px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: ${theme.colors.text.primary};
+  font-size: 13px;
+  font-weight: 700;
+`;
+
+export const SlugHelper = styled.p`
+  margin: 7px 1px 0;
+  color: ${({ $error }) => ($error ? theme.colors.status.error.text : theme.colors.text.tertiary)};
+  font-size: 11px;
+  line-height: 1.4;
+`;
+
+export const SlugActions = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 8px;
+  margin-top: 10px;
+`;
+
+export const CancelSlugButton = styled.button`
+  min-height: 40px;
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  border-radius: ${theme.radius.md};
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.secondary};
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+`;
+
+export const SaveSlugButton = styled.button`
+  min-height: 40px;
+  border: 0;
+  border-radius: ${theme.radius.md};
+  background: ${theme.colors.primary};
+  color: ${theme.colors.text.inverse};
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: wait;
+  }
+`;
+
 export const ShopActions = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
