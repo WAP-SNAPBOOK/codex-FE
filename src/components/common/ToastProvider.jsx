@@ -1,11 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import theme from '../../styles/theme';
+import ConfirmDialog from './ConfirmDialog';
+import { registerConfirmHandler, registerToastHandler } from '../../utils/appFeedback';
 
 const ToastContext = createContext(null);
 
 export function ToastProvider({ children }) {
   const [toast, setToast] = useState(null);
+  const [confirmation, setConfirmation] = useState(null);
   const timerRef = useRef(null);
 
   const dismissToast = useCallback(() => {
@@ -42,6 +45,31 @@ export function ToastProvider({ children }) {
     []
   );
 
+  useEffect(() => registerToastHandler(showToast), [showToast]);
+
+  useEffect(
+    () =>
+      registerConfirmHandler(
+        (options) =>
+          new Promise((resolve) => {
+            setConfirmation({
+              title: options?.title || '확인이 필요해요',
+              description: options?.description,
+              confirmLabel: options?.confirmLabel || '확인',
+              cancelLabel: options?.cancelLabel || '취소',
+              tone: options?.tone || 'default',
+              resolve,
+            });
+          })
+      ),
+    []
+  );
+
+  const closeConfirmation = (confirmed) => {
+    confirmation?.resolve(confirmed);
+    setConfirmation(null);
+  };
+
   return (
     <ToastContext.Provider value={{ showToast, dismissToast }}>
       {children}
@@ -59,6 +87,16 @@ export function ToastProvider({ children }) {
           </ToastCard>
         ) : null}
       </ToastViewport>
+      <ConfirmDialog
+        open={!!confirmation}
+        title={confirmation?.title}
+        description={confirmation?.description}
+        confirmLabel={confirmation?.confirmLabel}
+        cancelLabel={confirmation?.cancelLabel}
+        tone={confirmation?.tone}
+        onCancel={() => closeConfirmation(false)}
+        onConfirm={() => closeConfirmation(true)}
+      />
     </ToastContext.Provider>
   );
 }

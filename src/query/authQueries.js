@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { kakaoAuthService } from '../api/services/kakaoAuthService';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { notify } from '../utils/appFeedback';
 
 export const useHandleAuthCode = () => {
   const { login } = useAuth();
@@ -32,7 +33,7 @@ export const useHandleAuthCode = () => {
     },
     onError: (error) => {
       console.error('로그인 실패:', error);
-      alert('로그인 중 문제가 발생했습니다. 다시 시도해주세요.');
+      notify('로그인 중 문제가 발생했습니다. 다시 시도해주세요.');
     },
   });
 };

@@ -10,8 +10,13 @@ import {
   useCreateHoliday,
 } from './scheduleQueries';
 import { useCreateShopTag } from './shopManage/tagQueries';
-import { useCreateShopMenu, useLinkMenuTag, useCreateMenuInputField } from './shopManage/menuQueries';
+import {
+  useCreateShopMenu,
+  useLinkMenuTag,
+  useCreateMenuInputField,
+} from './shopManage/menuQueries';
 import { useDeleteUser } from './authQueries';
+import { notify } from '../utils/appFeedback';
 
 export const useSignupCustomer = () => {
   const { login } = useAuth();
@@ -74,7 +79,7 @@ export const useOwnerSignupFlow = () => {
         await createHoliday.mutateAsync({ shopId, ...holiday }); // 5) 정기 휴무일 생성
       }
     } catch (error) {
-      alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+      notify('회원가입에 실패했습니다. 다시 시도해주세요.');
       deleteUser.mutate();
       throw error;
     }
@@ -110,7 +115,7 @@ export const useOwnerSignupFlow = () => {
         }
       }
     } catch {
-      alert('메뉴 설정 중 오류가 발생했습니다. 관리 페이지에서 추가로 설정할 수 있습니다.');
+      notify('메뉴 설정 중 오류가 발생했습니다. 관리 페이지에서 추가로 설정할 수 있습니다.');
     }
   };
 

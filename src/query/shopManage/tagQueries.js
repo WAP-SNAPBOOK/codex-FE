@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { tagService } from '../../api/services/tagService';
+import { notify } from '../../utils/appFeedback';
 
 /**
  * 상점별 태그(카테고리) 목록 조회 훅
@@ -30,7 +31,7 @@ export const useCreateShopTag = (options = {}) => {
         return;
       }
       console.error('태그 생성 실패:', error);
-      alert('태그 생성 중 오류가 발생했습니다.');
+      notify('태그 생성 중 오류가 발생했습니다.');
     },
   });
 };
@@ -53,7 +54,7 @@ export const useUpdateShopTag = (options = {}) => {
         return;
       }
       console.error('태그 수정 실패:', error);
-      alert('카테고리 수정 중 오류가 발생했습니다.');
+      notify('카테고리 수정 중 오류가 발생했습니다.');
     },
   });
 };
@@ -76,7 +77,7 @@ export const useDeleteShopTag = (options = {}) => {
         return;
       }
       console.error('태그 삭제 실패:', error);
-      alert('카테고리 삭제 중 오류가 발생했습니다.');
+      notify('카테고리 삭제 중 오류가 발생했습니다.');
     },
   });
 };

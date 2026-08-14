@@ -13,6 +13,7 @@ import { useNavigate, useLocation, useParams, useSearchParams } from 'react-rout
 import { useCreateReservation } from '@/query/reservationQueries';
 import { useUploadMultipleFiles } from '@/query/fileQueries';
 import { useAuth } from '@/context/AuthContext';
+import { notify } from '@/utils/appFeedback';
 
 export default function ReservationCreatePage() {
   const { shopId } = useParams();
@@ -119,7 +120,7 @@ export default function ReservationCreatePage() {
 
   const submitReservation = async () => {
     if (!staffId) {
-      alert('담당자 정보가 없어 예약을 진행할 수 없습니다.');
+      notify('담당자 정보가 없어 예약을 진행할 수 없습니다.');
       return;
     }
 

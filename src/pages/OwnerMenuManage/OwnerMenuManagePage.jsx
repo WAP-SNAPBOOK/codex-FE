@@ -22,6 +22,7 @@ import {
   useUpdateShopTag,
 } from '@/query/shopManage/tagQueries';
 import * as S from './OwnerMenuManagePage.styles';
+import { notify, requestConfirmation } from '@/utils/appFeedback';
 
 const CATEGORY_NAME_MAX_LENGTH = 10;
 const MENU_NAME_MAX_LENGTH = 30;
@@ -68,10 +69,7 @@ export default function OwnerMenuManagePage() {
   const [selectedTagId, setSelectedTagId] = useState(null);
   const selectedTag = tags.find((tag) => tag.id === selectedTagId) ?? null;
 
-  const { data: menus = [], isLoading: isMenusLoading } = useShopManageMenus(
-    shopId,
-    selectedTagId
-  );
+  const { data: menus = [], isLoading: isMenusLoading } = useShopManageMenus(shopId, selectedTagId);
 
   const [categoryModal, setCategoryModal] = useState(null);
   const [categoryName, setCategoryName] = useState('');
@@ -93,7 +91,7 @@ export default function OwnerMenuManagePage() {
   const updateTag = useUpdateShopTag({ onError: handleCategoryMutationError });
   const deleteTag = useDeleteShopTag({
     onError: () => {
-      alert('카테고리 삭제 중 오류가 발생했습니다.');
+      notify('카테고리 삭제 중 오류가 발생했습니다.');
     },
   });
   const createMenu = useCreateShopMenu({ onError: () => {} });
@@ -185,9 +183,12 @@ export default function OwnerMenuManagePage() {
 
   const deleteSelectedCategory = async () => {
     if (!shopId || !selectedTag) return;
-    const confirmed = window.confirm(
-      `'${selectedTag.name}' 카테고리를 삭제할까요? 연결된 메뉴와의 카테고리 연결도 해제됩니다.`
-    );
+    const confirmed = await requestConfirmation({
+      title: `'${selectedTag.name}' 카테고리를 삭제할까요?`,
+      description: '연결된 메뉴의 카테고리 연결도 함께 해제됩니다.',
+      confirmLabel: '삭제',
+      tone: 'danger',
+    });
     if (!confirmed) return;
 
     try {
@@ -206,7 +207,7 @@ export default function OwnerMenuManagePage() {
 
   const openCreateMenu = () => {
     if (!selectedTagId) {
-      alert('메뉴를 추가할 카테고리를 먼저 만들어주세요.');
+      notify('메뉴를 추가할 카테고리를 먼저 만들어주세요.');
       return;
     }
     setMenuModal({ mode: 'create', menu: null });
@@ -328,15 +329,18 @@ export default function OwnerMenuManagePage() {
 
   const hideMenu = async (menu) => {
     if (!shopId) return;
-    const confirmed = window.confirm(
-      `'${menu.name}' 메뉴를 삭제할까요? 예약 화면에서 더 이상 보이지 않습니다.`
-    );
+    const confirmed = await requestConfirmation({
+      title: `'${menu.name}' 메뉴를 삭제할까요?`,
+      description: '삭제하면 예약 화면에서 더 이상 보이지 않습니다.',
+      confirmLabel: '삭제',
+      tone: 'danger',
+    });
     if (!confirmed) return;
 
     try {
       await deactivateMenu.mutateAsync({ shopId, menuId: menu.id });
     } catch {
-      alert('메뉴 삭제 중 오류가 발생했습니다.');
+      notify('메뉴 삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -358,20 +362,23 @@ export default function OwnerMenuManagePage() {
         <Header title="메뉴" />
         <S.Content>
           <S.TopActions>
-            <S.BackButton type="button" aria-label="마이페이지로 돌아가기" onClick={() => navigate('/mypage')}>
+            <S.BackButton
+              type="button"
+              aria-label="마이페이지로 돌아가기"
+              onClick={() => navigate('/mypage')}
+            >
               <img src={BackIcon} alt="" />
             </S.BackButton>
-            <S.PrimaryTextButton
-              type="button"
-              onClick={() => setIsEditing((prev) => !prev)}
-            >
+            <S.PrimaryTextButton type="button" onClick={() => setIsEditing((prev) => !prev)}>
               {isEditing ? '완료' : '편집'}
             </S.PrimaryTextButton>
           </S.TopActions>
 
           {isShopLinkLoading && <S.StateMessage>매장 정보를 불러오는 중입니다.</S.StateMessage>}
           {isShopLinkError && (
-            <S.StateMessage>매장 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</S.StateMessage>
+            <S.StateMessage>
+              매장 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.
+            </S.StateMessage>
           )}
           {!isShopLinkLoading && !isShopLinkError && !shopId && (
             <S.StateMessage>메뉴를 관리할 매장 정보가 없습니다.</S.StateMessage>
@@ -405,7 +412,11 @@ export default function OwnerMenuManagePage() {
                   ))
                 )}
                 {(isEditing || tags.length === 0) && (
-                  <S.AddTagButton type="button" aria-label="카테고리 추가" onClick={openCreateCategory}>
+                  <S.AddTagButton
+                    type="button"
+                    aria-label="카테고리 추가"
+                    onClick={openCreateCategory}
+                  >
                     +
                   </S.AddTagButton>
                 )}
@@ -529,7 +540,9 @@ export default function OwnerMenuManagePage() {
                     onClick={() => toggleMenuCategory(tag.id)}
                   >
                     {tag.name}
-                    <S.CategoryCheckMark>{menuForm.tagIds.includes(tag.id) ? '✓' : ''}</S.CategoryCheckMark>
+                    <S.CategoryCheckMark>
+                      {menuForm.tagIds.includes(tag.id) ? '✓' : ''}
+                    </S.CategoryCheckMark>
                   </S.CategoryOptionButton>
                 ))}
               </S.CategoryPicker>
@@ -537,9 +550,7 @@ export default function OwnerMenuManagePage() {
                 value={menuForm.name}
                 maxLength={MENU_NAME_MAX_LENGTH}
                 placeholder="메뉴명"
-                onChange={(event) =>
-                  setMenuForm((prev) => ({ ...prev, name: event.target.value }))
-                }
+                onChange={(event) => setMenuForm((prev) => ({ ...prev, name: event.target.value }))}
               />
               <S.Textarea
                 value={menuForm.description}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import * as S from './StepHolidays.styles';
 import { DayButton, DaysRow } from '../StepCommon.styles';
+import { notify } from '../../../../../utils/appFeedback';
 
 const HOLIDAY_TYPES = [
   { value: 'WEEKLY', label: '매주' },
@@ -52,11 +53,11 @@ export default function StepHolidays({ initialData, onChange }) {
   const addHoliday = () => {
     const { holidayType, dayOfWeek, weekOfMonth, referenceDate, specificDate } = form;
     if (holidayType === 'BIWEEKLY' && !referenceDate) {
-      alert('기준 날짜를 선택해주세요.');
+      notify('기준 날짜를 선택해주세요.');
       return;
     }
     if (holidayType === 'CUSTOM' && !specificDate) {
-      alert('특정 날짜를 선택해주세요.');
+      notify('특정 날짜를 선택해주세요.');
       return;
     }
     let entry;

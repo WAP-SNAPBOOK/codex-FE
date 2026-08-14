@@ -6,6 +6,7 @@ import ImageModal from '@/components/modal/ImageModal';
 import { useNavigate } from 'react-router-dom';
 import backIcon from '@/assets/icons/back-icon.svg';
 import { formatDurationMinutes } from '../../utils/formatDurationMinutes';
+import { notify } from '../../utils/appFeedback';
 
 const DURATION_OPTIONS = [
   { label: '30분', minutes: 30 },
@@ -166,7 +167,7 @@ function ReservationCard({ res }) {
 
     if (mode === 'confirm') {
       if (!trimmedMessage) {
-        alert('전달 사항을 입력해주세요.');
+        notify('전달 사항을 입력해주세요.');
         return;
       }
 
@@ -191,7 +192,7 @@ function ReservationCard({ res }) {
 
     if (mode === 'reject') {
       if (!trimmedMessage) {
-        alert('거절 사유를 입력해주세요.');
+        notify('거절 사유를 입력해주세요.');
         return;
       }
 
