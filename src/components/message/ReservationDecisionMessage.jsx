@@ -5,6 +5,7 @@ import ReservationInfoView from '../reservation/ReservationInfoView';
 import ReservationConfirmForm from '../reservation/ReservationConfirmForm';
 import ReservationRejectForm from '../reservation/ReservationRejectForm';
 import { formatReservationTotalPrice } from '../../utils/reservationPrice';
+import { notify } from '../../utils/appFeedback';
 
 export default function ReservationDecisionMessage({ reservation, readOnly = false }) {
   const [localDecision, setLocalDecision] = useState(null); // CONFIRMED | REJECTED
@@ -12,7 +13,7 @@ export default function ReservationDecisionMessage({ reservation, readOnly = fal
   const [mode, setMode] = useState('VIEW'); // 상세보기(VIEW) | 예약 확정(CONFIRM) | 예약거절(REJECT)
 
   //예약 확정 쿼리 훅
-  const { mutate: confirm, isLoading: isConfirming } = useConfirmReservation();
+  const { mutate: confirmReservation, isLoading: isConfirming } = useConfirmReservation();
   //예약 거절 쿼리 훅
   const { mutate: reject, isLoading: isRejecting } = useRejectReservation();
 
@@ -34,11 +35,11 @@ export default function ReservationDecisionMessage({ reservation, readOnly = fal
     const trimmedMemo = memo.trim();
 
     if (!trimmedMemo) {
-      alert('전달 사항을 입력해주세요.');
+      notify('전달 사항을 입력해주세요.');
       return;
     }
 
-    confirm(
+    confirmReservation(
       {
         id,
         date: confirmDate,
@@ -100,7 +101,7 @@ export default function ReservationDecisionMessage({ reservation, readOnly = fal
 
       <S.Divider />
 
-      <S.Toggle onClick={() => setOpen((v) => !v)}>
+      <S.Toggle type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
         상세 보기
         <span>{open ? '▲' : '▼'}</span>
       </S.Toggle>
@@ -142,6 +143,7 @@ export default function ReservationDecisionMessage({ reservation, readOnly = fal
         {mode === 'VIEW' && !isDecisionDone && !readOnly ? (
           <>
             <S.RejectButton
+              type="button"
               onClick={() => {
                 setMode('REJECT');
               }}
@@ -149,6 +151,7 @@ export default function ReservationDecisionMessage({ reservation, readOnly = fal
               거절
             </S.RejectButton>
             <S.ApproveButton
+              type="button"
               onClick={() => {
                 setMode('CONFIRM');
               }}

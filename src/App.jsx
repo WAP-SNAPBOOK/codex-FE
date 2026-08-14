@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
+import styled from 'styled-components';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import AuthRedirectPage from './pages/redirect/AuthRedirectPage';
 import SignupGatePage from './pages/signup/SignupGatePage';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -21,6 +22,7 @@ import CustomerReservationList from './pages/CustomerReservation/CustomerReserva
 import LinkRedirectPage from './pages/redirect/LinkRedirectPage';
 import ReservationCreatePage from './pages/CustomerReservation/ReservationCreatePage';
 import { blockZoom } from './utils/gesture/zoomBlocker';
+import { ToastProvider } from './components/common/ToastProvider';
 const queryClient = new QueryClient();
 
 function App() {
@@ -36,7 +38,10 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <BrowserRouter>
-            <AppRoutes /> {/* AuthProvider 내부로 분리 */}
+            <ToastProvider>
+              <ScrollToTop />
+              <AppRoutes /> {/* AuthProvider 내부로 분리 */}
+            </ToastProvider>
           </BrowserRouter>
         </AuthProvider>
 
@@ -46,8 +51,23 @@ function App() {
   );
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, [pathname]);
+
+  return null;
+}
+
 function AppRoutes() {
-  const { auth } = useAuth();
+  const { auth, isAuthReady } = useAuth();
+
+  if (!isAuthReady) {
+    return <AppLoading role="status" aria-label="로그인 정보 확인 중" />;
+  }
+
   return (
     <Routes>
       {/* 로그인 여부에 따라 분기 */}
@@ -119,7 +139,11 @@ function AppRoutes() {
 }
 
 function ProtectedRoute({ children }) {
-  const { auth } = useAuth();
+  const { auth, isAuthReady } = useAuth();
+
+  if (!isAuthReady) {
+    return <AppLoading role="status" aria-label="로그인 정보 확인 중" />;
+  }
 
   if (!auth) {
     return <Navigate to="/" replace />;
@@ -143,5 +167,11 @@ function OwnerReservationDetailRoute() {
     <Navigate to="/reservations" replace />
   );
 }
+
+const AppLoading = styled.div`
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+`;
 
 export default App;

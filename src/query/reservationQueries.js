@@ -2,13 +2,26 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { reservationService } from '../api/services/reservationService';
 import { shopReservationService } from '../api/services/shopReservation';
 import { useAuth } from '../context/AuthContext';
+import { myReservation } from '../api/services/myReservation';
+import { notify } from '../utils/appFeedback';
+
+export const useMyReservations = (options = {}) => {
+  const { auth } = useAuth();
+
+  return useQuery({
+    queryKey: ['my-reservations', auth?.userId],
+    queryFn: () => myReservation.getMyReservations(),
+    ...options,
+    enabled: !!auth?.userId && (options.enabled ?? true),
+  });
+};
 
 //예약 생성 훅
 export const useCreateReservation = (handleClose) => {
   return useMutation({
     mutationFn: (payload) => reservationService.createReservation(payload),
     onSuccess: () => {
-      alert('예약이 완료되었습니다!');
+      notify('예약이 완료되었습니다!');
 
       //모달 닫기까지 훅 내부에서 처리
       handleClose?.();
@@ -20,13 +33,13 @@ export const useCreateReservation = (handleClose) => {
 
       // 409 충돌 (이미 예약된 시간)
       if (status === 409 && code === 'TIME_SLOT_ALREADY_BOOKED') {
-        alert('해당 시간은 이미 예약되었거나 접수 대기 중입니다.');
+        notify('해당 시간은 이미 예약되었거나 접수 대기 중입니다.');
         return;
       }
 
       //기타 오류 처리
       console.error('예약 실패:', error);
-      alert('예약 중 오류가 발생했습니다.');
+      notify('예약 중 오류가 발생했습니다.');
     },
   });
 };
@@ -58,11 +71,11 @@ export const useConfirmReservation = () => {
     mutationFn: (payload) => shopReservationService.confirmReservation(payload),
 
     onSuccess: () => {
-      alert('예약이 확정되었습니다.');
+      notify('예약이 확정되었습니다.');
     },
     onError: (error) => {
       console.error('예약 확정 실패:', error);
-      alert('예약 확정 중 오류가 발생했습니다.');
+      notify('예약 확정 중 오류가 발생했습니다.');
     },
   });
 };
@@ -75,12 +88,12 @@ export const useRejectReservation = () => {
     mutationFn: ({ id, reason }) => shopReservationService.rejectReservation(id, reason),
 
     onSuccess: () => {
-      alert('예약을 거절했습니다.');
+      notify('예약을 거절했습니다.');
     },
 
     onError: (error) => {
       console.error('예약 거절 실패:', error);
-      alert('예약 거절 중 오류가 발생했습니다.');
+      notify('예약 거절 중 오류가 발생했습니다.');
     },
   });
 };

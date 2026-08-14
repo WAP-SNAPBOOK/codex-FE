@@ -13,9 +13,11 @@ export default function CountStepper({ count = 1, onChange, min = 1, max = 10, s
 
   return (
     <S.CountControl>
-      <S.CountButton onClick={handleMinus}>−</S.CountButton>
+      <S.CountButton type="button" aria-label="수량 줄이기" onClick={handleMinus}>
+        −
+      </S.CountButton>
       <S.CountNumber>{count}</S.CountNumber>
-      <S.CountButton $primary onClick={handlePlus}>
+      <S.CountButton type="button" aria-label="수량 늘리기" $primary onClick={handlePlus}>
         +
       </S.CountButton>
     </S.CountControl>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Container from '../../components/common/Container';
 import { authStorage } from '../../utils/auth/authStorage';
 import { useLinkChat } from '../../query/linkQueries';
+import { notify } from '../../utils/appFeedback';
 
 export default function LinkRedirectPage() {
   const { slugOrCode } = useParams(); //가게 식별 코드
@@ -36,7 +37,7 @@ export default function LinkRedirectPage() {
   // 에러 시 홈으로 리다이렉트
   useEffect(() => {
     if (isError) {
-      alert('잘못된 링크이거나 만료된 링크입니다.');
+      notify('잘못된 링크이거나 만료된 링크입니다.');
       navigate('/');
     }
   }, [isError, navigate]);

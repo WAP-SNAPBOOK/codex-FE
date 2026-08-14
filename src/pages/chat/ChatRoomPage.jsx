@@ -5,7 +5,6 @@ import { chatSocketService } from '../../api/services/chatSocketService';
 import Container from '../../components/common/Container';
 import * as S from './ChatRoomPage.style';
 import backIcon from '../../assets/icons/back-icon.svg';
-import { ChatRoomTitle } from '../../components/title/SignupTitle';
 import { authStorage } from '../../utils/auth/authStorage';
 import { useAuth } from '../../context/AuthContext';
 import { usePreserveScrollPosition } from '../../hooks/chat/usePreserveScrollPosition';
@@ -80,8 +79,16 @@ export default function ChatRoomPage() {
   );
 
   // 기존 메시지, cursor (HTTP GET 기반)
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isSuccess } =
-    useChatMessages(chatRoomId);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isSuccess,
+    isLoading,
+    isError,
+    refetch,
+  } = useChatMessages(chatRoomId);
 
   const handleBack = () => {
     // 외부 링크 유입(slug), 홈으로 강제 이동
@@ -244,39 +251,74 @@ export default function ChatRoomPage() {
   return (
     <Container $start>
       <S.PageWrapper>
-        <div className="absolute bottom-[80px] left-3 z-20">
+        <S.GuideBarSlot>
           <InAppGuideBar />
-        </div>
+        </S.GuideBarSlot>
         <S.Header>
-          <S.BackButton onClick={handleBack}>
-            <img src={backIcon} alt="back" />
+          <S.BackButton type="button" aria-label="채팅 목록으로 돌아가기" onClick={handleBack}>
+            <img src={backIcon} alt="" />
           </S.BackButton>
-          <ChatRoomTitle>{headerTitle}</ChatRoomTitle>
-          <S.BookButton onClick={handleClickReservation}>예약</S.BookButton>
+          <S.RoomHeading>
+            <S.RoomTitle>{headerTitle}</S.RoomTitle>
+            <S.RoomDescription>
+              {userType === 'OWNER' ? '고객과 상담 중' : '매장과 상담 중'}
+            </S.RoomDescription>
+          </S.RoomHeading>
+          {userType === 'CUSTOMER' ? (
+            <S.BookButton
+              type="button"
+              disabled={!shopInfo?.shopId}
+              onClick={handleClickReservation}
+            >
+              예약하기
+            </S.BookButton>
+          ) : (
+            <S.HeaderSpacer aria-hidden="true" />
+          )}
         </S.Header>
         <S.Messages ref={messageListRef} onScroll={handleScroll}>
           {/*상단 스크롤 감지용 */}
           <div ref={topObserverRef} />
-          <MessageList messages={mergedMessages} userId={userId} />
+          {isLoading ? (
+            <S.RoomState role="status">
+              <S.LoadingDot aria-hidden="true" />
+              <strong>대화를 불러오는 중이에요.</strong>
+            </S.RoomState>
+          ) : isError ? (
+            <S.RoomState role="alert">
+              <strong>대화를 불러오지 못했어요.</strong>
+              <span>네트워크 상태를 확인한 뒤 다시 시도해주세요.</span>
+              <S.RetryButton type="button" onClick={() => refetch()}>
+                다시 시도
+              </S.RetryButton>
+            </S.RoomState>
+          ) : mergedMessages.length === 0 ? (
+            <S.RoomState role="status">
+              <strong>아직 메시지가 없어요.</strong>
+              <span>궁금한 내용을 보내 대화를 시작해보세요.</span>
+            </S.RoomState>
+          ) : (
+            <MessageList messages={mergedMessages} userId={userId} />
+          )}
           {/* 하단 스크롤 고정용 */}
           <div ref={bottomRef} />
         </S.Messages>
         {/* 채팅 메뉴 패널 */}
         <ChatMenuPanel visible={showMenu} />
         {/*새 메시지 알림 카드 */}
-        {
-          <NewMessageCard
-            preview={newMessagePreview}
-            onClick={handleClickCard}
-            visible={showNewMessageCard}
-          />
-        }
+        <NewMessageCard
+          preview={newMessagePreview}
+          onClick={handleClickCard}
+          visible={showNewMessageCard}
+        />
 
         <S.InputBar>
           {/* 채팅 메뉴 목록 버튼 */}
           <AddMenuButton onToggleMenu={handleToggleMenu} />
           {/* 채팅 입력 바 */}
           <S.ChatInput
+            aria-label="메시지 입력"
+            placeholder="메시지를 입력하세요"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -284,7 +326,7 @@ export default function ChatRoomPage() {
             onFocus={() => setShowMenu(false)} //키보드 열릴때 메뉴 닫기
           />
           {/*채팅 전송 버튼*/}
-          <ChatSumbitButton onClick={handleSend} />
+          <ChatSumbitButton disabled={!input.trim()} onClick={handleSend} />
         </S.InputBar>
       </S.PageWrapper>
     </Container>

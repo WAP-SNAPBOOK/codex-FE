@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { menuService } from '../../api/services/menuService';
+import { notify } from '../../utils/appFeedback';
 
 /**
  * 메뉴 목록 조회 훅
@@ -31,11 +32,11 @@ export const useCreateShopMenu = (options = {}) => {
       }
       const status = error?.response?.status;
       if (status === 409) {
-        alert('동일한 이름의 메뉴가 이미 존재합니다.');
+        notify('동일한 이름의 메뉴가 이미 존재합니다.');
         return;
       }
       console.error('메뉴 생성 실패:', error);
-      alert('메뉴 생성 중 오류가 발생했습니다.');
+      notify('메뉴 생성 중 오류가 발생했습니다.');
     },
   });
 };
@@ -51,7 +52,7 @@ export const useUpdateShopMenu = (options = {}) => {
     onSuccess: (_, { shopId }) => {
       queryClient.invalidateQueries({ queryKey: ['shop-manage-menus', shopId] });
       if (!options.silent) {
-        alert('메뉴가 수정되었습니다.');
+        notify('메뉴가 수정되었습니다.');
       }
       options.onSuccess?.();
     },
@@ -61,7 +62,7 @@ export const useUpdateShopMenu = (options = {}) => {
         return;
       }
       console.error('메뉴 수정 실패:', error);
-      alert('메뉴 수정 중 오류가 발생했습니다.');
+      notify('메뉴 수정 중 오류가 발생했습니다.');
     },
   });
 };
@@ -77,7 +78,7 @@ export const useDeactivateShopMenu = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: ['shop-manage-menus', shopId] });
       queryClient.invalidateQueries({ queryKey: ['shop-manage-tags', shopId] });
       if (!options.silent) {
-        alert('메뉴가 비활성화되었습니다.');
+        notify('메뉴가 비활성화되었습니다.');
       }
       options.onSuccess?.();
     },
@@ -87,7 +88,7 @@ export const useDeactivateShopMenu = (options = {}) => {
         return;
       }
       console.error('메뉴 비활성화 실패:', error);
-      alert('메뉴 비활성화 중 오류가 발생했습니다.');
+      notify('메뉴 비활성화 중 오류가 발생했습니다.');
     },
   });
 };
@@ -112,7 +113,7 @@ export const useLinkMenuTag = (options = {}) => {
         return;
       }
       console.error('태그 연결 실패:', error);
-      alert('태그 연결 중 오류가 발생했습니다.');
+      notify('태그 연결 중 오류가 발생했습니다.');
     },
   });
 };
@@ -130,7 +131,7 @@ export const useUnlinkMenuTag = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: ['shop-manage-tags', shopId] });
       queryClient.invalidateQueries({ queryKey: ['shop-tags', shopId] });
       if (!options.silent) {
-        alert('메뉴가 태그에서 제거되었습니다.');
+        notify('메뉴가 태그에서 제거되었습니다.');
       }
       options.onSuccess?.();
     },
@@ -140,7 +141,7 @@ export const useUnlinkMenuTag = (options = {}) => {
         return;
       }
       console.error('태그에서 메뉴 제거 실패:', error);
-      alert('태그에서 메뉴 제거 중 오류가 발생했습니다.');
+      notify('태그에서 메뉴 제거 중 오류가 발생했습니다.');
     },
   });
 };
@@ -164,7 +165,7 @@ export const useCreateMenuInputField = () => {
     mutationFn: ({ shopId, menuId, ...body }) => menuService.createInputField(shopId, menuId, body),
     onError: (error) => {
       console.error('입력 필드 생성 실패:', error);
-      alert('입력 필드 생성 중 오류가 발생했습니다.');
+      notify('입력 필드 생성 중 오류가 발생했습니다.');
     },
   });
 };
@@ -177,11 +178,11 @@ export const useUpdateMenuInputField = () => {
     mutationFn: ({ shopId, menuId, fieldId, ...body }) =>
       menuService.updateInputField(shopId, menuId, fieldId, body),
     onSuccess: () => {
-      alert('입력 필드가 수정되었습니다.');
+      notify('입력 필드가 수정되었습니다.');
     },
     onError: (error) => {
       console.error('입력 필드 수정 실패:', error);
-      alert('입력 필드 수정 중 오류가 발생했습니다.');
+      notify('입력 필드 수정 중 오류가 발생했습니다.');
     },
   });
 };
@@ -194,11 +195,11 @@ export const useDeactivateMenuInputField = () => {
     mutationFn: ({ shopId, menuId, fieldId }) =>
       menuService.deactivateInputField(shopId, menuId, fieldId),
     onSuccess: () => {
-      alert('입력 필드가 비활성화되었습니다.');
+      notify('입력 필드가 비활성화되었습니다.');
     },
     onError: (error) => {
       console.error('입력 필드 비활성화 실패:', error);
-      alert('입력 필드 비활성화 중 오류가 발생했습니다.');
+      notify('입력 필드 비활성화 중 오류가 발생했습니다.');
     },
   });
 };

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const UploadBox = styled.div`
+  width: 100%;
   height: 48px;
   border: 1px solid #ddd;
   border-radius: 12px;
@@ -11,6 +12,7 @@ export const UploadBox = styled.div`
   justify-content: space-between;
 
   color: #999;
+  background: #fff;
   cursor: pointer;
 `;
 
@@ -20,8 +22,8 @@ export const UploadIcon = styled.span`
 
 export const PhotoGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
   margin-top: 12px;
 `;
 
@@ -61,7 +63,7 @@ export const EmptyPhoto = styled.div`
 `;
 
 export const TextCount = styled.div`
-  margin: 6px 0px 200px;
+  margin: 6px 0 0;
   font-size: 12px;
   color: #999;
   text-align: right;

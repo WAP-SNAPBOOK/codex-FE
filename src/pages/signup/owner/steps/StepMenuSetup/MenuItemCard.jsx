@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import * as S from './MenuItemCard.styles';
+import { notify } from '../../../../../utils/appFeedback';
 
 const DEFAULT_FIELD_FORM = {
   label: '',
@@ -12,12 +13,20 @@ const DEFAULT_FIELD_FORM = {
   placeholder: '',
 };
 
-export default function MenuItemCard({ item, idx, isExpanded, onToggle, onRemove, onAddField, onRemoveField }) {
+export default function MenuItemCard({
+  item,
+  idx,
+  isExpanded,
+  onToggle,
+  onRemove,
+  onAddField,
+  onRemoveField,
+}) {
   const [fieldForm, setFieldForm] = useState(DEFAULT_FIELD_FORM);
 
   const handleAdd = () => {
     if (!fieldForm.label.trim()) {
-      alert('필드 라벨을 입력해주세요.');
+      notify('필드 라벨을 입력해주세요.');
       return;
     }
     const field = {
@@ -25,7 +34,10 @@ export default function MenuItemCard({ item, idx, isExpanded, onToggle, onRemove
       inputType: fieldForm.inputType,
       required: fieldForm.required,
       placeholder: fieldForm.placeholder || null,
-      sortOrder: item.inputFields.length === 0 ? 0 : Math.max(...item.inputFields.map((f) => f.sortOrder)) + 1,
+      sortOrder:
+        item.inputFields.length === 0
+          ? 0
+          : Math.max(...item.inputFields.map((f) => f.sortOrder)) + 1,
       ...(fieldForm.inputType === 'NUMBER'
         ? {
             minValue: fieldForm.minValue !== '' ? Number(fieldForm.minValue) : null,
@@ -58,7 +70,11 @@ export default function MenuItemCard({ item, idx, isExpanded, onToggle, onRemove
             <S.MenuName>{item.menuName}</S.MenuName>
             {item.description && <S.Description>{item.description}</S.Description>}
           </div>
-          <S.RemoveButton type="button" aria-label={`${item.menuName} 삭제`} onClick={() => onRemove(idx)}>
+          <S.RemoveButton
+            type="button"
+            aria-label={`${item.menuName} 삭제`}
+            onClick={() => onRemove(idx)}
+          >
             ×
           </S.RemoveButton>
         </S.MenuItemHeader>

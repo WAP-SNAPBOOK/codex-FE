@@ -5,6 +5,7 @@ import Container from '../../components/common/Container';
 import { SignupButton } from '../../components/auth/SignupButton';
 import { NextButton } from '../../components/common/NextButton';
 import { SignupTitle } from '../../components/title/SignupTitle';
+import { notify } from '../../utils/appFeedback';
 
 //회원가입 분기 페이지
 function SignupGatePage() {
@@ -15,10 +16,10 @@ function SignupGatePage() {
   const isSignupRequired = location.state?.isSignupRequired;
   const slug = new URLSearchParams(location.search).get('slug');
   const handleNext = () => {
-    if (!selectedRole) return alert('회원 유형을 선택해주세요');
+    if (!selectedRole) return notify('회원 유형을 선택해주세요');
     // slug 값이 있을 땐 고객만 허용
     if (slug && selectedRole !== 'customer') {
-      return alert('링크를 통한 회원가입은 고객만 가능합니다.');
+      return notify('링크를 통한 회원가입은 고객만 가능합니다.');
     }
 
     //회원 분기에 따라 분기

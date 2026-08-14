@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
+import { requestConfirmation } from './utils/appFeedback';
 import App from './App.jsx';
 import './index.css';
 
@@ -30,8 +31,13 @@ bootstrap();
 
 if (!import.meta.env.DEV) {
   registerSW({
-    onNeedRefresh() {
-      if (confirm('새 버전이 있습니다. 새로고침할까요?')) {
+    async onNeedRefresh() {
+      const confirmed = await requestConfirmation({
+        title: '새 버전이 준비됐어요',
+        description: '최신 버전을 적용하려면 화면을 새로고침해주세요.',
+        confirmLabel: '새로고침',
+      });
+      if (confirmed) {
         window.location.reload();
       }
     },

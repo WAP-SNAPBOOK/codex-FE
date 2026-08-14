@@ -1,121 +1,347 @@
 import styled from 'styled-components';
-import { BaseButton } from '../../components/common/Button';
+import { PageContent, PageShell } from '../../components/common/PageLayout';
+import { CardSurface, GroupedSurface } from '../../components/common/Surface';
 import theme from '../../styles/theme';
 
-export const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-  background: ${theme.colors.white};
+export const PageWrapper = styled(PageShell)``;
+
+export const Content = styled(PageContent)`
+  padding-top: 10px;
 `;
 
-export const Content = styled.div`
-  flex: 1;
-  padding: 24px 20px 110px;
+export const ProfileCard = styled(CardSurface)`
+  padding: 18px;
+  background: linear-gradient(145deg, #fff 0%, #fff8f8 100%);
 `;
 
-export const AccountCard = styled.section`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 24px 20px;
-  border: 1px solid ${theme.colors.gray.border};
-  border-radius: 24px;
-  background: ${theme.colors.gray[20]};
-`;
-
-export const Label = styled.span`
-  font-size: 13px;
-  font-weight: 600;
-  color: ${theme.colors.gray.dark.DEFAULT};
-`;
-
-export const Name = styled.strong`
-  font-size: 24px;
+export const ProfileLabel = styled.span`
+  display: block;
+  margin-bottom: 13px;
+  color: ${theme.colors.text.tertiary};
+  font-size: 12px;
   font-weight: 700;
-  color: ${theme.colors.black.DEFAULT};
 `;
 
-export const Meta = styled.span`
-  font-size: 15px;
-  color: ${theme.colors.gray.dark.DEFAULT};
+export const ProfileRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+`;
+
+export const Avatar = styled.div`
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border: 1px solid rgba(240, 128, 128, 0.16);
+  border-radius: 19px;
+  background: rgba(240, 128, 128, 0.12);
+  color: ${theme.colors.primary};
+  font-size: 23px;
+  font-weight: 800;
+`;
+
+export const ProfileInfo = styled.div`
+  min-width: 0;
+  flex: 1;
+`;
+
+export const ProfileHeading = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const Name = styled.h2`
+  margin: 0;
+  overflow: hidden;
+  color: ${theme.colors.text.primary};
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const RoleBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: ${theme.colors.white};
-  color: ${theme.colors.black.DEFAULT};
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: ${theme.radius.pill};
+  background: rgba(240, 128, 128, 0.12);
+  color: ${theme.colors.primary};
+  font-size: 11px;
+  font-weight: 800;
+`;
+
+export const PhoneNumber = styled.p`
+  margin: 4px 0 0;
+  color: ${theme.colors.text.secondary};
   font-size: 13px;
-  font-weight: 700;
+  line-height: 1.4;
 `;
 
-export const ShareLinkCard = styled.section`
+export const ShopMeta = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 16px;
-  padding: 20px;
-  border: 1px solid ${theme.colors.gray.border};
-  border-radius: 20px;
-  background: ${theme.colors.white};
+  min-height: 17px;
+  align-items: center;
+  margin-top: 3px;
+  color: ${theme.colors.text.tertiary};
+  font-size: 12px;
+  font-weight: 600;
 `;
 
-export const ShareLinkButton = styled.button`
-  display: block;
-  width: 100%;
-  padding: 14px 16px;
-  border: 0;
-  border-radius: 14px;
-  background: ${theme.colors.gray[20]};
-  color: ${theme.colors.black.DEFAULT};
-  font-size: 14px;
-  font-weight: 700;
+export const Section = styled.section`
+  margin-top: 28px;
+`;
+
+export const SectionHeading = styled.div`
+  margin-bottom: 12px;
+`;
+
+export const SectionTitle = styled.h2`
+  margin: 0;
+  color: ${theme.colors.text.primary};
+  font-size: 17px;
+  font-weight: 800;
+`;
+
+export const SectionDescription = styled.p`
+  margin: 5px 0 0;
+  color: ${theme.colors.text.tertiary};
+  font-size: 12px;
   line-height: 1.45;
-  overflow-wrap: anywhere;
-  text-align: left;
+`;
+
+export const ShopCard = styled(CardSurface)`
+  padding: 18px;
+`;
+
+export const ShopCardHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+`;
+
+export const ShopSummary = styled.div`
+  min-width: 0;
+`;
+
+export const ShopName = styled.strong`
+  display: block;
+  overflow: hidden;
+  color: ${theme.colors.text.primary};
+  font-size: 18px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+export const ShopDescription = styled.span`
+  display: block;
+  margin-top: 5px;
+  color: ${theme.colors.text.tertiary};
+  font-size: 12px;
+  line-height: 1.4;
+`;
+
+export const LinkPreview = styled.p`
+  margin: 16px 0 0;
+  padding: 12px 13px;
+  overflow: hidden;
+  border-radius: ${theme.radius.md};
+  background: ${theme.colors.surface.subtle};
+  color: ${theme.colors.text.tertiary};
+  font-size: 12px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+export const ShopActions = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+`;
+
+const actionButtonStyles = `
+  display: flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
   text-decoration: none;
   cursor: pointer;
 `;
 
-export const LinkStatus = styled.p`
-  margin: 0;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: ${theme.colors.gray[20]};
-  color: ${theme.colors.gray.dark.DEFAULT};
-  font-size: 14px;
-  line-height: 1.45;
+export const PreviewLink = styled.a`
+  ${actionButtonStyles}
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.secondary};
+
+  &:focus-visible {
+    outline: 2px solid ${theme.colors.primary};
+    outline-offset: 2px;
+  }
 `;
 
-export const CopyStatus = styled.p`
-  margin: 0;
+export const CopyButton = styled.button`
+  ${actionButtonStyles}
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.primary};
+`;
+
+export const ShareButton = styled.button`
+  ${actionButtonStyles}
+  border: 1px solid ${theme.colors.primary};
+  background: ${theme.colors.primary};
+  color: ${theme.colors.text.inverse};
+`;
+
+export const ShopLoading = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+`;
+
+export const LinkError = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 2px 0;
+
+  strong {
+    color: ${theme.colors.text.primary};
+    font-size: 14px;
+  }
+
+  span {
+    margin-top: 6px;
+    color: ${theme.colors.text.tertiary};
+    font-size: 12px;
+    line-height: 1.5;
+  }
+`;
+
+export const RetryButton = styled.button`
+  min-height: 40px;
+  margin-top: 14px;
+  padding: 0 15px;
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  border-radius: ${theme.radius.md};
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.primary};
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+`;
+
+export const ServiceMenu = styled(GroupedSurface)``;
+
+export const ServiceMenuButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 74px;
+  padding: 13px 15px;
+  border: 0;
+  border-bottom: 1px solid ${theme.colors.border.subtle};
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.primary};
+  text-align: left;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &:active {
+    background: ${theme.colors.surface.subtle};
+  }
+
+  &:focus-visible {
+    position: relative;
+    outline: 2px solid ${theme.colors.primary};
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+`;
+
+export const ServiceIcon = styled.span`
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: rgba(240, 128, 128, 0.12);
   color: ${theme.colors.primary};
-  font-size: 13px;
-  font-weight: 700;
+
+  svg {
+    width: 23px;
+    height: 23px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 `;
 
-export const MenuManageButton = styled(BaseButton).attrs({
-  $fullWidth: true,
-  $height: '52px',
-  $radius: '16px',
-})`
-  margin-top: 16px;
-  background: ${theme.colors.white};
-  color: ${theme.colors.black.DEFAULT};
-  border: 1px solid ${theme.colors.gray.border};
+export const ServiceText = styled.span`
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    color: ${theme.colors.text.primary};
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  span {
+    overflow: hidden;
+    color: ${theme.colors.text.tertiary};
+    font-size: 12px;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 `;
 
-export const LogoutButton = styled(BaseButton).attrs({
-  $fullWidth: true,
-  $height: '52px',
-  $radius: '16px',
-})`
-  margin-top: 20px;
-  background: ${theme.colors.black.DEFAULT};
-  color: ${theme.colors.white};
+export const Chevron = styled.span`
+  flex: 0 0 auto;
+  color: #afb1b7;
+  font-size: 23px;
+  font-weight: 300;
+  line-height: 1;
+`;
+
+export const AccountMenu = styled(GroupedSurface)``;
+
+export const LogoutButton = styled(ServiceMenuButton)`
+  color: ${theme.colors.text.secondary};
+`;
+
+export const AccountIcon = styled(ServiceIcon)`
+  background: ${theme.colors.surface.subtle};
+  color: ${theme.colors.text.secondary};
 `;

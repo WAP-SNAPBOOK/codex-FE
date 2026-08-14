@@ -39,20 +39,29 @@ export default function InAppGuideBar() {
         <S.Text>
           <span>브라우저로 열어보세요!</span>
         </S.Text>
-        <S.OpenButton onClick={handleClick}>열기</S.OpenButton>
-        <S.CloseButton onClick={() => setHidden(true)}>✕</S.CloseButton>
+        <S.OpenButton type="button" onClick={handleClick}>
+          열기
+        </S.OpenButton>
+        <S.CloseButton type="button" aria-label="안내 닫기" onClick={() => setHidden(true)}>
+          ✕
+        </S.CloseButton>
       </S.Card>
       {showModal && (
         <CommonModal
           headerTop={
             <S.Tabs>
               <S.TabButton
+                type="button"
                 $active={selectedOS === 'android'}
                 onClick={() => setSelectedOS('android')}
               >
                 Android
               </S.TabButton>
-              <S.TabButton $active={selectedOS === 'ios'} onClick={() => setSelectedOS('ios')}>
+              <S.TabButton
+                type="button"
+                $active={selectedOS === 'ios'}
+                onClick={() => setSelectedOS('ios')}
+              >
                 iOS
               </S.TabButton>
             </S.Tabs>

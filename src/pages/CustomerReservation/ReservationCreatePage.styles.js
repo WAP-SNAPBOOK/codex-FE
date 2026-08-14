@@ -1,19 +1,24 @@
 import styled from 'styled-components';
+import theme from '@/styles/theme';
 
 /* 전체 카드 */
 export const PageWrapper = styled.div`
-  width: 100%;
   display: flex;
+  width: min(100%, ${theme.layout.mobileMaxWidth});
+  min-height: 100vh;
+  min-height: 100dvh;
   flex-direction: column;
+  background: ${theme.colors.surface.DEFAULT};
 `;
 
 /* 헤더 */
 export const Header = styled.header`
-  height: 118px;
   display: grid;
+  min-height: 68px;
   grid-template-columns: 40px 1fr 40px;
   align-items: center;
-  padding: 38px 24px 0;
+  padding: calc(8px + env(safe-area-inset-top)) 20px 8px;
+  border-bottom: 1px solid ${theme.colors.border.subtle};
 `;
 
 export const Title = styled.h1`
@@ -36,6 +41,7 @@ export const IconButton = styled.button`
   background: transparent;
   font-size: 18px;
   cursor: pointer;
+  border-radius: ${theme.radius.md};
 
   img {
     max-width: 23px;
@@ -52,8 +58,8 @@ export const HeaderSpacer = styled.div`
 /* 진행 바 */
 export const ProgressBar = styled.div`
   display: flex;
-  gap: 15px;
-  padding: 24px 29px 0;
+  gap: 8px;
+  padding: 18px 20px 0;
 `;
 
 export const Progress = styled.div`
@@ -80,17 +86,23 @@ export const Progress = styled.div`
 /* 중앙 컨텐츠 */
 export const Content = styled.div`
   display: flex;
+  min-height: 0;
+  flex: 1;
   flex-direction: column;
-  padding: 32px 29px 24px;
+  padding: 28px 20px calc(24px + env(safe-area-inset-bottom));
 
   > button:last-child {
-    margin-top: 24px;
-    margin-left: -5px;
-    width: calc(100% + 10px);
+    margin-top: 32px;
+    width: 100%;
     height: 56px;
     border-radius: 16px;
     font-size: 16px;
     font-weight: 700;
+  }
+
+  @media (max-width: 360px) {
+    padding-right: 16px;
+    padding-left: 16px;
   }
 `;
 

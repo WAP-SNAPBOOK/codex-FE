@@ -4,6 +4,7 @@ import Container from '../../components/common/Container';
 import { NextButton } from '../../components/common/NextButton';
 import { useSignupCustomer } from '../../query/signupQueries';
 import { validateMobile010 } from '../../utils/phoneNumber';
+import { notify } from '../../utils/appFeedback';
 import * as S from './CustomerSignupPage.styles';
 
 // CUSTOMER 전용 회원가입 페이지
@@ -41,7 +42,7 @@ function CustomerSignupPage() {
 
     const { name, phoneNumber } = formData;
     if (!name || !phoneNumber) {
-      alert('이름과 전화번호를 모두 입력해주세요.');
+      notify('이름과 전화번호를 모두 입력해주세요.');
       return;
     }
 
@@ -50,9 +51,9 @@ function CustomerSignupPage() {
 
     if (!valid) {
       if (reason === 'length') {
-        alert('전화번호는 숫자만 11자리여야 합니다.');
+        notify('전화번호는 숫자만 11자리여야 합니다.');
       } else if (reason === 'format') {
-        alert('정확한 휴대폰 번호(010으로 시작)를 입력해주세요.');
+        notify('정확한 휴대폰 번호(010으로 시작)를 입력해주세요.');
       }
       return;
     }

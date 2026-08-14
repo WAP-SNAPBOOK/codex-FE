@@ -5,6 +5,7 @@ import { AuthInput } from '../../components/auth/AuthInput';
 import Container from '../../components/common/Container';
 import { NextButton } from '../../components/common/NextButton';
 import { useRegisterShopInfo } from '../../query/signupQueries';
+import { notify } from '../../utils/appFeedback';
 
 function ShopInfoPage() {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ function ShopInfoPage() {
 
     const { businessName, address, businessNumber } = formData;
     if (!businessName || !address || !businessNumber) {
-      alert('가게 정보를 모두 입력해주세요.');
+      notify('가게 정보를 모두 입력해주세요.');
       return;
     }
 

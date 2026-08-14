@@ -1,18 +1,13 @@
 import styled from 'styled-components';
 import { BaseButton } from '@/components/common/Button';
 import theme from '@/styles/theme';
+import { PageShell } from '@/components/common/PageLayout';
 
-export const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-  background: ${theme.colors.white};
-`;
+export const PageWrapper = styled(PageShell)``;
 
 export const Content = styled.main`
   flex: 1;
-  padding: 14px 20px 110px;
+  padding: 14px 20px calc(110px + env(safe-area-inset-bottom));
 `;
 
 export const TopActions = styled.div`
