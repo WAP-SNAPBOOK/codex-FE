@@ -86,6 +86,18 @@ export const HeaderSpacer = styled.span`
   justify-self: end;
 `;
 
+export const ConnectionStatus = styled.div`
+  padding: 8px 16px;
+  border-bottom: 1px solid ${theme.colors.border.subtle};
+  background: ${({ $error }) =>
+    $error ? theme.colors.status.error.background : theme.colors.status.pending.background};
+  color: ${({ $error }) =>
+    $error ? theme.colors.status.error.text : theme.colors.status.pending.text};
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+`;
+
 export const Messages = styled.main`
   display: flex;
   min-height: 0;

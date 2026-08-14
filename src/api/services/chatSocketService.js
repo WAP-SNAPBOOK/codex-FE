@@ -11,22 +11,23 @@ class ChatSocketService {
   /**
    * 소켓 연결
    * @param {string} accessToken JWT 토큰
-   * @param {function} onConnect 연결 완료 콜백
-   * @param {function} onError onError 에러 콜백
+   * @param {object} handlers 연결 상태 콜백
    */
-  connect(accessToken, onConnect, onError) {
+  connect(accessToken, { onConnect, onDisconnect, onError } = {}) {
     this.client = new Client({
       webSocketFactory: () => new SockJS(SOCKET_URL),
       connectHeaders: {
         Authorization: `Bearer ${accessToken}`,
       },
       reconnectDelay: 5000,
-      onConnect,
+      onConnect: (frame) => onConnect?.(frame),
       onStompError: (frame) => {
-        console.log('Broker reported error: ', +frame.headers['message']);
-        console.log('Additional details' + frame.body);
-        if (onError) onError(frame);
+        console.error('Broker reported error:', frame.headers['message']);
+        console.error('Additional details:', frame.body);
+        onError?.(frame);
       },
+      onWebSocketError: (event) => onError?.(event),
+      onWebSocketClose: (event) => onDisconnect?.(event),
     });
 
     this.client.activate();
