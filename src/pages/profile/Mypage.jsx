@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/common/BottomNav';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
 import Container from '../../components/common/Container';
 import Header from '../../components/common/Header';
+import { SkeletonBlock } from '../../components/common/Skeleton';
+import StatusBadge from '../../components/common/StatusBadge';
+import { useToast } from '../../components/common/ToastProvider';
 import { useAuth } from '../../context/AuthContext';
 import { useLogout } from '../../query/authQueries';
 import { useShopLink } from '../../query/linkQueries';
 import { useShopInfoById } from '../../query/shopQueries';
-import * as S from './Mypage.styles';
-import ConfirmDialog from '../../components/common/ConfirmDialog';
-import { useToast } from '../../components/common/ToastProvider';
 import { getShopProfileLink } from '../../utils/shopProfileLink';
+import * as S from './Mypage.styles';
 
 const getProfileInitial = (name) =>
   String(name || 'S')
@@ -53,6 +55,15 @@ function ChatIcon() {
   );
 }
 
+function LogoutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M10 5H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h5" />
+      <path d="m15 8 4 4-4 4M19 12H9" />
+    </svg>
+  );
+}
+
 function ServiceMenuItem({ icon: Icon, label, description, onClick, disabled = false }) {
   return (
     <S.ServiceMenuButton type="button" onClick={onClick} disabled={disabled}>
@@ -79,15 +90,17 @@ export default function Mypage() {
     data: shopLink,
     isLoading: isShopLinkLoading,
     isError: isShopLinkError,
+    refetch: refetchShopLink,
   } = useShopLink({ enabled: isOwner });
-  const { data: shopInfo } = useShopInfoById(isOwner ? shopLink?.shopId : null);
+  const { data: shopInfo, isLoading: isShopInfoLoading } = useShopInfoById(
+    isOwner ? shopLink?.shopId : null
+  );
 
   const roleLabel = isOwner ? '사장님' : '고객';
   const shopProfileLink = getShopProfileLink(shopLink);
-
-  const handleLogout = () => {
-    setIsLogoutConfirmOpen(true);
-  };
+  const phoneNumber = auth?.phoneNumber
+    ? formatPhoneNumber(auth.phoneNumber)
+    : '등록된 전화번호가 없습니다';
 
   const confirmLogout = () => {
     setIsLogoutConfirmOpen(false);
@@ -132,45 +145,71 @@ export default function Mypage() {
   return (
     <Container $start>
       <S.PageWrapper>
-        <Header title="마이페이지" />
+        <Header
+          title="마이"
+          description={
+            isOwner ? '매장 운영과 계정 정보를 관리해요.' : '내 활동과 계정 정보를 확인해요.'
+          }
+        />
         <S.Content>
-          <S.ProfileSection>
-            <S.Avatar aria-hidden="true">{getProfileInitial(auth?.name)}</S.Avatar>
-            <S.ProfileInfo>
-              <S.ProfileHeading>
-                <S.Name>{auth?.name || '이름 정보 없음'}</S.Name>
-                <S.RoleBadge>{roleLabel}</S.RoleBadge>
-              </S.ProfileHeading>
-              <S.PhoneNumber>
-                {auth?.phoneNumber ? formatPhoneNumber(auth.phoneNumber) : '전화번호 정보 없음'}
-              </S.PhoneNumber>
-            </S.ProfileInfo>
-          </S.ProfileSection>
+          <S.ProfileCard>
+            <S.ProfileLabel>계정 정보</S.ProfileLabel>
+            <S.ProfileRow>
+              <S.Avatar aria-hidden="true">{getProfileInitial(auth?.name)}</S.Avatar>
+              <S.ProfileInfo>
+                <S.ProfileHeading>
+                  <S.Name>{auth?.name || '이름 정보 없음'}</S.Name>
+                  <S.RoleBadge>{roleLabel}</S.RoleBadge>
+                </S.ProfileHeading>
+                <S.PhoneNumber>{phoneNumber}</S.PhoneNumber>
+                {isOwner ? (
+                  <S.ShopMeta>
+                    {isShopInfoLoading ? (
+                      <SkeletonBlock $width="96px" $height="12px" />
+                    ) : (
+                      `${shopInfo?.shopName || '내 매장'} 운영 중`
+                    )}
+                  </S.ShopMeta>
+                ) : null}
+              </S.ProfileInfo>
+            </S.ProfileRow>
+          </S.ProfileCard>
 
           {isOwner ? (
             <S.Section>
-              <S.SectionTitle>내 매장</S.SectionTitle>
+              <S.SectionHeading>
+                <S.SectionTitle>내 매장</S.SectionTitle>
+                <S.SectionDescription>고객에게 공유할 예약 페이지예요.</S.SectionDescription>
+              </S.SectionHeading>
               <S.ShopCard>
-                <S.ShopCardHeader>
-                  <S.ShopSummary>
-                    <S.ShopLabel>고객 예약 페이지</S.ShopLabel>
-                    <S.ShopName>{shopInfo?.shopName || '내 매장'}</S.ShopName>
-                  </S.ShopSummary>
-                  {!isShopLinkLoading && !isShopLinkError && shopProfileLink ? (
-                    <S.PublicBadge>공개 중</S.PublicBadge>
-                  ) : null}
-                </S.ShopCardHeader>
-
                 {isShopLinkLoading ? (
-                  <S.LinkStatus>예약 링크를 불러오는 중입니다.</S.LinkStatus>
+                  <S.ShopLoading role="status" aria-label="매장 예약 페이지 불러오는 중">
+                    <SkeletonBlock $width="44%" $height="18px" />
+                    <SkeletonBlock $width="100%" $height="44px" $radius="12px" />
+                    <SkeletonBlock $width="100%" $height="46px" $radius="12px" />
+                  </S.ShopLoading>
                 ) : isShopLinkError || !shopProfileLink ? (
-                  <S.LinkStatus $error>
-                    예약 링크를 불러오지 못했습니다. 잠시 후 다시 확인해주세요.
-                  </S.LinkStatus>
+                  <S.LinkError role="alert">
+                    <strong>예약 페이지를 불러오지 못했어요.</strong>
+                    <span>네트워크 상태를 확인한 뒤 다시 시도해주세요.</span>
+                    <S.RetryButton type="button" onClick={() => refetchShopLink()}>
+                      다시 시도
+                    </S.RetryButton>
+                  </S.LinkError>
                 ) : (
                   <>
+                    <S.ShopCardHeader>
+                      <S.ShopSummary>
+                        <S.ShopName>{shopInfo?.shopName || '내 매장'}</S.ShopName>
+                        <S.ShopDescription>예약과 상담을 시작하는 공개 페이지</S.ShopDescription>
+                      </S.ShopSummary>
+                      <StatusBadge tone="success">공개 중</StatusBadge>
+                    </S.ShopCardHeader>
                     <S.LinkPreview>{shopProfileLink}</S.LinkPreview>
                     <S.ShopActions>
+                      <S.PreviewLink href={shopProfileLink} target="_blank" rel="noreferrer">
+                        미리보기
+                      </S.PreviewLink>
                       <S.CopyButton type="button" onClick={handleCopyProfileLink}>
                         링크 복사
                       </S.CopyButton>
@@ -185,7 +224,12 @@ export default function Mypage() {
           ) : null}
 
           <S.Section>
-            <S.SectionTitle>서비스</S.SectionTitle>
+            <S.SectionHeading>
+              <S.SectionTitle>{isOwner ? '매장 운영' : '내 활동'}</S.SectionTitle>
+              <S.SectionDescription>
+                {isOwner ? '자주 사용하는 운영 기능을 모았어요.' : '예약과 상담 내역을 확인해요.'}
+              </S.SectionDescription>
+            </S.SectionHeading>
             <S.ServiceMenu>
               {isOwner ? (
                 <ServiceMenuItem
@@ -216,10 +260,19 @@ export default function Mypage() {
           </S.Section>
 
           <S.Section>
-            <S.SectionTitle>계정</S.SectionTitle>
+            <S.SectionHeading>
+              <S.SectionTitle>계정</S.SectionTitle>
+              <S.SectionDescription>이 기기의 로그인 상태를 관리해요.</S.SectionDescription>
+            </S.SectionHeading>
             <S.AccountMenu>
-              <S.LogoutButton type="button" onClick={handleLogout}>
-                로그아웃
+              <S.LogoutButton type="button" onClick={() => setIsLogoutConfirmOpen(true)}>
+                <S.AccountIcon aria-hidden="true">
+                  <LogoutIcon />
+                </S.AccountIcon>
+                <S.ServiceText>
+                  <strong>로그아웃</strong>
+                  <span>현재 기기에서 계정 연결을 종료해요</span>
+                </S.ServiceText>
                 <S.Chevron aria-hidden="true">›</S.Chevron>
               </S.LogoutButton>
             </S.AccountMenu>
