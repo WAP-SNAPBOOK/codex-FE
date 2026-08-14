@@ -28,9 +28,13 @@ const formatLastMessageAt = (value) => {
     });
   }
 
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (isSameDate(date, yesterday)) return '어제';
+
   return date.toLocaleDateString('ko-KR', {
-    month: '2-digit',
-    day: '2-digit',
+    month: 'numeric',
+    day: 'numeric',
   });
 };
 
@@ -58,11 +62,15 @@ export default function ChatRoomItem({ room }) {
   const shortMessage = truncateByVisualLength(getChatRoomLastMessagePreview(room), MAX_LENGTH);
 
   return (
-    <S.Container type="button" onClick={handleClick}>
-      <S.Avatar>{otherUserName?.trim()?.[0] || '?'}</S.Avatar>
+    <S.Container type="button" $unread={unreadCount > 0} onClick={handleClick}>
+      <S.Avatar aria-hidden="true">
+        {(userType === 'OWNER' ? otherUserName : shopBusinessName)?.trim()?.[0] || '?'}
+      </S.Avatar>
       <S.InfoWrapper>
         <S.TopRow>
-          <S.ShopName>{userType === 'OWNER' ? otherUserName : shopBusinessName}</S.ShopName>
+          <S.ShopName $unread={unreadCount > 0}>
+            {userType === 'OWNER' ? otherUserName : shopBusinessName}
+          </S.ShopName>
           <S.Time>{formatLastMessageAt(lastMessageAt)}</S.Time>
         </S.TopRow>
         <S.BottomRow>

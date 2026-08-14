@@ -87,7 +87,9 @@ export default function MessageItem({ msg, isMine }) {
 
     return (
       <S.MessageRow $isMine={false}>
-        <S.Bubble $isMine={false}>{CardComponent}</S.Bubble>
+        <S.Bubble $isMine={false} $isCard>
+          {CardComponent}
+        </S.Bubble>
         <S.Time>{formatTime(msg.sentAt)}</S.Time>
       </S.MessageRow>
     );

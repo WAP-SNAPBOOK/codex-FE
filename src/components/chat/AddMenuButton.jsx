@@ -8,8 +8,8 @@ export default function AddMenuButton({ onToggleMenu }) {
   };
 
   return (
-    <AddButton onClick={handleClick}>
-      <img src={addIcon} alt="addMenu" />
+    <AddButton type="button" aria-label="채팅 메뉴 열기" onClick={handleClick}>
+      <img src={addIcon} alt="" />
     </AddButton>
   );
 }

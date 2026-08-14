@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import reservationListIcon from '../../assets/icons/reservation-list-icon.svg';
 import { BaseButton } from '../common/Button';
+import theme from '../../styles/theme';
 
 export default function ChatMenuPanel({ visible }) {
   const navigate = useNavigate();
@@ -11,11 +12,14 @@ export default function ChatMenuPanel({ visible }) {
   const handleClick = () => {
     navigate('/reservations');
   };
+
+  if (!visible) return null;
+
   return (
-    <Panel $visible={visible}>
+    <Panel>
       <PanelInner>
-        <ReservationListButton $column onClick={handleClick}>
-          <img src={reservationListIcon} alt="reservationListIcon" />
+        <ReservationListButton type="button" $column onClick={handleClick}>
+          <img src={reservationListIcon} alt="" />
           <span>예약 내역</span>
         </ReservationListButton>
       </PanelInner>
@@ -28,20 +32,35 @@ export const Panel = styled.div`
   align-items: center;
   justify-content: center;
   position: fixed;
-  bottom: 59px; /* InputBar 높이 */
-  left: 0;
-  width: 100%;
-  height: 180px;
-  background: #f3f3f3;
-  border-top: 1px solid #ddd;
-  transition: all 0.3s ease;
-  padding: 16px;
-  z-index: ${({ $visible }) => ($visible ? 15 : -1)}; /* 닫힐 땐 완전히 뒤로 */
-  /* 메뉴가 보이거나 숨겨질 때 부드럽게 */
-  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
-  transform: ${({ $visible }) => ($visible ? 'translateY(0)' : 'translateY(100%)')};
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  left: 50%;
+  width: min(100%, 480px);
+  min-height: 148px;
+  border-top: 1px solid ${theme.colors.border.subtle};
+  background: #fff;
+  padding: 18px;
+  z-index: 15;
+  transform: translateX(-50%);
 `;
 
-const PanelInner = styled.div``;
+const PanelInner = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+`;
 
-const ReservationListButton = styled(BaseButton)``;
+const ReservationListButton = styled(BaseButton)`
+  width: 76px;
+  min-height: 72px;
+  gap: 7px;
+  border-radius: 16px;
+  background: #f6f7f9;
+  color: #555960;
+  font-size: 12px;
+  font-weight: 700;
+
+  img {
+    width: 28px;
+    height: 28px;
+  }
+`;
