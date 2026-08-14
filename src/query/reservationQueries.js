@@ -2,6 +2,18 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { reservationService } from '../api/services/reservationService';
 import { shopReservationService } from '../api/services/shopReservation';
 import { useAuth } from '../context/AuthContext';
+import { myReservation } from '../api/services/myReservation';
+
+export const useMyReservations = (options = {}) => {
+  const { auth } = useAuth();
+
+  return useQuery({
+    queryKey: ['my-reservations', auth?.userId],
+    queryFn: () => myReservation.getMyReservations(),
+    ...options,
+    enabled: !!auth?.userId && (options.enabled ?? true),
+  });
+};
 
 //예약 생성 훅
 export const useCreateReservation = (handleClose) => {

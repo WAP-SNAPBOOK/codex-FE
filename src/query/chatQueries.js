@@ -3,10 +3,12 @@ import { chatService } from '../api/services/chatService';
 import { chatSocketService } from '../api/services/chatSocketService';
 
 //채팅방 목록 조회 훅
-export const useChatRooms = () =>
+export const useChatRooms = (options = {}) =>
   useQuery({
     queryKey: ['chatRooms'],
     queryFn: () => chatService.getChatRooms(),
+    ...options,
+    enabled: options.enabled ?? true,
   });
 
 /**

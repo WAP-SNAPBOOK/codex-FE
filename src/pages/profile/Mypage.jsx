@@ -10,19 +10,7 @@ import { useShopInfoById } from '../../query/shopQueries';
 import * as S from './Mypage.styles';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import { useToast } from '../../components/common/ToastProvider';
-
-const SHOP_PROFILE_LINK_BASE_URL = 'https://snapbook.store/s/';
-
-const getShopIdentifierCode = (shopLink) => {
-  if (!shopLink) return null;
-
-  if (shopLink.slug) return shopLink.slug;
-  if (shopLink.publicCode) return shopLink.publicCode;
-
-  const linkUrl = shopLink.canonicalUrl || shopLink.fullUrl;
-  const [, code] = String(linkUrl || '').match(/\/s\/([^/?#]+)/) || [];
-  return code || null;
-};
+import { getShopProfileLink } from '../../utils/shopProfileLink';
 
 const getProfileInitial = (name) =>
   String(name || 'S')
@@ -95,10 +83,7 @@ export default function Mypage() {
   const { data: shopInfo } = useShopInfoById(isOwner ? shopLink?.shopId : null);
 
   const roleLabel = isOwner ? '사장님' : '고객';
-  const shopIdentifierCode = getShopIdentifierCode(shopLink);
-  const shopProfileLink = shopIdentifierCode
-    ? `${SHOP_PROFILE_LINK_BASE_URL}${encodeURIComponent(shopIdentifierCode)}`
-    : null;
+  const shopProfileLink = getShopProfileLink(shopLink);
 
   const handleLogout = () => {
     setIsLogoutConfirmOpen(true);
