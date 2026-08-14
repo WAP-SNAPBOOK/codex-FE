@@ -48,6 +48,19 @@ export const ProfileInfo = styled.div`
   flex: 1;
 `;
 
+export const ProfileAction = styled.button`
+  width: 100%;
+  min-height: 42px;
+  margin-top: 16px;
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  border-radius: ${theme.radius.md};
+  background: rgba(255, 255, 255, 0.72);
+  color: ${theme.colors.text.secondary};
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+`;
+
 export const ProfileHeading = styled.div`
   display: flex;
   align-items: center;
@@ -344,4 +357,17 @@ export const LogoutButton = styled(ServiceMenuButton)`
 export const AccountIcon = styled(ServiceIcon)`
   background: ${theme.colors.surface.subtle};
   color: ${theme.colors.text.secondary};
+`;
+
+export const WithdrawalButton = styled(ServiceMenuButton)`
+  color: ${theme.colors.status.error.text};
+
+  ${ServiceText} strong {
+    color: ${theme.colors.status.error.text};
+  }
+`;
+
+export const DangerIcon = styled(ServiceIcon)`
+  background: ${theme.colors.status.error.background};
+  color: ${theme.colors.status.error.text};
 `;

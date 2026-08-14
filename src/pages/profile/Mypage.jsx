@@ -64,6 +64,58 @@ function LogoutIcon() {
   );
 }
 
+function AccountIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21a8 8 0 0 1 16 0" />
+    </svg>
+  );
+}
+
+function BellIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+      <path d="M10 21h4" />
+    </svg>
+  );
+}
+
+function NoticeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" />
+    </svg>
+  );
+}
+
+function HelpIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.8 9a2.4 2.4 0 1 1 3.1 2.3c-.9.4-.9 1.1-.9 1.7M12 17h.01" />
+    </svg>
+  );
+}
+
+function DocumentIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 3h8l4 4v14H6zM14 3v5h5M9 13h6M9 17h6" />
+    </svg>
+  );
+}
+
+function WithdrawalIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3 2.8 20h18.4L12 3Z" />
+      <path d="M12 9v5M12 17h.01" />
+    </svg>
+  );
+}
+
 function ServiceMenuItem({ icon: Icon, label, description, onClick, disabled = false }) {
   return (
     <S.ServiceMenuButton type="button" onClick={onClick} disabled={disabled}>
@@ -173,6 +225,9 @@ export default function Mypage() {
                 ) : null}
               </S.ProfileInfo>
             </S.ProfileRow>
+            <S.ProfileAction type="button" onClick={() => navigate('/mypage/account')}>
+              계정 정보 보기
+            </S.ProfileAction>
           </S.ProfileCard>
 
           {isOwner ? (
@@ -261,8 +316,53 @@ export default function Mypage() {
 
           <S.Section>
             <S.SectionHeading>
-              <S.SectionTitle>계정</S.SectionTitle>
-              <S.SectionDescription>이 기기의 로그인 상태를 관리해요.</S.SectionDescription>
+              <S.SectionTitle>설정 및 지원</S.SectionTitle>
+              <S.SectionDescription>계정과 서비스 이용 정보를 확인해요.</S.SectionDescription>
+            </S.SectionHeading>
+            <S.AccountMenu>
+              <ServiceMenuItem
+                icon={AccountIcon}
+                label="계정 정보"
+                description="로그인 정보와 연결 상태를 확인해요"
+                onClick={() => navigate('/mypage/account')}
+              />
+              <ServiceMenuItem
+                icon={BellIcon}
+                label="알림 설정"
+                description="현재 제공되는 알림 범위를 확인해요"
+                onClick={() => navigate('/mypage/notifications')}
+              />
+              <ServiceMenuItem
+                icon={NoticeIcon}
+                label="공지사항"
+                description="서비스 안내와 업데이트를 확인해요"
+                onClick={() => navigate('/mypage/notices')}
+              />
+              <ServiceMenuItem
+                icon={HelpIcon}
+                label="문의하기"
+                description="문의 방법과 상담 경로를 확인해요"
+                onClick={() => navigate('/mypage/support')}
+              />
+              <ServiceMenuItem
+                icon={DocumentIcon}
+                label="이용약관"
+                description="서비스 이용 정책을 확인해요"
+                onClick={() => navigate('/mypage/terms')}
+              />
+              <ServiceMenuItem
+                icon={DocumentIcon}
+                label="개인정보처리방침"
+                description="개인정보 처리 정책을 확인해요"
+                onClick={() => navigate('/mypage/privacy')}
+              />
+            </S.AccountMenu>
+          </S.Section>
+
+          <S.Section>
+            <S.SectionHeading>
+              <S.SectionTitle>계정 연결</S.SectionTitle>
+              <S.SectionDescription>로그인 상태와 계정 연결을 관리해요.</S.SectionDescription>
             </S.SectionHeading>
             <S.AccountMenu>
               <S.LogoutButton type="button" onClick={() => setIsLogoutConfirmOpen(true)}>
@@ -275,6 +375,16 @@ export default function Mypage() {
                 </S.ServiceText>
                 <S.Chevron aria-hidden="true">›</S.Chevron>
               </S.LogoutButton>
+              <S.WithdrawalButton type="button" onClick={() => navigate('/mypage/withdrawal')}>
+                <S.DangerIcon aria-hidden="true">
+                  <WithdrawalIcon />
+                </S.DangerIcon>
+                <S.ServiceText>
+                  <strong>회원 탈퇴</strong>
+                  <span>계정과 서비스 데이터 처리 안내를 확인해요</span>
+                </S.ServiceText>
+                <S.Chevron aria-hidden="true">›</S.Chevron>
+              </S.WithdrawalButton>
             </S.AccountMenu>
           </S.Section>
         </S.Content>
