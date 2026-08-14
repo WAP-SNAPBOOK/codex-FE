@@ -2,35 +2,18 @@
   width: min(100%, 480px);
   min-height: 100vh;
   margin: 0 auto;
-  padding: 0 20px calc(108px + env(safe-area-inset-bottom));
+  padding: 0 0 calc(108px + env(safe-area-inset-bottom));
   box-sizing: border-box;
   background: #fff;
   color: #17181a;
   font-family: Pretendard, sans-serif;
 }
 
-.customer-reservation-page .title-wrapper {
-  padding: 38px 0 24px;
-}
-
-.customer-reservation-page .title-header {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-.customer-reservation-page .title-description {
-  margin: 7px 0 0;
-  color: #777b84;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
 .customer-reservation-page .reservation-list {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  padding: 0 20px;
 }
 
 .customer-reservation-page .card {
@@ -83,25 +66,6 @@
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.customer-reservation-page .status {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.customer-reservation-page .status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
 }
 
 .customer-reservation-page .card-body {
@@ -159,7 +123,6 @@
 }
 
 .customer-reservation-page .toggle-customer:focus-visible,
-.customer-reservation-page .reservation-state button:focus-visible,
 .customer-reservation-page .photo-item:focus-visible {
   outline: 2px solid #f08080;
   outline-offset: 2px;
@@ -304,82 +267,18 @@
   white-space: pre-wrap;
 }
 
-.customer-reservation-page .reservation-state {
-  display: flex;
-  min-height: 55vh;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  box-sizing: border-box;
-  color: #8a8d95;
-  text-align: center;
-}
-
-.customer-reservation-page .reservation-state .state-icon {
-  display: flex;
-  width: 54px;
-  height: 54px;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-  border-radius: 18px;
-  background: rgba(240, 128, 128, 0.12);
-  color: #f08080;
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.customer-reservation-page .reservation-state .state-icon.calendar {
-  font-size: 0;
-}
-
-.customer-reservation-page .reservation-state .state-icon.calendar::before {
-  content: '';
-  width: 23px;
-  height: 21px;
-  border: 2px solid currentColor;
-  border-radius: 5px;
-  box-shadow: inset 0 6px 0 rgba(240, 128, 128, 0.14);
-}
-
-.customer-reservation-page .reservation-state strong {
-  color: #292b30;
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.customer-reservation-page .reservation-state > span:not(.state-icon) {
-  max-width: 260px;
-  margin-top: 7px;
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.customer-reservation-page .reservation-state button {
-  min-height: 42px;
-  margin-top: 18px;
-  padding: 0 18px;
-  border: 0;
-  border-radius: 12px;
-  background: #f08080;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
 @media (max-width: 360px) {
   .customer-reservation-page {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .customer-reservation-page .reservation-list {
     padding-right: 16px;
     padding-left: 16px;
   }
 
   .customer-reservation-page .card {
     padding: 16px;
-  }
-
-  .customer-reservation-page .status {
-    padding: 0 8px;
   }
 }

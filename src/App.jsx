@@ -22,6 +22,7 @@ import CustomerReservationList from './pages/CustomerReservation/CustomerReserva
 import LinkRedirectPage from './pages/redirect/LinkRedirectPage';
 import ReservationCreatePage from './pages/CustomerReservation/ReservationCreatePage';
 import { blockZoom } from './utils/gesture/zoomBlocker';
+import { ToastProvider } from './components/common/ToastProvider';
 const queryClient = new QueryClient();
 
 function App() {
@@ -37,8 +38,10 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <BrowserRouter>
-            <ScrollToTop />
-            <AppRoutes /> {/* AuthProvider 내부로 분리 */}
+            <ToastProvider>
+              <ScrollToTop />
+              <AppRoutes /> {/* AuthProvider 내부로 분리 */}
+            </ToastProvider>
           </BrowserRouter>
         </AuthProvider>
 

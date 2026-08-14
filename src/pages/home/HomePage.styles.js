@@ -1,13 +1,8 @@
 import styled from 'styled-components';
 import theme from '../../styles/theme';
+import { PageContent, PageShell } from '../../components/common/PageLayout';
 
-export const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: min(100%, 480px);
-  background: #fff;
-`;
+export const PageWrapper = styled(PageShell)``;
 
 export const HomeHeader = styled.header`
   display: flex;
@@ -24,14 +19,8 @@ export const Brand = styled.h1`
   letter-spacing: -0.04em;
 `;
 
-export const Content = styled.main`
-  flex: 1;
-  padding: 28px 20px calc(104px + env(safe-area-inset-bottom));
-
-  @media (max-width: 360px) {
-    padding-right: 16px;
-    padding-left: 16px;
-  }
+export const Content = styled(PageContent)`
+  padding-top: 28px;
 `;
 
 export const WelcomeSection = styled.section`

@@ -1,22 +1,12 @@
 import styled from 'styled-components';
 import theme from '../../styles/theme';
+import { PageContent, PageShell } from '../../components/common/PageLayout';
+import { CardSurface, GroupedSurface } from '../../components/common/Surface';
 
-export const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: min(100%, 480px);
-  background: ${theme.colors.white};
-`;
+export const PageWrapper = styled(PageShell)``;
 
-export const Content = styled.main`
-  flex: 1;
-  padding: 20px 20px calc(104px + env(safe-area-inset-bottom));
-
-  @media (max-width: 360px) {
-    padding-right: 16px;
-    padding-left: 16px;
-  }
+export const Content = styled(PageContent)`
+  padding-top: 20px;
 `;
 
 export const ProfileSection = styled.section`
@@ -90,12 +80,8 @@ export const SectionTitle = styled.h2`
   font-weight: 800;
 `;
 
-export const ShopCard = styled.div`
+export const ShopCard = styled(CardSurface)`
   padding: 18px;
-  border: 1px solid #e8e9ec;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.05);
 `;
 
 export const ShopCardHeader = styled.div`
@@ -198,20 +184,7 @@ export const LinkStatus = styled.p`
   line-height: 1.5;
 `;
 
-export const ShareStatus = styled.p`
-  margin: 10px 0 0;
-  color: ${theme.colors.primary};
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.4;
-`;
-
-export const ServiceMenu = styled.div`
-  overflow: hidden;
-  border: 1px solid #e8e9ec;
-  border-radius: 18px;
-  background: #fff;
-`;
+export const ServiceMenu = styled(GroupedSurface)``;
 
 export const ServiceMenuButton = styled.button`
   display: flex;
@@ -299,11 +272,7 @@ export const Chevron = styled.span`
   line-height: 1;
 `;
 
-export const AccountMenu = styled.div`
-  overflow: hidden;
-  border: 1px solid #e8e9ec;
-  border-radius: 16px;
-`;
+export const AccountMenu = styled(GroupedSurface)``;
 
 export const LogoutButton = styled.button`
   display: flex;

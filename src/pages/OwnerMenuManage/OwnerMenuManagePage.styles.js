@@ -1,14 +1,9 @@
 import styled from 'styled-components';
 import { BaseButton } from '@/components/common/Button';
 import theme from '@/styles/theme';
+import { PageShell } from '@/components/common/PageLayout';
 
-export const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: min(100%, 480px);
-  background: ${theme.colors.white};
-`;
+export const PageWrapper = styled(PageShell)``;
 
 export const Content = styled.main`
   flex: 1;

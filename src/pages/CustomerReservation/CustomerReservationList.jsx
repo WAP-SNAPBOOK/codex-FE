@@ -5,11 +5,15 @@ import ImageModal from '@/components/modal/ImageModal';
 import { useNavigate } from 'react-router-dom';
 import { formatDurationMinutes } from '../../utils/formatDurationMinutes';
 import BottomNav from '../../components/common/BottomNav';
+import AsyncState from '../../components/common/AsyncState';
+import StatusBadge from '../../components/common/StatusBadge';
+import { ListSkeleton } from '../../components/common/Skeleton';
+import Header from '../../components/common/Header';
 
-const STATUS_STYLES = {
-  PENDING: { bg: '#fff4df', text: '#9a6500' },
-  CONFIRMED: { bg: '#edf8ef', text: '#318b42' },
-  REJECTED: { bg: '#fff0f0', text: '#c94a4a' },
+const STATUS_TONES = {
+  PENDING: 'pending',
+  CONFIRMED: 'success',
+  REJECTED: 'error',
 };
 
 const STATUS_LABELS = {
@@ -95,41 +99,30 @@ export default function CustomerReservationList() {
 
   return (
     <div className="customer-reservation-page">
-      <div className="title-wrapper">
-        <h1 className="title-header">내 예약</h1>
-        <p className="title-description">신청한 예약과 진행 상태를 확인하세요.</p>
-      </div>
+      <Header title="내 예약" description="신청한 예약과 진행 상태를 확인하세요." />
       {isLoading && (
-        <div className="reservation-state" role="status">
-          <span className="state-icon" aria-hidden="true">
-            ···
-          </span>
-          <strong>예약을 불러오고 있어요</strong>
-        </div>
+        <main className="reservation-list">
+          <ListSkeleton count={2} label="예약을 불러오는 중" />
+        </main>
       )}
       {!isLoading && error && (
-        <div className="reservation-state" role="alert">
-          <span className="state-icon" aria-hidden="true">
-            !
-          </span>
-          <strong>{error}</strong>
-          <span>잠시 후 다시 시도해 주세요.</span>
-          <button type="button" onClick={fetchReservations}>
-            다시 시도
-          </button>
-        </div>
+        <AsyncState
+          variant="error"
+          title={error}
+          description="잠시 후 다시 시도해 주세요."
+          actionLabel="다시 시도"
+          onAction={fetchReservations}
+          withBottomNav
+        />
       )}
       {!isLoading && !error && reservations.length === 0 && (
-        <div className="reservation-state">
-          <span className="state-icon calendar" aria-hidden="true">
-            0
-          </span>
-          <strong>아직 예약 내역이 없어요</strong>
-          <span>매장의 예약 링크에서 첫 예약을 신청해 보세요.</span>
-          <button type="button" onClick={() => navigate('/')}>
-            홈으로 가기
-          </button>
-        </div>
+        <AsyncState
+          title="아직 예약 내역이 없어요"
+          description="매장의 예약 링크에서 첫 예약을 신청해 보세요."
+          actionLabel="홈으로 가기"
+          onAction={() => navigate('/')}
+          withBottomNav
+        />
       )}
       {!isLoading && !error && reservations.length > 0 && (
         <main className="reservation-list">
@@ -148,10 +141,7 @@ function ReservationCard({ data }) {
   const [activeIndex, setActiveIndex] = useState(null); //모달 활성화된 사진 idx
 
   const statusText = STATUS_LABELS[data.status] || '상태 확인';
-  const statusStyle = STATUS_STYLES[data.status] || {
-    bg: '#eeeeee',
-    text: '#555555',
-  };
+  const statusTone = STATUS_TONES[data.status] || 'neutral';
 
   const ownerMessage =
     data.ownerMessage || (data.status === 'REJECTED' ? '사유 없음' : '전달 사항이 없습니다.');
@@ -173,16 +163,7 @@ function ReservationCard({ data }) {
         </div>
 
         {/* 상태 표시 */}
-        <div
-          className="status"
-          style={{
-            backgroundColor: statusStyle.bg,
-            color: statusStyle.text,
-          }}
-        >
-          <span className="status-dot" style={{ backgroundColor: statusStyle.text }} />
-          {statusText}
-        </div>
+        <StatusBadge tone={statusTone}>{statusText}</StatusBadge>
       </div>
 
       {/* 본문 영역 */}

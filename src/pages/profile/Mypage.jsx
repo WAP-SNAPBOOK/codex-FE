@@ -8,6 +8,8 @@ import { useLogout } from '../../query/authQueries';
 import { useShopLink } from '../../query/linkQueries';
 import { useShopInfoById } from '../../query/shopQueries';
 import * as S from './Mypage.styles';
+import ConfirmDialog from '../../components/common/ConfirmDialog';
+import { useToast } from '../../components/common/ToastProvider';
 
 const SHOP_PROFILE_LINK_BASE_URL = 'https://snapbook.store/s/';
 
@@ -82,7 +84,8 @@ export default function Mypage() {
   const navigate = useNavigate();
   const { auth } = useAuth();
   const logout = useLogout();
-  const [shareStatus, setShareStatus] = useState('');
+  const { showToast } = useToast();
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const isOwner = auth?.userType === 'OWNER';
   const {
     data: shopLink,
@@ -98,7 +101,11 @@ export default function Mypage() {
     : null;
 
   const handleLogout = () => {
-    if (!window.confirm('로그아웃하시겠어요?')) return;
+    setIsLogoutConfirmOpen(true);
+  };
+
+  const confirmLogout = () => {
+    setIsLogoutConfirmOpen(false);
     logout();
   };
 
@@ -112,15 +119,15 @@ export default function Mypage() {
           text: '아래 링크에서 예약과 상담을 시작해보세요.',
           url: shopProfileLink,
         });
-        setShareStatus('공유가 완료되었습니다.');
+        showToast('공유가 완료되었습니다.', { tone: 'success' });
         return;
       }
 
       await navigator.clipboard.writeText(shopProfileLink);
-      setShareStatus('예약 링크가 복사되었습니다.');
+      showToast('예약 링크가 복사되었습니다.', { tone: 'success' });
     } catch (error) {
       if (error?.name === 'AbortError') return;
-      setShareStatus('공유하지 못했습니다. 잠시 후 다시 시도해주세요.');
+      showToast('공유하지 못했습니다. 잠시 후 다시 시도해주세요.', { tone: 'error' });
     }
   };
 
@@ -129,9 +136,11 @@ export default function Mypage() {
 
     try {
       await navigator.clipboard.writeText(shopProfileLink);
-      setShareStatus('예약 링크가 복사되었습니다.');
+      showToast('예약 링크가 복사되었습니다.', { tone: 'success' });
     } catch {
-      setShareStatus('링크를 복사하지 못했습니다. 잠시 후 다시 시도해주세요.');
+      showToast('링크를 복사하지 못했습니다. 잠시 후 다시 시도해주세요.', {
+        tone: 'error',
+      });
     }
   };
 
@@ -184,9 +193,6 @@ export default function Mypage() {
                         공유하기
                       </S.ShareButton>
                     </S.ShopActions>
-                    {shareStatus ? (
-                      <S.ShareStatus role="status">{shareStatus}</S.ShareStatus>
-                    ) : null}
                   </>
                 )}
               </S.ShopCard>
@@ -236,6 +242,15 @@ export default function Mypage() {
         </S.Content>
         <BottomNav />
       </S.PageWrapper>
+      <ConfirmDialog
+        open={isLogoutConfirmOpen}
+        title="로그아웃하시겠어요?"
+        description="언제든 다시 로그인할 수 있습니다."
+        confirmLabel="로그아웃"
+        tone="danger"
+        onCancel={() => setIsLogoutConfirmOpen(false)}
+        onConfirm={confirmLogout}
+      />
     </Container>
   );
 }
