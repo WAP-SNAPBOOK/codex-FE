@@ -2,7 +2,9 @@ import styled from 'styled-components';
 import theme from '@/styles/theme';
 
 export const Page = styled.div`
+  width: min(100%, 480px);
   min-height: 100vh;
+  margin: 0 auto;
   background: #fff;
   color: #111;
   font-family: Pretendard, sans-serif;
@@ -186,7 +188,7 @@ export const MonthOption = styled.button`
 
 export const Body = styled.main`
   overflow-x: auto;
-  padding: 26px 0 28px;
+  padding: 26px 0 calc(104px + env(safe-area-inset-bottom));
 `;
 
 export const TimelineGrid = styled.div`

@@ -58,16 +58,20 @@ export default function ChatRoomItem({ room }) {
   const shortMessage = truncateByVisualLength(getChatRoomLastMessagePreview(room), MAX_LENGTH);
 
   return (
-    <S.Container>
-      <S.Avatar>{otherUserName[0]}</S.Avatar>
-      <S.InfoWrapper onClick={handleClick}>
+    <S.Container type="button" onClick={handleClick}>
+      <S.Avatar>{otherUserName?.trim()?.[0] || '?'}</S.Avatar>
+      <S.InfoWrapper>
         <S.TopRow>
           <S.ShopName>{userType === 'OWNER' ? otherUserName : shopBusinessName}</S.ShopName>
           <S.Time>{formatLastMessageAt(lastMessageAt)}</S.Time>
         </S.TopRow>
         <S.BottomRow>
           <S.LastMessage>{shortMessage}</S.LastMessage>
-          {unreadCount > 0 && <S.UnreadBadge>{unreadCount}</S.UnreadBadge>}
+          {unreadCount > 0 && (
+            <S.UnreadBadge aria-label={`읽지 않은 메시지 ${unreadCount}개`}>
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </S.UnreadBadge>
+          )}
         </S.BottomRow>
       </S.InfoWrapper>
     </S.Container>

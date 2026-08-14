@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import './CustomerReservationList.css';
 import { myReservation } from '../../api/services/myReservation';
 import ImageModal from '@/components/modal/ImageModal';
 import { useNavigate } from 'react-router-dom';
-import backIcon from '@/assets/icons/back-icon.svg';
 import { formatDurationMinutes } from '../../utils/formatDurationMinutes';
+import BottomNav from '../../components/common/BottomNav';
 
 const STATUS_STYLES = {
-  PENDING: { bg: '#ababFF', text: '#3131f7' },
-  CONFIRMED: { bg: '#E6FFE8', text: '#2ECC71' },
-  REJECTED: { bg: '#FFE8E8', text: '#FF5A5A' },
+  PENDING: { bg: '#fff4df', text: '#9a6500' },
+  CONFIRMED: { bg: '#edf8ef', text: '#318b42' },
+  REJECTED: { bg: '#fff0f0', text: '#c94a4a' },
 };
 
 const STATUS_LABELS = {
@@ -46,6 +46,7 @@ const normalizeReservation = (item) => {
 
   return {
     ...item,
+    id: item.id ?? item.reservationId,
     imageUrls: normalizedImageUrls,
     imageCount: item.imageCount ?? item.photoCount ?? normalizedImageUrls.length,
     requirements: item.requirements ?? item.requests ?? '',
@@ -74,63 +75,70 @@ export default function CustomerReservationList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const handleBack = () => {
-    if (window.history.state?.idx > 0) {
-      navigate(-1);
-      return;
+  const fetchReservations = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await myReservation.getMyReservations();
+      setReservations((Array.isArray(data) ? data : []).map(normalizeReservation));
+    } catch (err) {
+      console.error('예약 내역 불러오기 실패:', err);
+      setError('예약 내역을 불러오지 못했어요.');
+    } finally {
+      setIsLoading(false);
     }
-
-    navigate('/');
-  };
-
-  useEffect(() => {
-    const fetchReservations = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await myReservation.getMyReservations();
-        setReservations((Array.isArray(data) ? data : []).map(normalizeReservation));
-      } catch (err) {
-        console.error('예약 내역 불러오기 실패:', err);
-        setError('예약 내역을 불러오는데 실패했습니다. 다시 시도해주세요.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchReservations();
   }, []);
 
+  useEffect(() => {
+    fetchReservations();
+  }, [fetchReservations]);
+
   return (
-    <div className="page">
+    <div className="customer-reservation-page">
       <div className="title-wrapper">
-        <button
-          className="list-back-button"
-          type="button"
-          aria-label="뒤로가기"
-          onClick={handleBack}
-        >
-          <img src={backIcon} alt="back" />
-        </button>
-        <h1 className="title-header">예약 내역</h1>
-        <div className="title-spacer" aria-hidden="true" />
+        <h1 className="title-header">내 예약</h1>
+        <p className="title-description">신청한 예약과 진행 상태를 확인하세요.</p>
       </div>
-      {/* 1) 로딩 중일 때: 회색 박스 + 로딩 문구 */}
-      {isLoading && <div className="reservation-empty-text">예약 내역을 불러오는 중입니다...</div>}
-      {/* 에러처리 */}
-      {!isLoading && error && <div className="reservation-empty-text">{error}</div>}
-      {/* 2) 데이터가 없을 때: 회색 박스 없이 텍스트만 */}
-      {!isLoading && !error && reservations.length === 0 && (
-        <div className="reservation-empty-text">아직 예약이 없습니다... 😭</div>
-      )}
-      {/* 3) 데이터가 있을 때 : 회색 박스 + 카드들 렌더링 */}
-      {!isLoading && reservations.length > 0 && (
-        <div className="gray-box">
-          {reservations.map((r) => (
-            <ReservationCard key={r.id} data={r} />
-          ))}
+      {isLoading && (
+        <div className="reservation-state" role="status">
+          <span className="state-icon" aria-hidden="true">
+            ···
+          </span>
+          <strong>예약을 불러오고 있어요</strong>
         </div>
       )}
+      {!isLoading && error && (
+        <div className="reservation-state" role="alert">
+          <span className="state-icon" aria-hidden="true">
+            !
+          </span>
+          <strong>{error}</strong>
+          <span>잠시 후 다시 시도해 주세요.</span>
+          <button type="button" onClick={fetchReservations}>
+            다시 시도
+          </button>
+        </div>
+      )}
+      {!isLoading && !error && reservations.length === 0 && (
+        <div className="reservation-state">
+          <span className="state-icon calendar" aria-hidden="true">
+            0
+          </span>
+          <strong>아직 예약 내역이 없어요</strong>
+          <span>매장의 예약 링크에서 첫 예약을 신청해 보세요.</span>
+          <button type="button" onClick={() => navigate('/')}>
+            홈으로 가기
+          </button>
+        </div>
+      )}
+      {!isLoading && !error && reservations.length > 0 && (
+        <main className="reservation-list">
+          {reservations.map((r) => (
+            <ReservationCard key={r.id ?? `${r.shopName}-${r.date}-${r.time}`} data={r} />
+          ))}
+        </main>
+      )}
+      <BottomNav />
     </div>
   );
 }
@@ -139,7 +147,7 @@ function ReservationCard({ data }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null); //모달 활성화된 사진 idx
 
-  const statusText = STATUS_LABELS[data.status];
+  const statusText = STATUS_LABELS[data.status] || '상태 확인';
   const statusStyle = STATUS_STYLES[data.status] || {
     bg: '#eeeeee',
     text: '#555555',
@@ -154,11 +162,13 @@ function ReservationCard({ data }) {
       {/* 상단 영역 */}
       <div className="card-top">
         <div className="shop-info">
-          <img
-            src={data.shopImageUrl || 'https://placehold.co/80x80?text=SHOP'}
-            alt={data.shopName}
-            className="shop-img"
-          />
+          {data.shopImageUrl ? (
+            <img src={data.shopImageUrl} alt="" className="shop-img" />
+          ) : (
+            <span className="shop-img shop-placeholder" aria-hidden="true">
+              {data.shopName?.trim()?.[0] || '샵'}
+            </span>
+          )}
           <h2 className="shop-name">{data.shopName}</h2>
         </div>
 
@@ -181,10 +191,6 @@ function ReservationCard({ data }) {
 
         <div className="info-section">
           <div className="info-row">
-            <span className="label">고객명</span>
-            <span className="value-1">{data.customerName}</span>
-          </div>
-          <div className="info-row">
             <span className="label">예약 날짜</span>
             <span className="value-1 highlight">{data.date}</span>
           </div>
@@ -202,10 +208,17 @@ function ReservationCard({ data }) {
 
         <div className="divider" />
 
-        <div className="toggle-customer" onClick={() => setIsOpen(!isOpen)}>
+        <button
+          type="button"
+          className="toggle-customer"
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen(!isOpen)}
+        >
           <span>상세 보기</span>
-          <span className={`arrow ${isOpen ? 'open' : ''}`}>▼</span>
-        </div>
+          <span className={`arrow ${isOpen ? 'open' : ''}`} aria-hidden="true">
+            ⌄
+          </span>
+        </button>
 
         {isOpen && (
           <div className="details">
@@ -236,13 +249,15 @@ function ReservationCard({ data }) {
               {data.imageUrls.length > 0 ? (
                 <div className="photo-list">
                   {data.imageUrls.map((url, i) => (
-                    <img
+                    <button
                       key={`${data.id}-photo-${i}`}
+                      type="button"
                       className="photo-item"
-                      src={url}
-                      alt={`예약 사진 ${i + 1}`}
+                      aria-label={`예약 사진 ${i + 1} 크게 보기`}
                       onClick={() => setActiveIndex(i)}
-                    />
+                    >
+                      <img src={url} alt="" />
+                    </button>
                   ))}
                   {/*예약 사진 모달 활성화*/}
                   {activeIndex !== null && (

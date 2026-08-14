@@ -1,22 +1,38 @@
 import styled from 'styled-components';
 import theme from '../../styles/theme';
 
-export const Container = styled.div`
+export const Container = styled.button`
   display: flex;
-  padding: 12px 16px;
+  width: 100%;
+  min-height: 78px;
+  align-items: center;
+  padding: 14px 15px;
+  border: 1px solid #e8e9ec;
+  border-radius: 18px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
-  &:hover {
+
+  &:active {
     background-color: ${theme.colors.gray[25]};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${theme.colors.primary};
+    outline-offset: 2px;
   }
 `;
 
 export const Avatar = styled.div`
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background-color: ${theme.colors.highlight[10]};
-  color: white;
-  font-weight: bold;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background-color: rgba(240, 128, 128, 0.12);
+  color: ${theme.colors.primary};
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,6 +40,7 @@ export const Avatar = styled.div`
 
 export const InfoWrapper = styled.div`
   flex: 1;
+  min-width: 0;
   margin-left: 12px;
   display: flex;
   flex-direction: column;
@@ -43,9 +60,13 @@ export const BottomRow = styled.div`
 `;
 
 export const ShopName = styled.span`
+  min-width: 0;
+  overflow: hidden;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 16px;
   color: ${theme.colors.black.DEFAULT};
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const Time = styled.span`
@@ -55,8 +76,12 @@ export const Time = styled.span`
 
 export const LastMessage = styled.span`
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
   font-size: 13px;
   color: ${theme.colors.gray.dark.DEFAULT};
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const UnreadBadge = styled.div`

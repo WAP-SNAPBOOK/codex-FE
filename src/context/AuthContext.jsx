@@ -6,13 +6,21 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   //회원 정보 전역 상태
   const [auth, setAuth] = useState(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
   useEffect(() => {
-    const stored = authStorage.get();
-    if (stored) {
-      //토큰을 제외한 사용자 정보만 관리
-      const { name, phoneNumber, userType, userId } = stored;
-      setAuth({ name, phoneNumber, userType, userId });
+    try {
+      const stored = authStorage.get();
+      if (stored) {
+        //토큰을 제외한 사용자 정보만 관리
+        const { name, phoneNumber, userType, userId } = stored;
+        setAuth({ name, phoneNumber, userType, userId });
+      }
+    } catch (error) {
+      console.error('저장된 로그인 정보를 불러오지 못했습니다.', error);
+      authStorage.clear();
+    } finally {
+      setIsAuthReady(true);
     }
   }, []);
 
@@ -38,7 +46,11 @@ export function AuthProvider({ children }) {
     authStorage.clear();
   };
 
-  return <AuthContext.Provider value={{ auth, login, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ auth, isAuthReady, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

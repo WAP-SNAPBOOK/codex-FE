@@ -1,58 +1,78 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDeleteUser } from '../../query/authQueries';
 import { useAuth } from '../../context/AuthContext';
-import { useShopLink } from '../../query/linkQueries';
 import * as S from './HomePage.styles';
-import ChatIcon from '../../assets/icons/mainChat-icon.svg';
-import BookIcon from '../../assets/icons/book-icon.svg';
 import Container from '../../components/common/Container';
-import Header from '../../components/common/Header';
 import MainActionButton from '../../components/home/MainActionButton ';
 import BottomNav from '../../components/common/BottomNav';
 
+const CalendarIcon = () => (
+  <svg viewBox="0 0 32 32">
+    <rect x="5" y="7" width="22" height="20" rx="3" />
+    <path d="M10 4.5v5M22 4.5v5M5 12h22M10 17h4M10 22h8" />
+  </svg>
+);
+
+const ChatIcon = () => (
+  <svg viewBox="0 0 32 32">
+    <path d="M27 15.3c0 5.7-4.9 10.2-11 10.2-1.5 0-3-.3-4.3-.8l-6.1 2.1 2-5.3A9.7 9.7 0 0 1 5 15.3C5 9.7 9.9 5.2 16 5.2s11 4.5 11 10.1Z" />
+    <path d="M10.5 15.5h.1M15.9 15.5h.1M21.3 15.5h.1" />
+  </svg>
+);
+
 export default function HomePage() {
   const navigate = useNavigate();
-  const deleteUser = useDeleteUser();
   const { auth } = useAuth();
-  const { data: shopLink } = useShopLink({
-    enabled: import.meta.env.DEV && auth?.userType === 'OWNER',
-  });
-
-  useEffect(() => {
-    if (import.meta.env.DEV && shopLink) {
-      console.log('[DEV] 매장 링크:', shopLink);
-    }
-  }, [shopLink]);
-
-  //채팅방 목록 이동
-  const goToChat = () => {
-    navigate('/chat');
-  };
-
-  // 예약 캘린더 이동
-  const goToReservationList = () => {
-    navigate('/reservations'); // or 실제 라우트 이름에 맞게 수정
-  };
+  const isOwner = auth?.userType === 'OWNER';
 
   return (
-    <Container $start $padding="23px 0">
-      <Header title="SNAPBOOK" showSetting={true} onSettingClick={() => navigate('/mypage')} />
-      <S.CenterArea>
-        <S.ButtonGroup>
-          <MainActionButton onClick={goToChat} icon={ChatIcon} label="채팅방 조회" />
-          <MainActionButton onClick={goToReservationList} icon={BookIcon} label="예약 캘린더" />
-        </S.ButtonGroup>
+    <Container $start>
+      <S.PageWrapper>
+        <S.HomeHeader>
+          <S.Brand>SNAPBOOK</S.Brand>
+        </S.HomeHeader>
+
+        <S.Content>
+          <S.WelcomeSection>
+            <S.Greeting>
+              {isOwner
+                ? `${auth?.name || '사장님'}님, 오늘도 좋은 하루 보내세요.`
+                : `${auth?.name || '고객'}님, 반가워요.`}
+            </S.Greeting>
+            <S.Introduction>
+              {isOwner
+                ? '예약 일정과 고객 문의를 한곳에서 관리하세요.'
+                : '예약 내역을 확인하거나 매장과 대화를 이어가세요.'}
+            </S.Introduction>
+          </S.WelcomeSection>
+
+          <S.ActionSection>
+            <S.SectionTitle>무엇을 도와드릴까요?</S.SectionTitle>
+            <S.ActionList>
+              <MainActionButton
+                onClick={() => navigate('/reservations')}
+                icon={<CalendarIcon />}
+                label={isOwner ? '예약 캘린더' : '내 예약'}
+                description={
+                  isOwner
+                    ? '매장 예약 일정을 확인하고 관리해요'
+                    : '신청한 예약과 진행 상태를 확인해요'
+                }
+              />
+              <MainActionButton
+                onClick={() => navigate('/chat')}
+                icon={<ChatIcon />}
+                label="채팅"
+                description={
+                  isOwner ? '고객 문의와 상담을 확인해요' : '매장과 나눈 대화를 확인해요'
+                }
+              />
+            </S.ActionList>
+          </S.ActionSection>
+        </S.Content>
+
         <BottomNav />
-      </S.CenterArea>
-      {import.meta.env.DEV && (
-        <button
-          onClick={() => deleteUser.mutate()}
-          style={{ position: 'fixed', top: 8, right: 8, fontSize: 11, color: 'gray', zIndex: 9999 }}
-        >
-          [DEV] 회원탈퇴
-        </button>
-      )}
+      </S.PageWrapper>
     </Container>
   );
 }

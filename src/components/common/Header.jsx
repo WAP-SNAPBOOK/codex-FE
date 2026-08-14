@@ -8,8 +8,8 @@ export default function Header({ title, showSetting = false, onSettingClick }) {
     <HeaderWrapper>
       <Title>{title}</Title>
       {showSetting && (
-        <SettingButton onClick={onSettingClick}>
-          <img src={SettingIcon} alt="setting" />
+        <SettingButton type="button" aria-label="설정" onClick={onSettingClick}>
+          <img src={SettingIcon} alt="" />
         </SettingButton>
       )}
     </HeaderWrapper>
@@ -21,16 +21,17 @@ const HeaderWrapper = styled.header`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 51px;
-  padding: 0 21px;
+  min-height: 68px;
+  padding: 12px 20px;
   background-color: ${theme.colors.white};
 `;
 
 const Title = styled.h1`
-  text-align: center;
-  font-size: 32px;
-  font-weight: 600;
-  color: ${theme.colors.black[90]};
+  margin: 0;
+  color: #17181a;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 `;
 
 export const SettingButton = styled(BaseButton).attrs({
