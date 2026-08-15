@@ -15,6 +15,13 @@ const shopTagsByShopId = {
 let nextGlobalTagId = 5;
 let nextShopTagId = 102;
 let nextMenuId = 1000;
+let mockUserProfile = {
+  userId: 1,
+  name: '원지섭',
+  phoneNumber: '01058790514',
+  userType: 'OWNER',
+  role: 'USER',
+};
 
 const menusByShopTag = {
   1: [
@@ -298,6 +305,17 @@ const buildOwnerCalendar = (date, staffId) => {
 };
 
 export const handlers = [
+  http.patch(`${BASE}/user/me`, async ({ request }) => {
+    const payload = await request.json();
+    mockUserProfile = {
+      ...mockUserProfile,
+      name: payload.name,
+      phoneNumber: payload.phoneNumber,
+    };
+
+    return HttpResponse.json(mockUserProfile);
+  }),
+
   http.get(`${BASE}/shop/link`, () => {
     return HttpResponse.json({
       shopId: 65,

@@ -3,6 +3,7 @@ import { kakaoAuthService } from '../api/services/kakaoAuthService';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { notify } from '../utils/appFeedback';
+import { userService } from '../api/services/userService';
 
 export const useHandleAuthCode = () => {
   const { login } = useAuth();
@@ -68,4 +69,20 @@ export function useLogout() {
     queryClient.clear();
     navigate('/', { replace: true });
   };
+}
+
+export function useUpdateUserProfile() {
+  const { updateProfile } = useAuth();
+
+  return useMutation({
+    mutationFn: userService.updateMyProfile,
+    onSuccess: (data) => {
+      updateProfile({
+        name: data.name,
+        phoneNumber: data.phoneNumber,
+        userType: data.userType,
+        userId: data.userId,
+      });
+    },
+  });
 }

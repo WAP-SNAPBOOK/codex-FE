@@ -46,8 +46,16 @@ export function AuthProvider({ children }) {
     authStorage.clear();
   };
 
+  const updateProfile = (profile) => {
+    if (!profile) return;
+
+    setAuth((current) => (current ? { ...current, ...profile } : current));
+    const stored = authStorage.get();
+    if (stored) authStorage.save({ ...stored, ...profile });
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, isAuthReady, login, logout }}>
+    <AuthContext.Provider value={{ auth, isAuthReady, login, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
