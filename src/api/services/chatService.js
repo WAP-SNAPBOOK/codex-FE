@@ -62,4 +62,22 @@ export const chatService = {
       throw error;
     }
   },
+
+  // 웹소켓 재연결 시 마지막 수신 메시지 이후 누락분 조회
+  getMessagesAfter: async (chatRoomId, afterMessageId, size = 50) => {
+    try {
+      const res = await axiosClient.get(`/chat/rooms/${chatRoomId}/messages`, {
+        params: {
+          user: {},
+          afterMessageId,
+          size,
+        },
+      });
+
+      return Array.isArray(res.data) ? res.data : [];
+    } catch (error) {
+      console.error('[getMessagesAfter] 누락 메시지 조회 실패:', error);
+      throw error;
+    }
+  },
 };

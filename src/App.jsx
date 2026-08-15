@@ -6,6 +6,7 @@ import AuthRedirectPage from './pages/redirect/AuthRedirectPage';
 import SignupGatePage from './pages/signup/SignupGatePage';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './context/AuthContext';
+import NotificationProvider from './context/NotificationProvider';
 import LoginPage from './pages/login/LoginPage';
 import GlobalStyle from './styles/GlobalStyled';
 import CustomerSignupPage from './pages/signup/CustomerSignupPage';
@@ -23,6 +24,7 @@ import OwnerReservationDetailPage from './pages/OwnerReservation/OwnerReservatio
 import CustomerReservationList from './pages/CustomerReservation/CustomerReservationList';
 import LinkRedirectPage from './pages/redirect/LinkRedirectPage';
 import ReservationCreatePage from './pages/CustomerReservation/ReservationCreatePage';
+import NotificationPage from './pages/notification/NotificationPage';
 import { blockZoom } from './utils/gesture/zoomBlocker';
 import { ToastProvider } from './components/common/ToastProvider';
 const queryClient = new QueryClient();
@@ -39,12 +41,14 @@ function App() {
       <GlobalStyle />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <BrowserRouter>
-            <ToastProvider>
-              <ScrollToTop />
-              <AppRoutes /> {/* AuthProvider 내부로 분리 */}
-            </ToastProvider>
-          </BrowserRouter>
+          <NotificationProvider>
+            <BrowserRouter>
+              <ToastProvider>
+                <ScrollToTop />
+                <AppRoutes /> {/* AuthProvider 내부로 분리 */}
+              </ToastProvider>
+            </BrowserRouter>
+          </NotificationProvider>
         </AuthProvider>
 
         <ReactQueryDevtools initialIsOpen={false} position="bottom" />
@@ -149,6 +153,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <MypageDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationPage />
           </ProtectedRoute>
         }
       />

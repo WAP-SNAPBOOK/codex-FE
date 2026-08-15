@@ -11,9 +11,11 @@ import * as S from './HomePage.styles';
 import Container from '../../components/common/Container';
 import MainActionButton from '../../components/home/MainActionButton ';
 import BottomNav from '../../components/common/BottomNav';
+import Header from '../../components/common/Header';
 import StatusBadge from '../../components/common/StatusBadge';
 import { SkeletonBlock } from '../../components/common/Skeleton';
 import { useToast } from '../../components/common/ToastProvider';
+import { useUnreadNotificationCount } from '../../query/notificationQueries';
 
 const ACTIVE_RESERVATION_STATUSES = new Set(['PENDING', 'CONFIRMED']);
 
@@ -98,6 +100,7 @@ export default function HomePage() {
   const { showToast } = useToast();
   const isOwner = auth?.userType === 'OWNER';
   const today = dayjs().format('YYYY-MM-DD');
+  const { data: unreadNotificationCount } = useUnreadNotificationCount({ enabled: !!auth });
 
   const {
     data: customerReservations = [],
@@ -179,9 +182,12 @@ export default function HomePage() {
   return (
     <Container $start>
       <S.PageWrapper>
-        <S.HomeHeader>
-          <S.Brand>SNAPBOOK</S.Brand>
-        </S.HomeHeader>
+        <Header
+          title="SNAPBOOK"
+          showNotification
+          unreadNotificationCount={unreadNotificationCount?.unreadCount ?? 0}
+          onNotificationClick={() => navigate('/notifications')}
+        />
 
         <S.Content>
           <S.WelcomeSection>

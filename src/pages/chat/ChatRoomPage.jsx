@@ -23,6 +23,9 @@ import { useShopInfoById } from '../../query/shopQueries';
 import { useInitFullReadyScroll } from '../../hooks/chat/useInitFullReadyScroll';
 import { useNormalizedMessages } from '../../hooks/chat/useNormalizedMessages';
 import { useReservationSocketHandler } from '../../hooks/chat/useReservationSocketHandler';
+import { chatService } from '../../api/services/chatService';
+
+const MESSAGE_SYNC_SIZE = 50;
 
 export default function ChatRoomPage() {
   const [input, setInput] = useState(''); //메시지 입력 상태
@@ -120,6 +123,8 @@ export default function ChatRoomPage() {
   const topObserverRef = useRef(null);
   //스크롤 제어 ref
   const bottomRef = useRef(null);
+  const lastServerMessageIdRef = useRef(null);
+  const trackedChatRoomIdRef = useRef(chatRoomId);
   const hasConnectedRef = useRef(false);
 
   //초기 메시지 조회 정보
@@ -141,8 +146,29 @@ export default function ChatRoomPage() {
       map.set(m.messageId, m);
     });
 
-    return Array.from(map.values());
+    return Array.from(map.values()).sort((a, b) => {
+      const aId = Number(a.messageId);
+      const bId = Number(b.messageId);
+      if (Number.isSafeInteger(aId) && Number.isSafeInteger(bId)) {
+        return aId - bId;
+      }
+
+      return new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime();
+    });
   }, [normalizedOldMessages, liveMessages]);
+
+  useEffect(() => {
+    const latestServerMessageId = mergedMessages.reduce((latest, message) => {
+      if (message.pending) return latest;
+
+      const messageId = Number(message.messageId);
+      return Number.isSafeInteger(messageId) ? Math.max(latest, messageId) : latest;
+    }, 0);
+
+    if (latestServerMessageId > 0) {
+      lastServerMessageIdRef.current = latestServerMessageId;
+    }
+  }, [mergedMessages]);
 
   //메시지 전송 훅
   const { mutate: sendMessage } = useSendMessage(chatRoomId, (message) => {
@@ -163,12 +189,21 @@ export default function ChatRoomPage() {
   //WebSocket 연결
   useEffect(() => {
     let active = true;
-    let refreshing = false;
+    let synchronizing = false;
     setConnectionStatus('connecting');
+    if (trackedChatRoomIdRef.current !== chatRoomId) {
+      lastServerMessageIdRef.current = null;
+      trackedChatRoomIdRef.current = chatRoomId;
+    }
     hasConnectedRef.current = false;
 
     const handleIncomingMessage = async (incoming) => {
       if (!active) return;
+
+      const messageId = Number(incoming.messageId);
+      if (Number.isSafeInteger(messageId)) {
+        lastServerMessageIdRef.current = Math.max(lastServerMessageIdRef.current ?? 0, messageId);
+      }
 
       const handled = await handleReservationMessage(incoming);
 
@@ -178,19 +213,42 @@ export default function ChatRoomPage() {
       replaceWithServerMessage(incoming);
     };
 
-    const refreshLatestMessages = async () => {
-      if (!active || refreshing) return;
+    const synchronizeMissedMessages = async () => {
+      if (!active || synchronizing) return;
 
-      refreshing = true;
+      synchronizing = true;
       try {
-        await queryClient.invalidateQueries({ queryKey: ['messages', chatRoomId] });
+        let afterMessageId = lastServerMessageIdRef.current;
+
+        if (!afterMessageId) {
+          await queryClient.invalidateQueries({ queryKey: ['messages', chatRoomId] });
+          return;
+        }
+
+        while (active) {
+          const missedMessages = await chatService.getMessagesAfter(
+            chatRoomId,
+            afterMessageId,
+            MESSAGE_SYNC_SIZE
+          );
+
+          for (const message of missedMessages) {
+            await handleIncomingMessage(message);
+          }
+
+          if (missedMessages.length < MESSAGE_SYNC_SIZE) break;
+
+          const nextMessageId = Number(missedMessages.at(-1)?.messageId);
+          if (!Number.isSafeInteger(nextMessageId) || nextMessageId <= afterMessageId) break;
+          afterMessageId = nextMessageId;
+        }
 
         if (active) setConnectionStatus('connected');
       } catch (error) {
-        console.error('최신 메시지 새로고침 실패:', error);
+        console.error('누락 메시지 동기화 실패:', error);
         if (active) setConnectionStatus('sync-error');
       } finally {
-        refreshing = false;
+        synchronizing = false;
       }
     };
 
@@ -202,7 +260,7 @@ export default function ChatRoomPage() {
         setConnectionStatus('connected');
 
         if (hasConnectedRef.current) {
-          refreshLatestMessages();
+          synchronizeMissedMessages();
         }
         hasConnectedRef.current = true;
       },
@@ -216,7 +274,7 @@ export default function ChatRoomPage() {
 
     const handleWindowFocus = () => {
       if (chatSocketService.client?.connected) {
-        refreshLatestMessages();
+        synchronizeMissedMessages();
       }
     };
     window.addEventListener('focus', handleWindowFocus);
