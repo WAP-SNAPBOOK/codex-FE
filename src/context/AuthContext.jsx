@@ -3,6 +3,28 @@ import { authStorage } from '../utils/auth/authStorage';
 
 const AuthContext = createContext(null);
 
+const getPreviewAuth = () => {
+  if (!import.meta.env.DEV || import.meta.env.VITE_USE_MOCK !== 'true') return null;
+
+  const previewRole = new URLSearchParams(window.location.search).get('previewRole')?.toUpperCase();
+
+  if (!['OWNER', 'CUSTOMER'].includes(previewRole)) return null;
+
+  return previewRole === 'OWNER'
+    ? {
+        userId: 1,
+        name: '원지섭',
+        phoneNumber: '01058790514',
+        userType: 'OWNER',
+      }
+    : {
+        userId: 2,
+        name: '김고객',
+        phoneNumber: '01012345678',
+        userType: 'CUSTOMER',
+      };
+};
+
 export function AuthProvider({ children }) {
   //회원 정보 전역 상태
   const [auth, setAuth] = useState(null);
@@ -10,6 +32,12 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     try {
+      const previewAuth = getPreviewAuth();
+      if (previewAuth) {
+        setAuth(previewAuth);
+        return;
+      }
+
       const stored = authStorage.get();
       if (stored) {
         //토큰을 제외한 사용자 정보만 관리
