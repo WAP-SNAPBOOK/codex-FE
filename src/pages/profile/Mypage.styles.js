@@ -482,16 +482,3 @@ export const AccountIcon = styled(ServiceIcon)`
   background: ${theme.colors.surface.subtle};
   color: ${theme.colors.text.secondary};
 `;
-
-export const WithdrawalButton = styled(ServiceMenuButton)`
-  color: ${theme.colors.status.error.text};
-
-  ${ServiceText} strong {
-    color: ${theme.colors.status.error.text};
-  }
-`;
-
-export const DangerIcon = styled(ServiceIcon)`
-  background: ${theme.colors.status.error.background};
-  color: ${theme.colors.status.error.text};
-`;

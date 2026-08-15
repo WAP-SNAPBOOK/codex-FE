@@ -73,128 +73,81 @@ export const CardTitle = styled.h2`
   font-weight: 800;
 `;
 
-export const InfoList = styled.dl`
-  margin: 18px 0 0;
+export const FieldList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
 `;
 
-export const InfoRow = styled.div`
+export const FieldLabel = styled.label`
   display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: ${theme.colors.text.secondary};
+  font-size: 12px;
+  font-weight: 800;
+`;
+
+export const TextInput = styled.input`
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  border-radius: ${theme.radius.md};
+  outline: 0;
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.primary};
+  font-size: 15px;
+  font-weight: 700;
+
+  &:focus {
+    border-color: ${theme.colors.primary};
+    box-shadow: 0 0 0 3px ${theme.colors.highlight[10]};
+  }
+`;
+
+export const ReadOnlyRow = styled.div`
+  display: flex;
+  min-height: 48px;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 48px;
-  border-bottom: 1px solid ${theme.colors.border.subtle};
-
-  &:last-child {
-    border-bottom: 0;
-  }
+  margin-top: 14px;
+  padding: 0 2px;
+  border-top: 1px solid ${theme.colors.border.subtle};
 
   span {
     color: ${theme.colors.text.tertiary};
+    font-size: 12px;
+  }
+
+  strong {
     font-size: 13px;
   }
-
-  strong {
-    color: ${theme.colors.text.primary};
-    font-size: 14px;
-    text-align: right;
-  }
 `;
 
-export const InfoNote = styled.p`
-  margin: 16px 0 0;
-  padding: 14px;
-  border-radius: ${theme.radius.md};
-  background: ${theme.colors.status.info.background};
-  color: ${theme.colors.status.info.text};
+export const ErrorText = styled.p`
+  margin: 4px 0 0;
+  color: ${theme.colors.status.error.text};
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.5;
 `;
 
-export const StatusList = styled.div`
-  margin-top: 16px;
-`;
-
-export const StatusRow = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 0;
-  border-bottom: 1px solid ${theme.colors.border.subtle};
-
-  &:last-child {
-    border-bottom: 0;
-  }
-
-  > span {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  strong {
-    color: ${theme.colors.text.primary};
-    font-size: 14px;
-  }
-
-  small {
-    color: ${theme.colors.text.tertiary};
-    font-size: 12px;
-    line-height: 1.45;
-  }
-`;
-
-export const EmptyCard = styled(CardSurface)`
-  display: flex;
-  min-height: 300px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 36px 24px;
-  border-color: ${({ $danger }) =>
-    $danger ? theme.colors.status.error.background : theme.colors.border.DEFAULT};
-  text-align: center;
-`;
-
-export const EmptyIcon = styled.span`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: ${theme.colors.surface.subtle};
-  color: ${theme.colors.text.secondary};
-  font-size: 18px;
-  font-weight: 800;
-`;
-
-export const EmptyTitle = styled.h2`
-  margin: 18px 0 0;
-  color: ${theme.colors.text.primary};
-  font-size: 17px;
-  font-weight: 800;
-`;
-
-export const EmptyDescription = styled.p`
-  max-width: 310px;
-  margin: 9px 0 0;
-  color: ${theme.colors.text.tertiary};
-  font-size: 13px;
-  line-height: 1.65;
-`;
-
-export const PrimaryButton = styled.button`
-  min-height: 44px;
-  margin-top: 22px;
-  padding: 0 18px;
+export const SaveButton = styled.button`
+  width: 100%;
+  min-height: 48px;
+  margin-top: 14px;
   border: 0;
   border-radius: ${theme.radius.md};
   background: ${theme.colors.primary};
   color: ${theme.colors.text.inverse};
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: wait;
+  }
 `;
