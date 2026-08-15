@@ -117,7 +117,14 @@ export default function ReservationInfoView({
           <S.CountText>{imageCount}장</S.CountText>
           <S.PhotoGrid>
             {imageUrls.map((url, index) => (
-              <S.Photo key={`${url}-${index}`} src={url} onClick={() => setActiveIndex(index)} />
+              <S.PhotoButton
+                key={`${url}-${index}`}
+                type="button"
+                aria-label={`예약 첨부 이미지 ${index + 1} 크게 보기`}
+                onClick={() => setActiveIndex(index)}
+              >
+                <S.Photo src={url} alt="" />
+              </S.PhotoButton>
             ))}
           </S.PhotoGrid>
           {activeIndex !== null && (

@@ -9,7 +9,7 @@ import StatusBadge from '../../components/common/StatusBadge';
 import { useToast } from '../../components/common/ToastProvider';
 import { useAuth } from '../../context/AuthContext';
 import { useLogout } from '../../query/authQueries';
-import { useShopLink } from '../../query/linkQueries';
+import { useShopLink, useUpdateShopSlug } from '../../query/linkQueries';
 import { useShopInfoById } from '../../query/shopQueries';
 import { getShopProfileLink } from '../../utils/shopProfileLink';
 import * as S from './Mypage.styles';
@@ -46,6 +46,16 @@ function CalendarIcon() {
   );
 }
 
+function OperationsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6" />
+      <circle cx="14" cy="7" r="2" />
+      <circle cx="6" cy="17" r="2" />
+    </svg>
+  );
+}
+
 function ChatIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -60,6 +70,58 @@ function LogoutIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M10 5H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h5" />
       <path d="m15 8 4 4-4 4M19 12H9" />
+    </svg>
+  );
+}
+
+function AccountIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21a8 8 0 0 1 16 0" />
+    </svg>
+  );
+}
+
+function BellIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+      <path d="M10 21h4" />
+    </svg>
+  );
+}
+
+function NoticeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" />
+    </svg>
+  );
+}
+
+function HelpIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.8 9a2.4 2.4 0 1 1 3.1 2.3c-.9.4-.9 1.1-.9 1.7M12 17h.01" />
+    </svg>
+  );
+}
+
+function DocumentIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 3h8l4 4v14H6zM14 3v5h5M9 13h6M9 17h6" />
+    </svg>
+  );
+}
+
+function WithdrawalIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3 2.8 20h18.4L12 3Z" />
+      <path d="M12 9v5M12 17h.01" />
     </svg>
   );
 }
@@ -85,7 +147,11 @@ export default function Mypage() {
   const logout = useLogout();
   const { showToast } = useToast();
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+  const [isSlugEditing, setIsSlugEditing] = useState(false);
+  const [slugDraft, setSlugDraft] = useState('');
+  const [slugError, setSlugError] = useState('');
   const isOwner = auth?.userType === 'OWNER';
+  const updateShopSlug = useUpdateShopSlug();
   const {
     data: shopLink,
     isLoading: isShopLinkLoading,
@@ -105,6 +171,45 @@ export default function Mypage() {
   const confirmLogout = () => {
     setIsLogoutConfirmOpen(false);
     logout();
+  };
+
+  const openSlugEditor = () => {
+    setSlugDraft(shopLink?.slug || '');
+    setSlugError('');
+    setIsSlugEditing(true);
+  };
+
+  const closeSlugEditor = () => {
+    if (updateShopSlug.isPending) return;
+    setIsSlugEditing(false);
+    setSlugError('');
+  };
+
+  const handleSlugChange = (event) => {
+    const nextValue = event.target.value
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '')
+      .slice(0, 20);
+    setSlugDraft(nextValue);
+    setSlugError('');
+  };
+
+  const saveSlug = async (event) => {
+    event.preventDefault();
+    const normalizedSlug = slugDraft.trim();
+
+    if (!/^[a-z0-9-]{3,20}$/.test(normalizedSlug)) {
+      setSlugError('영문 소문자, 숫자, 하이픈으로 3~20자를 입력해주세요.');
+      return;
+    }
+
+    try {
+      await updateShopSlug.mutateAsync(normalizedSlug);
+      setIsSlugEditing(false);
+      showToast('공개 주소가 수정되었습니다.', { tone: 'success' });
+    } catch {
+      setSlugError('이미 사용 중인 주소이거나 저장할 수 없습니다. 다른 주소를 입력해주세요.');
+    }
   };
 
   const handleShareProfileLink = async () => {
@@ -173,6 +278,9 @@ export default function Mypage() {
                 ) : null}
               </S.ProfileInfo>
             </S.ProfileRow>
+            <S.ProfileAction type="button" onClick={() => navigate('/mypage/account')}>
+              계정 정보 보기
+            </S.ProfileAction>
           </S.ProfileCard>
 
           {isOwner ? (
@@ -203,9 +311,44 @@ export default function Mypage() {
                         <S.ShopName>{shopInfo?.shopName || '내 매장'}</S.ShopName>
                         <S.ShopDescription>예약과 상담을 시작하는 공개 페이지</S.ShopDescription>
                       </S.ShopSummary>
-                      <StatusBadge tone="success">공개 중</StatusBadge>
+                      <StatusBadge tone="success">공개 링크 활성</StatusBadge>
                     </S.ShopCardHeader>
                     <S.LinkPreview>{shopProfileLink}</S.LinkPreview>
+                    {isSlugEditing ? (
+                      <S.SlugForm onSubmit={saveSlug}>
+                        <S.SlugField>
+                          <S.SlugPrefix>snapbook.store/s/</S.SlugPrefix>
+                          <S.SlugInput
+                            aria-label="사용자 지정 공개 주소"
+                            value={slugDraft}
+                            placeholder="my-shop"
+                            autoComplete="off"
+                            onChange={handleSlugChange}
+                          />
+                        </S.SlugField>
+                        <S.SlugHelper $error={Boolean(slugError)}>
+                          {slugError || '영문 소문자, 숫자, 하이픈 3~20자'}
+                        </S.SlugHelper>
+                        <S.SlugActions>
+                          <S.CancelSlugButton type="button" onClick={closeSlugEditor}>
+                            취소
+                          </S.CancelSlugButton>
+                          <S.SaveSlugButton type="submit" disabled={updateShopSlug.isPending}>
+                            {updateShopSlug.isPending ? '저장 중...' : '주소 저장'}
+                          </S.SaveSlugButton>
+                        </S.SlugActions>
+                      </S.SlugForm>
+                    ) : (
+                      <S.SlugSummary>
+                        <span>
+                          <small>사용자 지정 주소</small>
+                          <strong>{shopLink?.slug || '아직 설정하지 않음'}</strong>
+                        </span>
+                        <S.EditSlugButton type="button" onClick={openSlugEditor}>
+                          {shopLink?.slug ? '수정' : '설정'}
+                        </S.EditSlugButton>
+                      </S.SlugSummary>
+                    )}
                     <S.ShopActions>
                       <S.PreviewLink href={shopProfileLink} target="_blank" rel="noreferrer">
                         미리보기
@@ -232,13 +375,22 @@ export default function Mypage() {
             </S.SectionHeading>
             <S.ServiceMenu>
               {isOwner ? (
-                <ServiceMenuItem
-                  icon={MenuManageIcon}
-                  label="메뉴·카테고리 관리"
-                  description="예약 메뉴와 옵션을 관리해요"
-                  onClick={() => navigate('/mypage/menus')}
-                  disabled={isShopLinkLoading || isShopLinkError || !shopLink?.shopId}
-                />
+                <>
+                  <ServiceMenuItem
+                    icon={MenuManageIcon}
+                    label="메뉴·카테고리 관리"
+                    description="예약 메뉴와 옵션을 관리해요"
+                    onClick={() => navigate('/mypage/menus')}
+                    disabled={isShopLinkLoading || isShopLinkError || !shopLink?.shopId}
+                  />
+                  <ServiceMenuItem
+                    icon={OperationsIcon}
+                    label="매장 운영 설정"
+                    description="영업시간, 휴무일과 예약 간격을 관리해요"
+                    onClick={() => navigate('/mypage/operations')}
+                    disabled={isShopLinkLoading || isShopLinkError || !shopLink?.shopId}
+                  />
+                </>
               ) : null}
               <ServiceMenuItem
                 icon={CalendarIcon}
@@ -261,8 +413,53 @@ export default function Mypage() {
 
           <S.Section>
             <S.SectionHeading>
-              <S.SectionTitle>계정</S.SectionTitle>
-              <S.SectionDescription>이 기기의 로그인 상태를 관리해요.</S.SectionDescription>
+              <S.SectionTitle>설정 및 지원</S.SectionTitle>
+              <S.SectionDescription>계정과 서비스 이용 정보를 확인해요.</S.SectionDescription>
+            </S.SectionHeading>
+            <S.AccountMenu>
+              <ServiceMenuItem
+                icon={AccountIcon}
+                label="계정 정보"
+                description="로그인 정보와 연결 상태를 확인해요"
+                onClick={() => navigate('/mypage/account')}
+              />
+              <ServiceMenuItem
+                icon={BellIcon}
+                label="알림 설정"
+                description="현재 제공되는 알림 범위를 확인해요"
+                onClick={() => navigate('/mypage/notifications')}
+              />
+              <ServiceMenuItem
+                icon={NoticeIcon}
+                label="공지사항"
+                description="서비스 안내와 업데이트를 확인해요"
+                onClick={() => navigate('/mypage/notices')}
+              />
+              <ServiceMenuItem
+                icon={HelpIcon}
+                label="문의하기"
+                description="문의 방법과 상담 경로를 확인해요"
+                onClick={() => navigate('/mypage/support')}
+              />
+              <ServiceMenuItem
+                icon={DocumentIcon}
+                label="이용약관"
+                description="서비스 이용 정책을 확인해요"
+                onClick={() => navigate('/mypage/terms')}
+              />
+              <ServiceMenuItem
+                icon={DocumentIcon}
+                label="개인정보처리방침"
+                description="개인정보 처리 정책을 확인해요"
+                onClick={() => navigate('/mypage/privacy')}
+              />
+            </S.AccountMenu>
+          </S.Section>
+
+          <S.Section>
+            <S.SectionHeading>
+              <S.SectionTitle>계정 연결</S.SectionTitle>
+              <S.SectionDescription>로그인 상태와 계정 연결을 관리해요.</S.SectionDescription>
             </S.SectionHeading>
             <S.AccountMenu>
               <S.LogoutButton type="button" onClick={() => setIsLogoutConfirmOpen(true)}>
@@ -275,6 +472,16 @@ export default function Mypage() {
                 </S.ServiceText>
                 <S.Chevron aria-hidden="true">›</S.Chevron>
               </S.LogoutButton>
+              <S.WithdrawalButton type="button" onClick={() => navigate('/mypage/withdrawal')}>
+                <S.DangerIcon aria-hidden="true">
+                  <WithdrawalIcon />
+                </S.DangerIcon>
+                <S.ServiceText>
+                  <strong>회원 탈퇴</strong>
+                  <span>계정과 서비스 데이터 처리 안내를 확인해요</span>
+                </S.ServiceText>
+                <S.Chevron aria-hidden="true">›</S.Chevron>
+              </S.WithdrawalButton>
             </S.AccountMenu>
           </S.Section>
         </S.Content>

@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { scheduleService } from '../api/services/scheduleService';
 
 /**
@@ -12,14 +12,43 @@ export const useOperatingTimes = (shopId) => {
   });
 };
 
+export const useScheduleSettings = (shopId) => {
+  return useQuery({
+    queryKey: ['schedule-settings', shopId],
+    queryFn: () => scheduleService.getScheduleSettings(shopId),
+    enabled: !!shopId,
+  });
+};
+
+export const useHolidays = (shopId) => {
+  return useQuery({
+    queryKey: ['schedule-holidays', shopId],
+    queryFn: () => scheduleService.getHolidays(shopId),
+    enabled: !!shopId,
+  });
+};
+
+export const useStaffOperatingTimes = (shopId, staffId) => {
+  return useQuery({
+    queryKey: ['staff-operating-times', shopId, staffId],
+    queryFn: () => scheduleService.getStaffOperatingTimes(shopId, staffId),
+    enabled: !!shopId && !!staffId,
+  });
+};
+
 /**
  * 운영시간 설정 훅
  * scheduleType: 'DAILY' | 'WEEKDAY_WEEKEND' | 'BY_DAY'
  */
 export const useUpdateOperatingTimes = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ shopId, ...payload }) =>
-      scheduleService.updateOperatingTimes(shopId, payload),
+    mutationFn: ({ shopId, ...payload }) => scheduleService.updateOperatingTimes(shopId, payload),
+    onSuccess: (_, { shopId }) => {
+      queryClient.invalidateQueries({ queryKey: ['operating-times', shopId] });
+      queryClient.invalidateQueries({ queryKey: ['schedule-settings', shopId] });
+    },
   });
 };
 
@@ -27,18 +56,14 @@ export const useUpdateOperatingTimes = () => {
  * 예약 슬롯 간격 설정 훅
  */
 export const useUpdateSlotInterval = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ shopId, intervalMinutes }) =>
       scheduleService.updateSlotInterval(shopId, intervalMinutes),
-  });
-};
-
-/**
- * 공휴일 휴무 토글 훅
- */
-export const useUpdateScheduleSettings = () => {
-  return useMutation({
-    mutationFn: ({ shopId, ...payload }) => scheduleService.updateScheduleSettings(shopId, payload),
+    onSuccess: (_, { shopId }) => {
+      queryClient.invalidateQueries({ queryKey: ['schedule-settings', shopId] });
+    },
   });
 };
 
@@ -47,8 +72,38 @@ export const useUpdateScheduleSettings = () => {
  * holidayType: 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY' | 'CUSTOM'
  */
 export const useCreateHoliday = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ shopId, ...payload }) => scheduleService.createHoliday(shopId, payload),
+    onSuccess: (_, { shopId }) => {
+      queryClient.invalidateQueries({ queryKey: ['schedule-holidays', shopId] });
+    },
+  });
+};
+
+export const useDeleteHoliday = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ shopId, holidayId }) => scheduleService.deleteHoliday(shopId, holidayId),
+    onSuccess: (_, { shopId }) => {
+      queryClient.invalidateQueries({ queryKey: ['schedule-holidays', shopId] });
+    },
+  });
+};
+
+export const useUpdateStaffOperatingTimes = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ shopId, staffId, overrides }) =>
+      scheduleService.updateStaffOperatingTimes(shopId, staffId, overrides),
+    onSuccess: (_, { shopId, staffId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['staff-operating-times', shopId, staffId],
+      });
+    },
   });
 };
 

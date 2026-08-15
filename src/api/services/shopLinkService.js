@@ -16,6 +16,15 @@ export const shopLinkService = {
   },
 
   /**
+   * 점주 공개 링크의 사용자 지정 주소 수정
+   * @param {string} slug 영문 소문자, 숫자, 하이픈으로 구성된 3~20자 주소
+   */
+  updateShopSlug: async (slug) => {
+    const res = await axiosClient.put('/shop/link/slug', { slug });
+    return res.data;
+  },
+
+  /**
    * 공개 링크로 채팅방 조회 or 생성
    * @param {string} slugOrCode - 매장 식별 코드
    */

@@ -320,7 +320,7 @@ export const ModalOverlay = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 18px;
+  padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
   background: rgba(0, 0, 0, 0.38);
 `;
 

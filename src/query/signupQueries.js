@@ -6,7 +6,6 @@ import { useAuth } from '../context/AuthContext';
 import {
   useUpdateOperatingTimes,
   useUpdateSlotInterval,
-  useUpdateScheduleSettings,
   useCreateHoliday,
 } from './scheduleQueries';
 import { useCreateShopTag } from './shopManage/tagQueries';
@@ -49,7 +48,6 @@ export const useOwnerSignupFlow = () => {
   const signup = useSignupOwner();
   const updateSlotInterval = useUpdateSlotInterval();
   const updateOperatingTimes = useUpdateOperatingTimes();
-  const updateScheduleSettings = useUpdateScheduleSettings();
   const createHoliday = useCreateHoliday();
   const createShopTag = useCreateShopTag();
   const createShopMenu = useCreateShopMenu();
@@ -59,7 +57,7 @@ export const useOwnerSignupFlow = () => {
 
   const submit = async (step1Data, schedulePayload, holidayPayload, menuItems = []) => {
     const { slotInterval, ...timesPayload } = schedulePayload;
-    const { publicHolidayOff, holidays } = holidayPayload;
+    const { holidays } = holidayPayload;
 
     // 1~5단계: 실패 시 계정 롤백
     let shopId;
@@ -69,14 +67,8 @@ export const useOwnerSignupFlow = () => {
 
       await updateSlotInterval.mutateAsync({ shopId, intervalMinutes: Number(slotInterval) }); // 2) 슬롯 간격 설정
       await updateOperatingTimes.mutateAsync({ shopId, ...timesPayload }); // 3) 운영시간 설정
-      //TODO: 추후 백앤드 쪽 api 오류 수정시 주석 제거
-      // await updateScheduleSettings.mutateAsync({
-      //   shopId,
-      //   intervalMinutes: Number(slotInterval),
-      //   publicHolidayOff,
-      // }); // 4) 공휴일 휴무 설정
       for (const holiday of holidays) {
-        await createHoliday.mutateAsync({ shopId, ...holiday }); // 5) 정기 휴무일 생성
+        await createHoliday.mutateAsync({ shopId, ...holiday }); // 4) 정기 휴무일 생성
       }
     } catch (error) {
       notify('회원가입에 실패했습니다. 다시 시도해주세요.');
@@ -125,7 +117,6 @@ export const useOwnerSignupFlow = () => {
       signup.isPending ||
       updateSlotInterval.isPending ||
       updateOperatingTimes.isPending ||
-      updateScheduleSettings.isPending ||
       createHoliday.isPending ||
       createShopTag.isPending ||
       createShopMenu.isPending ||
@@ -136,14 +127,9 @@ export const useOwnerSignupFlow = () => {
       signup.isError ||
       updateSlotInterval.isError ||
       updateOperatingTimes.isError ||
-      updateScheduleSettings.isError ||
       createHoliday.isError,
     error:
-      signup.error ||
-      updateSlotInterval.error ||
-      updateOperatingTimes.error ||
-      updateScheduleSettings.error ||
-      createHoliday.error,
+      signup.error || updateSlotInterval.error || updateOperatingTimes.error || createHoliday.error,
   };
 };
 
