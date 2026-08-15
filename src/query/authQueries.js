@@ -80,8 +80,6 @@ export function useUpdateUserProfile() {
       updateProfile({
         name: data.name,
         phoneNumber: data.phoneNumber,
-        userType: data.userType,
-        userId: data.userId,
       });
     },
   });

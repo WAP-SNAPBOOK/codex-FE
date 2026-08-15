@@ -73,6 +73,36 @@ export const CardTitle = styled.h2`
   font-weight: 800;
 `;
 
+export const InfoList = styled.dl`
+  margin: 16px 0 0;
+`;
+
+export const InfoRow = styled.div`
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid ${theme.colors.border.subtle};
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  span {
+    color: ${theme.colors.text.tertiary};
+    font-size: 12px;
+  }
+
+  strong {
+    color: ${theme.colors.text.primary};
+    font-size: 14px;
+    text-align: right;
+  }
+`;
+
+export const EditForm = styled.form``;
+
 export const FieldList = styled.div`
   display: flex;
   flex-direction: column;
@@ -134,14 +164,16 @@ export const ErrorText = styled.p`
   line-height: 1.5;
 `;
 
-export const SaveButton = styled.button`
-  width: 100%;
-  min-height: 48px;
+export const ActionRow = styled.div`
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 10px;
   margin-top: 14px;
-  border: 0;
+`;
+
+const ActionButton = styled.button`
+  min-height: 48px;
   border-radius: ${theme.radius.md};
-  background: ${theme.colors.primary};
-  color: ${theme.colors.text.inverse};
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
@@ -150,4 +182,25 @@ export const SaveButton = styled.button`
     opacity: 0.55;
     cursor: wait;
   }
+`;
+
+export const EditButton = styled(ActionButton)`
+  width: 100%;
+  margin-top: 16px;
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.primary};
+`;
+
+export const CancelButton = styled(ActionButton)`
+  border: 1px solid ${theme.colors.border.DEFAULT};
+  background: ${theme.colors.surface.DEFAULT};
+  color: ${theme.colors.text.secondary};
+`;
+
+export const SaveButton = styled(ActionButton)`
+  min-height: 48px;
+  border: 0;
+  background: ${theme.colors.primary};
+  color: ${theme.colors.text.inverse};
 `;
