@@ -28,7 +28,31 @@ export const Overlay = styled.div`
 `;
 
 export const ImageWrapper = styled.div`
+  position: relative;
   animation: ${zoomIn} 0.35s ease-out;
+`;
+
+export const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.68);
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
 `;
 
 export const Image = styled.img`

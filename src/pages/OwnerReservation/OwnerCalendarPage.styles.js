@@ -375,7 +375,7 @@ export const Sheet = styled.section`
   width: min(100%, 430px);
   max-height: 86vh;
   overflow-y: auto;
-  padding: 22px 18px 26px;
+  padding: 22px 18px calc(26px + env(safe-area-inset-bottom));
   border-radius: 18px 18px 0 0;
   background: #fff;
 `;

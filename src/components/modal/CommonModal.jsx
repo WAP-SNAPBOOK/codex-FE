@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   ModalBackdrop,
   ModalCard,
@@ -17,9 +17,27 @@ import {
  * @param {function} onClose - 바깥 클릭 시 닫기
  */
 export default function CommonModal({ headerTop, title, text, buttons = [], onClose }) {
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') onClose?.();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    modalRef.current?.focus();
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
-    <ModalBackdrop onClick={onClose}>
-      <ModalCard onClick={(e) => e.stopPropagation()}>
+    <ModalBackdrop role="presentation" onClick={onClose}>
+      <ModalCard
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title || '안내'}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* --- 상단 슬롯 (탭 등) --- */}
         {headerTop && <div style={{ marginBottom: '10px' }}>{headerTop}</div>}
 
@@ -32,13 +50,17 @@ export default function CommonModal({ headerTop, title, text, buttons = [], onCl
         {buttons.length > 1 ? (
           <ChoiceButtons>
             {buttons.map((btn, idx) => (
-              <ModalButton key={idx} onClick={btn.onClick}>
+              <ModalButton key={idx} type="button" onClick={btn.onClick}>
                 {btn.label}
               </ModalButton>
             ))}
           </ChoiceButtons>
         ) : (
-          buttons[0] && <ModalButton onClick={buttons[0].onClick}>{buttons[0].label}</ModalButton>
+          buttons[0] && (
+            <ModalButton type="button" onClick={buttons[0].onClick}>
+              {buttons[0].label}
+            </ModalButton>
+          )
         )}
       </ModalCard>
     </ModalBackdrop>

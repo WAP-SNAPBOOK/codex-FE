@@ -115,6 +115,41 @@ export const PrimaryButton = styled.button`
     cursor: wait;
   }
 `;
+export const PolicyList = styled.dl`
+  margin: 0;
+`;
+export const PolicyRow = styled.div`
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid ${theme.colors.border.subtle};
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  span {
+    color: ${theme.colors.text.tertiary};
+    font-size: 12px;
+  }
+
+  strong {
+    color: ${theme.colors.text.primary};
+    font-size: 13px;
+    text-align: right;
+  }
+`;
+export const PolicyNote = styled.p`
+  margin: 14px 0 0;
+  padding: 12px;
+  border-radius: ${theme.radius.md};
+  background: ${theme.colors.status.info.background};
+  color: ${theme.colors.status.info.text};
+  font-size: 11px;
+  line-height: 1.6;
+`;
 export const SecondarySaveButton = styled.button`
   width: 100%;
   min-height: 44px;
@@ -367,7 +402,7 @@ export const TimePair = styled.div`
     padding: 0 4px;
     border: 1px solid ${theme.colors.border.DEFAULT};
     border-radius: ${theme.radius.sm};
-    font-size: 10px;
+    font-size: 11px;
   }
   span {
     color: ${theme.colors.text.tertiary};

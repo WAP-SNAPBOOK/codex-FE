@@ -43,6 +43,14 @@ const DEFAULT_HOLIDAY = {
 
 const normalizeTime = (value, fallback) => String(value || fallback).slice(0, 5);
 
+const formatLeadTime = (minutes) => {
+  if (!Number.isFinite(Number(minutes))) return '확인할 수 없음';
+  if (Number(minutes) < 60) return `${minutes}분 전까지`;
+  const hours = Math.floor(Number(minutes) / 60);
+  const remainder = Number(minutes) % 60;
+  return remainder ? `${hours}시간 ${remainder}분 전까지` : `${hours}시간 전까지`;
+};
+
 const holidayLabel = (holiday) => {
   if (holiday.holidayType === 'WEEKLY') {
     return `매주 ${DAY_LABELS[holiday.dayOfWeek]}요일`;
@@ -468,6 +476,40 @@ export default function OwnerOperationsPage() {
 
               <S.Section>
                 <S.SectionHeading>
+                  <h2>예약 접수 정책</h2>
+                  <p>고객 예약 가능 시간에 현재 적용되는 기준이에요.</p>
+                </S.SectionHeading>
+                <S.Card>
+                  <S.PolicyList>
+                    <S.PolicyRow>
+                      <span>예약 가능 기간</span>
+                      <strong>오늘부터 {settingsQuery.data?.bookingWindowDays}일 이내</strong>
+                    </S.PolicyRow>
+                    <S.PolicyRow>
+                      <span>최소 예약 준비 시간</span>
+                      <strong>{formatLeadTime(settingsQuery.data?.minBookingLeadMinutes)}</strong>
+                    </S.PolicyRow>
+                    <S.PolicyRow>
+                      <span>공휴일 자동 휴무</span>
+                      <strong>
+                        {settingsQuery.data?.publicHolidayOff ? '적용 중' : '적용 안 함'}
+                      </strong>
+                    </S.PolicyRow>
+                    <S.PolicyRow>
+                      <span>예약 확정 방식</span>
+                      <strong>사장님 확인 후 확정</strong>
+                    </S.PolicyRow>
+                  </S.PolicyList>
+                  <S.PolicyNote>
+                    예약 가능 기간·준비 시간·공휴일 정책의 수정 API는 아직 제공되지 않아 현재
+                    적용값만 표시합니다. 예약 취소와 거절은 각 예약 상세에서 사유를 확인한 뒤 처리할
+                    수 있습니다.
+                  </S.PolicyNote>
+                </S.Card>
+              </S.Section>
+
+              <S.Section>
+                <S.SectionHeading>
                   <h2>휴무일</h2>
                   <p>반복 휴무와 특정 날짜 휴무를 함께 관리해요.</p>
                 </S.SectionHeading>
@@ -586,9 +628,6 @@ export default function OwnerOperationsPage() {
                       <S.EmptyText>등록된 휴무일이 없습니다.</S.EmptyText>
                     )}
                   </S.HolidayList>
-                  {settingsQuery.data?.publicHolidayOff ? (
-                    <S.InfoNote>공휴일 자동 휴무가 적용 중입니다.</S.InfoNote>
-                  ) : null}
                 </S.Card>
               </S.Section>
 

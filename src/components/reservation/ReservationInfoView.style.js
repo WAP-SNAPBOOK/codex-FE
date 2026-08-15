@@ -45,12 +45,27 @@ export const PhotoGrid = styled.div`
   margin: 10px 0;
 `;
 
-export const Photo = styled.img`
+export const PhotoButton = styled.button`
   width: 56px;
   height: 56px;
-  border-radius: 10px;
-  object-fit: cover;
+  padding: 0;
+  overflow: hidden;
   border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #f08080;
+    outline-offset: 2px;
+  }
+`;
+
+export const Photo = styled.img`
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 export const RequestBox = styled.div`
