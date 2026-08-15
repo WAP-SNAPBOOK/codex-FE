@@ -37,13 +37,8 @@ export const scheduleService = {
     return res.data;
   },
 
-  /**
-   * 공휴일 휴무 토글
-   * @param {number} shopId - 매장 ID (path param)
-   * @param {{ intervalMinutes: number, publicHolidayOff: boolean }} payload
-   */
-  updateScheduleSettings: async (shopId, payload) => {
-    const res = await axiosClient.put(`/api/v1/shops/${shopId}/schedule/settings`, payload);
+  getScheduleSettings: async (shopId) => {
+    const res = await axiosClient.get(`/api/v1/shops/${shopId}/schedule/settings`);
     return res.data;
   },
 
@@ -65,6 +60,15 @@ export const scheduleService = {
     return res.data;
   },
 
+  getHolidays: async (shopId) => {
+    const res = await axiosClient.get(`/api/v1/shops/${shopId}/schedule/holidays`);
+    return res.data;
+  },
+
+  deleteHoliday: async (shopId, holidayId) => {
+    await axiosClient.delete(`/api/v1/shops/${shopId}/schedule/holidays/${holidayId}`);
+  },
+
   /**
    * 운영시간 조회
    * @param {number} shopId - 매장 ID (path param)
@@ -75,6 +79,17 @@ export const scheduleService = {
   getOperatingTimes: async (shopId) => {
     const res = await axiosClient.get(`/api/v1/shops/${shopId}/schedule/operating-times`);
     return res.data;
+  },
+
+  getStaffOperatingTimes: async (shopId, staffId) => {
+    const res = await axiosClient.get(`/api/v1/shops/${shopId}/staff/${staffId}/operating-times`);
+    return res.data;
+  },
+
+  updateStaffOperatingTimes: async (shopId, staffId, overrides) => {
+    await axiosClient.put(`/api/v1/shops/${shopId}/staff/${staffId}/operating-times`, {
+      overrides,
+    });
   },
 
   /**

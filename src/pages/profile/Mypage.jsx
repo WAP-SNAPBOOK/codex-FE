@@ -46,6 +46,16 @@ function CalendarIcon() {
   );
 }
 
+function OperationsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6" />
+      <circle cx="14" cy="7" r="2" />
+      <circle cx="6" cy="17" r="2" />
+    </svg>
+  );
+}
+
 function ChatIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -365,13 +375,22 @@ export default function Mypage() {
             </S.SectionHeading>
             <S.ServiceMenu>
               {isOwner ? (
-                <ServiceMenuItem
-                  icon={MenuManageIcon}
-                  label="메뉴·카테고리 관리"
-                  description="예약 메뉴와 옵션을 관리해요"
-                  onClick={() => navigate('/mypage/menus')}
-                  disabled={isShopLinkLoading || isShopLinkError || !shopLink?.shopId}
-                />
+                <>
+                  <ServiceMenuItem
+                    icon={MenuManageIcon}
+                    label="메뉴·카테고리 관리"
+                    description="예약 메뉴와 옵션을 관리해요"
+                    onClick={() => navigate('/mypage/menus')}
+                    disabled={isShopLinkLoading || isShopLinkError || !shopLink?.shopId}
+                  />
+                  <ServiceMenuItem
+                    icon={OperationsIcon}
+                    label="매장 운영 설정"
+                    description="영업시간, 휴무일과 예약 간격을 관리해요"
+                    onClick={() => navigate('/mypage/operations')}
+                    disabled={isShopLinkLoading || isShopLinkError || !shopLink?.shopId}
+                  />
+                </>
               ) : null}
               <ServiceMenuItem
                 icon={CalendarIcon}

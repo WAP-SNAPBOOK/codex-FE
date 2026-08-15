@@ -16,6 +16,7 @@ import ChatListPage from './pages/chat/ChatListPage';
 import ChatRoomPage from './pages/chat/ChatRoomPage';
 import Mypage from './pages/profile/Mypage';
 import MypageDetailPage from './pages/profile/MypageDetailPage';
+import OwnerOperationsPage from './pages/profile/OwnerOperationsPage';
 import OwnerMenuManagePage from './pages/OwnerMenuManage/OwnerMenuManagePage';
 import OwnerCalendarPage from './pages/OwnerReservation/OwnerCalendarPage';
 import OwnerReservationDetailPage from './pages/OwnerReservation/OwnerReservationDetailPage';
@@ -132,6 +133,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <OwnerMenuManagePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mypage/operations"
+        element={
+          <ProtectedRoute>
+            <OwnerOperationsPage />
           </ProtectedRoute>
         }
       />
